@@ -1,0 +1,174 @@
+[
+ {
+  "type": "STOP",
+  "tokens": [
+   [
+    0.0,
+    4.0
+   ],
+   [
+    5.0,
+    3.0
+   ],
+   [
+    9.0,
+    5.0
+   ],
+   [
+    15.0,
+    5.0
+   ]
+  ],
+  "name": "Usti nad Labem hl.n.",
+  "id": "de-DELFI_000005400019",
+  "lat": 50.65956,
+  "lon": 14.044727999999997,
+  "country": "CZ",
+  "tz": "Europe/Prague",
+  "areas": [
+   {
+    "name": "Česko",
+    "adminLevel": 2.0,
+    "matched": false,
+    "unique": false,
+    "default": false
+   },
+   {
+    "name": "Ústecký kraj",
+    "adminLevel": 4.0,
+    "matched": false,
+    "unique": false,
+    "default": false
+   },
+   {
+    "name": "okres Ústí nad Labem",
+    "adminLevel": 5.0,
+    "matched": false,
+    "unique": false,
+    "default": false
+   },
+   {
+    "name": "SO ORP Ústí nad Labem",
+    "adminLevel": 6.0,
+    "matched": false,
+    "unique": false,
+    "default": false
+   },
+   {
+    "name": "SO POÚ Ústí nad Labem",
+    "adminLevel": 7.0,
+    "matched": false,
+    "unique": false,
+    "default": false
+   },
+   {
+    "name": "Ústí nad Labem",
+    "adminLevel": 8.0,
+    "matched": false,
+    "unique": true,
+    "default": true
+   },
+   {
+    "name": "Ústí nad Labem-město",
+    "adminLevel": 9.0,
+    "matched": false,
+    "unique": false,
+    "default": false
+   }
+  ],
+  "score": -31.276287078857422,
+  "modes": [
+   "HIGHSPEED_RAIL",
+   "LONG_DISTANCE",
+   "NIGHT_RAIL",
+   "REGIONAL_RAIL",
+   "BUS"
+  ],
+  "importance": 0.00031819133437238634
+ },
+ {
+  "type": "STOP",
+  "tokens": [
+   [
+    0.0,
+    4.0
+   ],
+   [
+    5.0,
+    3.0
+   ],
+   [
+    9.0,
+    5.0
+   ],
+   [
+    15.0,
+    5.0
+   ]
+  ],
+  "name": "Usti Nad Labem hl. n.",
+  "id": "hu-mav_1:005453179",
+  "lat": 50.66028,
+  "lon": 14.046944,
+  "country": "CZ",
+  "tz": "Europe/Prague",
+  "areas": [
+   {
+    "name": "Česko",
+    "adminLevel": 2.0,
+    "matched": false,
+    "unique": false,
+    "default": false
+   },
+   {
+    "name": "Ústecký kraj",
+    "adminLevel": 4.0,
+    "matched": false,
+    "unique": false,
+    "default": false
+   },
+   {
+    "name": "okres Ústí nad Labem",
+    "adminLevel": 5.0,
+    "matched": false,
+    "unique": false,
+    "default": false
+   },
+   {
+    "name": "SO ORP Ústí nad Labem",
+    "adminLevel": 6.0,
+    "matched": false,
+    "unique": false,
+    "default": false
+   },
+   {
+    "name": "SO POÚ Ústí nad Labem",
+    "adminLevel": 7.0,
+    "matched": false,
+    "unique": false,
+    "default": false
+   },
+   {
+    "name": "Ústí nad Labem",
+    "adminLevel": 8.0,
+    "matched": false,
+    "unique": true,
+    "default": true
+   },
+   {
+    "name": "Ústí nad Labem-město",
+    "adminLevel": 9.0,
+    "matched": false,
+    "unique": false,
+    "default": false
+   }
+  ],
+  "score": -30.850000381469727,
+  "modes": [
+   "LONG_DISTANCE",
+   "NIGHT_RAIL",
+   "REGIONAL_RAIL"
+  ],
+  "importance": 0.00013826650683768094
+ }
+]

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="nav_journeys">Spojení</string>
+    <string name="nav_departures">Odjezdy</string>
+    <string name="nav_map">Mapa</string>
+    <string name="nav_settings">Nastavení</string>
+</resources>

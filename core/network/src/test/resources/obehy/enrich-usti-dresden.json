@@ -1,0 +1,39 @@
+{
+  "release_id": "20261102T024122Z-0bd3205e32b9",
+  "generated_at": "2026-11-03T07:58:01.123456+01:00",
+  "legs": [
+    {
+      "motis_trip_id": "20261103_06:47_cz-CZPTT_czptt:trip:Pa%3A0054%3AKT----11435A%3A00%3A2026:1",
+      "outcome": "resolved",
+      "detail": null,
+      "trip": {"trip_id": "czptt:trip:Pa%3A0054%3AKT----11435A%3A00%3A2026:1", "service_date": "2026-11-03"},
+      "journey": {"namespace": "czptt:train_number", "key": "696"},
+      "line": {"route_id": "czptt:route:line:20:1154:103", "short_name": "R20", "long_name": null, "mode": "rail", "color": null, "text_color": null},
+      "agency": "České dráhy, a.s.",
+      "trip_short_name": "R 696",
+      "headsign": "Děčín hlavní nádraží",
+      "realtime": {"lifecycle": "running", "delay_s": 120, "off_route": false, "stale": false, "updated_at": "2026-11-03T07:57:50+01:00", "sources": []},
+      "vehicles": [
+        {"vehicle_id": "cd:91547162014", "state": "running", "last_seen": "2026-11-03T07:57:40+01:00", "position_at": null, "latitude": 50.62, "longitude": 14.08, "bearing": 330.0,
+         "traits": {"low_floor": true, "air_conditioning": true, "wheelchair_accessible": null, "manufacturer": "Škoda", "model": "Elefant", "operator": "ČD", "licence_plate": null, "fleet_number": "471 016"},
+         "sources": ["sz-mapa"], "physical": true, "followed_as": null}
+      ],
+      "composition": true,
+      "calls": [
+        {"sequence": 30, "location_id": "czptt:stop:CZ:53179", "name": "Ústí nad Labem hlavní nádraží", "latitude": 50.6596, "longitude": 14.0447, "boarding": "regular", "alighting": "regular", "flags": [], "platform": "2",
+         "scheduled_arrival": "2026-11-03T08:13:00+01:00", "scheduled_departure": "2026-11-03T08:14:00+01:00", "estimated_arrival": "2026-11-03T08:15:00+01:00", "estimated_departure": "2026-11-03T08:16:00+01:00", "status": "predicted", "source_class": "gps"},
+        {"sequence": 33, "location_id": "czptt:stop:CZ:55659", "name": "Děčín hlavní nádraží", "latitude": 50.7731, "longitude": 14.1966, "boarding": "none", "alighting": "regular", "flags": [], "platform": "4",
+         "scheduled_arrival": "2026-11-03T08:32:00+01:00", "scheduled_departure": null, "estimated_arrival": "2026-11-03T08:34:00+01:00", "estimated_departure": null, "status": "predicted", "source_class": "gps"}
+      ],
+      "leg_calls": true,
+      "alerts": []
+    },
+    {
+      "motis_trip_id": "20261103_09:14_de-DELFI_3461130415",
+      "outcome": "unknown_dataset",
+      "detail": "Oběhy has no data of this dataset",
+      "trip": null, "journey": null, "line": null, "agency": null, "trip_short_name": null, "headsign": null, "realtime": null,
+      "vehicles": [], "composition": false, "calls": [], "leg_calls": false, "alerts": []
+    }
+  ]
+}

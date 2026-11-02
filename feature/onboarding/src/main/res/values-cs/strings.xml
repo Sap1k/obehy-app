@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onboarding_title">Vítejte v Obězích</string>
+    <string name="onboarding_intro">Vyhledávejte spojení po celé Evropě, se vším, co Oběhy vědí o českých vlacích a autobusech.</string>
+    <string name="onboarding_changeable">Obojí můžete později změnit v Nastavení.</string>
+    <string name="onboarding_continue">Pokračovat</string>
+
+    <string name="mode_title">Kolik toho chcete vidět?</string>
+    <string name="mode_enhanced">Vše (Oběhy)</string>
+    <string name="mode_enhanced_description">Spojení a odjezdy, k tomu živá mapa vozidel, vozidla, řazení vlaků a další podrobnosti. Nejlepší pro cestování po Česku.</string>
+    <string name="mode_transitous">Vyhledávač spojení</string>
+    <string name="mode_transitous_description">Jednodušší mezinárodní vyhledávač s odjezdy. České spoje i tak ukazují zpoždění a vozidla.</string>
+
+    <string name="provider_title">Vyhledávání spojení</string>
+    <string name="provider_transitous">Transitous</string>
+    <string name="provider_transitous_description">Komunitní služba pokrývající většinu Evropy. Obsahuje všechna česká data Oběhů.</string>
+    <string name="provider_obehy">Oběhy</string>
+    <string name="provider_obehy_description">Vlastní server Oběhů: jen Česko, s nejčerstvějšími českými jízdními řády.</string>
+
+    <string name="settings_title">Nastavení</string>
+</resources>

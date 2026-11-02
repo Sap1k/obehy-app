@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">Oběhy</string>
+    <string name="nav_journeys">Journeys</string>
+    <string name="nav_departures">Departures</string>
+    <string name="nav_map">Map</string>
+    <string name="nav_settings">Settings</string>
+</resources>
