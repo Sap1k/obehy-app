@@ -13,7 +13,9 @@ enum class AppMode {
 }
 
 /** The MOTIS instance journeys are planned with. */
-enum class RoutingProvider(val baseUrl: String) {
+enum class RoutingProvider(
+    val baseUrl: String,
+) {
     /** The community instance with international coverage, Oběhy's Czech feeds included. */
     Transitous("https://api.transitous.org/"),
 

@@ -16,36 +16,40 @@ import javax.inject.Singleton
 
 /** The user's mode and routing provider (by enum name) and whether onboarding is done, in DataStore. */
 @Singleton
-class SettingsRepository @Inject constructor(
-    private val store: DataStore<Preferences>,
-) {
-    val settings: Flow<AppSettings> = store.data.map { prefs ->
-        AppSettings(
-            mode = prefs[MODE]?.let { name -> AppMode.entries.firstOrNull { it.name == name } },
-            routingProvider = prefs[PROVIDER]?.let { name ->
-                RoutingProvider.entries.firstOrNull { it.name == name }
-            },
-            onboardingFinished = prefs[ONBOARDED] ?: false,
-        )
-    }
+class SettingsRepository
+    @Inject
+    constructor(
+        private val store: DataStore<Preferences>,
+    ) {
+        val settings: Flow<AppSettings> =
+            store.data.map { prefs ->
+                AppSettings(
+                    mode = prefs[MODE]?.let { name -> AppMode.entries.firstOrNull { it.name == name } },
+                    routingProvider =
+                        prefs[PROVIDER]?.let { name ->
+                            RoutingProvider.entries.firstOrNull { it.name == name }
+                        },
+                    onboardingFinished = prefs[ONBOARDED] ?: false,
+                )
+            }
 
-    suspend fun current(): AppSettings = settings.first()
+        suspend fun current(): AppSettings = settings.first()
 
-    suspend fun setMode(mode: AppMode) {
-        store.edit { it[MODE] = mode.name }
-    }
+        suspend fun setMode(mode: AppMode) {
+            store.edit { it[MODE] = mode.name }
+        }
 
-    suspend fun setRoutingProvider(provider: RoutingProvider) {
-        store.edit { it[PROVIDER] = provider.name }
-    }
+        suspend fun setRoutingProvider(provider: RoutingProvider) {
+            store.edit { it[PROVIDER] = provider.name }
+        }
 
-    suspend fun finishOnboarding() {
-        store.edit { it[ONBOARDED] = true }
-    }
+        suspend fun finishOnboarding() {
+            store.edit { it[ONBOARDED] = true }
+        }
 
-    private companion object {
-        val MODE = stringPreferencesKey("mode")
-        val PROVIDER = stringPreferencesKey("routing_provider")
-        val ONBOARDED = booleanPreferencesKey("onboarding_finished")
+        private companion object {
+            val MODE = stringPreferencesKey("mode")
+            val PROVIDER = stringPreferencesKey("routing_provider")
+            val ONBOARDED = booleanPreferencesKey("onboarding_finished")
+        }
     }
-}

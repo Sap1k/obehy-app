@@ -40,7 +40,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
@@ -63,11 +62,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cz.obehy.core.model.AppSettings
 import cz.obehy.core.ui.ObehyLogo
+import cz.obehy.core.ui.ObehyTheme
+import cz.obehy.core.ui.components.ChoiceList
 import cz.obehy.core.ui.R as UiR
 
 private enum class Step { Welcome, Mode, Provider }
@@ -76,14 +76,17 @@ private enum class Step { Welcome, Mode, Provider }
  * First start: a welcome, then the mode, then the routing provider. Each choice is saved as soon
  * as it is picked; the last button finishes onboarding and the app switches to its main screens.
  */
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun OnboardingScreen(viewModel: SetupViewModel = hiltViewModel()) {
+fun OnboardingScreen(
+    modifier: Modifier = Modifier,
+    viewModel: SetupViewModel = hiltViewModel(),
+) {
     val settings by viewModel.state.collectAsStateWithLifecycle()
     var step by rememberSaveable { mutableStateOf(Step.Welcome) }
     BackHandler(enabled = step != Step.Welcome) { step = Step.entries[step.ordinal - 1] }
 
     Scaffold(
+        modifier = modifier,
         containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
             BottomActions(
@@ -108,32 +111,40 @@ fun OnboardingScreen(viewModel: SetupViewModel = hiltViewModel()) {
             label = "onboarding step",
         ) { current ->
             when (current) {
-                Step.Welcome -> WelcomeStep()
-                Step.Mode -> ChoiceStep(
-                    number = 1,
-                    title = R.string.mode_title,
-                    subtitle = R.string.mode_subtitle,
-                ) { ChoiceList(modeChoices, settings.mode, viewModel::choose) }
-                Step.Provider -> ChoiceStep(
-                    number = 2,
-                    title = R.string.provider_title,
-                    subtitle = R.string.provider_subtitle,
-                ) { ChoiceList(providerChoices, settings.routingProvider, viewModel::choose) }
+                Step.Welcome -> {
+                    WelcomeStep()
+                }
+
+                Step.Mode -> {
+                    ChoiceStep(number = 1, title = R.string.mode_title, subtitle = R.string.mode_subtitle) {
+                        ChoiceList(modeChoices.toItems(), settings.mode, viewModel::choose)
+                    }
+                }
+
+                Step.Provider -> {
+                    ChoiceStep(
+                        number = 2,
+                        title = R.string.provider_title,
+                        subtitle = R.string.provider_subtitle,
+                    ) {
+                        ChoiceList(providerChoices.toItems(), settings.routingProvider, viewModel::choose)
+                    }
+                }
             }
         }
     }
 }
 
-private fun Step.isAnswered(settings: AppSettings) = when (this) {
-    Step.Welcome -> true
-    Step.Mode -> settings.mode != null
-    Step.Provider -> settings.routingProvider != null
-}
+private fun Step.isAnswered(settings: AppSettings) =
+    when (this) {
+        Step.Welcome -> true
+        Step.Mode -> settings.mode != null
+        Step.Provider -> settings.routingProvider != null
+    }
 
 /** The brand moment: the route loop on a slowly turning Lime cookie, the wordmark and the promise. */
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun WelcomeStep() {
+private fun WelcomeStep(modifier: Modifier = Modifier) {
     val turning = rememberInfiniteTransition(label = "welcome")
     val turn by turning.animateFloat(
         initialValue = 0f,
@@ -142,11 +153,14 @@ private fun WelcomeStep() {
         label = "cookie turn",
     )
     Column(
-        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 24.dp),
+        modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = ObehyTheme.spacing.xl),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        Box(Modifier.padding(vertical = 32.dp).size(220.dp), contentAlignment = Alignment.Center) {
+        Box(
+            Modifier.padding(vertical = ObehyTheme.spacing.xxl).size(ObehyTheme.sizes.hero),
+            contentAlignment = Alignment.Center,
+        ) {
             Box(
                 Modifier
                     .fillMaxSize()
@@ -157,21 +171,21 @@ private fun WelcomeStep() {
             Icon(
                 painterResource(UiR.drawable.obehy_symbol),
                 contentDescription = null,
-                modifier = Modifier.size(112.dp),
+                modifier = Modifier.size(ObehyTheme.sizes.heroSymbol),
                 tint = MaterialTheme.colorScheme.onPrimaryContainer,
             )
         }
-        ObehyLogo(height = 52.dp)
-        Spacer(Modifier.height(24.dp))
+        ObehyLogo(height = ObehyTheme.sizes.logoLarge)
+        Spacer(Modifier.height(ObehyTheme.spacing.xl))
         Text(
             stringResource(R.string.onboarding_welcome_title),
             style = MaterialTheme.typography.headlineLargeEmphasized,
             textAlign = TextAlign.Center,
         )
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(ObehyTheme.spacing.m))
         Text(
             stringResource(R.string.onboarding_welcome_body),
-            modifier = Modifier.widthIn(max = 420.dp),
+            modifier = Modifier.widthIn(max = ObehyTheme.sizes.paragraphWidth),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
@@ -179,39 +193,42 @@ private fun WelcomeStep() {
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun ChoiceStep(
     number: Int,
     @StringRes title: Int,
     @StringRes subtitle: Int,
+    modifier: Modifier = Modifier,
     choices: @Composable () -> Unit,
 ) {
     val progress by animateFloatAsState(number / 2f, MaterialTheme.motionScheme.slowEffectsSpec(), label = "progress")
     Column(
-        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 24.dp),
+        modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = ObehyTheme.spacing.xl),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        // Phones use the full width; tablets keep a readable column.
-        Column(Modifier.widthIn(max = 560.dp).padding(top = 16.dp, bottom = 24.dp)) {
+        Column(
+            Modifier
+                .widthIn(max = ObehyTheme.sizes.readableWidth)
+                .padding(top = ObehyTheme.spacing.l, bottom = ObehyTheme.spacing.xl),
+        ) {
             LinearWavyProgressIndicator(progress = { progress }, modifier = Modifier.fillMaxWidth())
-            Spacer(Modifier.height(32.dp))
+            Spacer(Modifier.height(ObehyTheme.spacing.xxl))
             Text(
                 stringResource(R.string.onboarding_step, number, 2),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.primary,
             )
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(ObehyTheme.spacing.s))
             Text(stringResource(title), style = MaterialTheme.typography.headlineMediumEmphasized)
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(ObehyTheme.spacing.s))
             Text(
                 stringResource(subtitle),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            Spacer(Modifier.height(28.dp))
+            Spacer(Modifier.height(ObehyTheme.spacing.xxl))
             choices()
-            Spacer(Modifier.height(20.dp))
+            Spacer(Modifier.height(ObehyTheme.spacing.xl))
             Text(
                 stringResource(R.string.onboarding_changeable),
                 style = MaterialTheme.typography.bodyMedium,
@@ -222,25 +239,37 @@ private fun ChoiceStep(
 }
 
 /** Back (from the first question on) and the one big forward button. */
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun BottomActions(step: Step, canContinue: Boolean, onBack: () -> Unit, onNext: () -> Unit) {
+private fun BottomActions(
+    step: Step,
+    canContinue: Boolean,
+    onBack: () -> Unit,
+    onNext: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val height = ButtonDefaults.MediumContainerHeight
     Row(
-        Modifier
+        modifier
             .fillMaxWidth()
             .windowInsetsPadding(WindowInsets.navigationBars)
-            .padding(horizontal = 24.dp, vertical = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+            .padding(horizontal = ObehyTheme.spacing.xl, vertical = ObehyTheme.spacing.l),
+        horizontalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.m),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        AnimatedVisibility(step != Step.Welcome, enter = expandHorizontally() + fadeIn(), exit = shrinkHorizontally() + fadeOut()) {
+        AnimatedVisibility(
+            step != Step.Welcome,
+            enter = expandHorizontally() + fadeIn(),
+            exit = shrinkHorizontally() + fadeOut(),
+        ) {
             FilledTonalIconButton(
                 onClick = onBack,
                 modifier = Modifier.size(height),
                 shapes = IconButtonDefaults.shapes(),
             ) {
-                Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.onboarding_back))
+                Icon(
+                    Icons.AutoMirrored.Rounded.ArrowBack,
+                    contentDescription = stringResource(R.string.onboarding_back),
+                )
             }
         }
         Button(
@@ -250,11 +279,12 @@ private fun BottomActions(step: Step, canContinue: Boolean, onBack: () -> Unit, 
             enabled = canContinue,
             contentPadding = ButtonDefaults.contentPaddingFor(height),
         ) {
-            val label = when (step) {
-                Step.Welcome -> R.string.onboarding_start
-                Step.Mode -> R.string.onboarding_next
-                Step.Provider -> R.string.onboarding_finish
-            }
+            val label =
+                when (step) {
+                    Step.Welcome -> R.string.onboarding_start
+                    Step.Mode -> R.string.onboarding_next
+                    Step.Provider -> R.string.onboarding_finish
+                }
             Text(stringResource(label), style = ButtonDefaults.textStyleFor(height))
         }
     }

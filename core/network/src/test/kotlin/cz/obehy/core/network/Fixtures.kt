@@ -20,14 +20,17 @@ fun mockClient(
     json: Json,
     seen: MutableList<HttpRequestData> = mutableListOf(),
     answer: suspend MockRequestHandleScope.(HttpRequestData) -> HttpResponseData,
-): HttpClient = apiClient(
-    MockEngine { request ->
-        seen += request
-        answer(request)
-    },
-    json,
-    userAgent = "Obehy-Android/test",
-)
+): HttpClient =
+    apiClient(
+        MockEngine { request ->
+            seen += request
+            answer(request)
+        },
+        json,
+        userAgent = "Obehy-Android/test",
+    )
 
-fun MockRequestHandleScope.json(body: String, status: HttpStatusCode = HttpStatusCode.OK) =
-    respond(body, status, headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()))
+fun MockRequestHandleScope.json(
+    body: String,
+    status: HttpStatusCode = HttpStatusCode.OK,
+) = respond(body, status, headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()))

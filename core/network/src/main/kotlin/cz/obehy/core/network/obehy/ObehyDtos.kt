@@ -15,7 +15,9 @@ data class EnrichLegRequest(
 )
 
 @Serializable
-data class EnrichRequest(val legs: List<EnrichLegRequest>)
+data class EnrichRequest(
+    val legs: List<EnrichLegRequest>,
+)
 
 @Serializable
 data class Enrichment(
@@ -26,12 +28,23 @@ data class Enrichment(
 
 @Serializable
 enum class EnrichOutcome {
-    @SerialName("resolved") Resolved,
-    @SerialName("not_running") NotRunning,
-    @SerialName("not_found") NotFound,
-    @SerialName("ambiguous") Ambiguous,
-    @SerialName("unknown_dataset") UnknownDataset,
-    @SerialName("malformed") Malformed,
+    @SerialName("resolved")
+    Resolved,
+
+    @SerialName("not_running")
+    NotRunning,
+
+    @SerialName("not_found")
+    NotFound,
+
+    @SerialName("ambiguous")
+    Ambiguous,
+
+    @SerialName("unknown_dataset")
+    UnknownDataset,
+
+    @SerialName("malformed")
+    Malformed,
 }
 
 @Serializable
@@ -55,10 +68,16 @@ data class EnrichedLeg(
 )
 
 @Serializable
-data class TripRef(val tripId: String, val serviceDate: String)
+data class TripRef(
+    val tripId: String,
+    val serviceDate: String,
+)
 
 @Serializable
-data class JourneyKey(val namespace: String, val key: String)
+data class JourneyKey(
+    val namespace: String,
+    val key: String,
+)
 
 @Serializable
 data class Line(

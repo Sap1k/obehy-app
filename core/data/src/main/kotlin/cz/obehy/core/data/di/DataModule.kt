@@ -27,18 +27,23 @@ import javax.inject.Singleton
 object DataModule {
     @Provides
     @Singleton
-    fun dataStore(@ApplicationContext context: Context): DataStore<Preferences> =
-        PreferenceDataStoreFactory.create { context.preferencesDataStoreFile("settings") }
+    fun dataStore(
+        @ApplicationContext context: Context,
+    ): DataStore<Preferences> = PreferenceDataStoreFactory.create { context.preferencesDataStoreFile("settings") }
 
     @Provides
     @Singleton
-    fun motisApi(settings: SettingsRepository, @Named("userAgent") userAgent: String): MotisApi =
+    fun motisApi(
+        settings: SettingsRepository,
+        @Named("userAgent") userAgent: String,
+    ): MotisApi =
         MotisApi(apiClient(OkHttp.create(), MotisJson, userAgent)) {
             (settings.current().routingProvider ?: RoutingProvider.Transitous).baseUrl
         }
 
     @Provides
     @Singleton
-    fun obehyApi(@Named("userAgent") userAgent: String): ObehyApi =
-        ObehyApi(apiClient(OkHttp.create(), ObehyJson, userAgent))
+    fun obehyApi(
+        @Named("userAgent") userAgent: String,
+    ): ObehyApi = ObehyApi(apiClient(OkHttp.create(), ObehyJson, userAgent))
 }

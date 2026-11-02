@@ -20,6 +20,13 @@ ktor = "3.6.0"
 
 junit = "4.13.2"
 
+# Formatting and Compose conventions (spotlessCheck).
+spotless = "8.11.0"
+ktlint = "1.8.0"
+composeRules = "0.6.8"
+# Android Lint for our own checks (:lint-rules): always AGP + 23 in the major version.
+lint = "32.4.1"
+
 # Android SDK levels, read by the convention plugins (build-logic).
 compileSdk = "37"
 targetSdk = "36"
@@ -56,6 +63,10 @@ ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "kto
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 
 junit = { module = "junit:junit", version.ref = "junit" }
+lint-api = { module = "com.android.tools.lint:lint-api", version.ref = "lint" }
+lint-checks = { module = "com.android.tools.lint:lint-checks", version.ref = "lint" }
+lint-tests = { module = "com.android.tools.lint:lint-tests", version.ref = "lint" }
+compose-rules-ktlint = { module = "io.nlopez.compose.rules:ktlint", version.ref = "composeRules" }
 
 # Plugins as libraries, for the convention plugins in build-logic.
 android-gradlePlugin = { module = "com.android.tools.build:gradle", version.ref = "androidGradlePlugin" }
@@ -72,6 +83,7 @@ kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "ko
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 
 # Convention plugins (build-logic/convention).
 obehy-android-application = { id = "obehy.android.application" }

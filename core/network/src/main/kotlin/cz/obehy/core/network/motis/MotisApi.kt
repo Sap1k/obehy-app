@@ -15,11 +15,15 @@ class MotisApi(
     private val baseUrl: suspend () -> String,
 ) {
     /** Stops and addresses matching [text], for the place search. */
-    suspend fun geocode(text: String, language: String? = null): List<MotisMatch> =
-        client.get("${baseUrl()}api/v1/geocode") {
-            parameter("text", text)
-            language?.let { parameter("language", it) }
-        }.body()
+    suspend fun geocode(
+        text: String,
+        language: String? = null,
+    ): List<MotisMatch> =
+        client
+            .get("${baseUrl()}api/v1/geocode") {
+                parameter("text", text)
+                language?.let { parameter("language", it) }
+            }.body()
 
     /**
      * Itineraries between two places: a MOTIS stop ID or `lat,lon`. [time] is the departure,
@@ -32,11 +36,12 @@ class MotisApi(
         arriveBy: Boolean = false,
         pageCursor: String? = null,
     ): MotisPlan =
-        client.get("${baseUrl()}api/v5/plan") {
-            parameter("fromPlace", from)
-            parameter("toPlace", to)
-            time?.let { parameter("time", it.toString()) }
-            if (arriveBy) parameter("arriveBy", true)
-            pageCursor?.let { parameter("pageCursor", it) }
-        }.body()
+        client
+            .get("${baseUrl()}api/v5/plan") {
+                parameter("fromPlace", from)
+                parameter("toPlace", to)
+                time?.let { parameter("time", it.toString()) }
+                if (arriveBy) parameter("arriveBy", true)
+                pageCursor?.let { parameter("pageCursor", it) }
+            }.body()
 }

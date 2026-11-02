@@ -15,22 +15,24 @@ import javax.inject.Inject
 
 /** The mode and routing provider: chosen at first start, changed in the settings. */
 @HiltViewModel
-class SetupViewModel @Inject constructor(
-    private val settings: SettingsRepository,
-) : ViewModel() {
-    val state: StateFlow<AppSettings> =
-        settings.settings.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AppSettings())
+class SetupViewModel
+    @Inject
+    constructor(
+        private val settings: SettingsRepository,
+    ) : ViewModel() {
+        val state: StateFlow<AppSettings> =
+            settings.settings.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AppSettings())
 
-    fun choose(mode: AppMode) {
-        viewModelScope.launch { settings.setMode(mode) }
-    }
+        fun choose(mode: AppMode) {
+            viewModelScope.launch { settings.setMode(mode) }
+        }
 
-    fun choose(provider: RoutingProvider) {
-        viewModelScope.launch { settings.setRoutingProvider(provider) }
-    }
+        fun choose(provider: RoutingProvider) {
+            viewModelScope.launch { settings.setRoutingProvider(provider) }
+        }
 
-    /** Ends onboarding; the app then shows its main screens. */
-    fun finishOnboarding() {
-        viewModelScope.launch { settings.finishOnboarding() }
+        /** Ends onboarding; the app then shows its main screens. */
+        fun finishOnboarding() {
+            viewModelScope.launch { settings.finishOnboarding() }
+        }
     }
-}

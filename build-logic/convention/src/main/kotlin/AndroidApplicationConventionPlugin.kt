@@ -20,6 +20,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                 testOptions.unitTests.isReturnDefaultValues = true
             }
             configureKotlin()
+            addDesignSystemLint()
         }
     }
 }

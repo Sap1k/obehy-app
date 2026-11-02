@@ -1,5 +1,7 @@
+import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.project
 
@@ -24,6 +26,23 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
                 "implementation"(library("androidx-navigation-compose"))
                 "implementation"(library("kotlinx-serialization-json"))
                 "testImplementation"(library("kotlinx-coroutines-test"))
+            }
+            forbidFeatureToFeatureDependencies()
+        }
+    }
+
+    /** Features are independent: they meet only in :app, through navigation routes. */
+    private fun Project.forbidFeatureToFeatureDependencies() {
+        configurations.configureEach {
+            withDependencies {
+                filterIsInstance<ProjectDependency>()
+                    .filter { it.path.startsWith(":feature:") && it.path != path }
+                    .forEach {
+                        throw GradleException(
+                            "$path depends on ${it.path}. Feature modules never depend on each other: move the " +
+                                "shared part to a core module, or navigate to the other feature through :app.",
+                        )
+                    }
             }
         }
     }

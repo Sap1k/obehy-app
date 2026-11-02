@@ -1,0 +1,26 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+
+[*.{kt,kts}]
+ktlint_code_style = ktlint_official
+max_line_length = 120
+ij_kotlin_allow_trailing_comma = true
+ij_kotlin_allow_trailing_comma_on_call_site = true
+# Composables are PascalCase.
+ktlint_function_naming_ignore_when_annotated_with = Composable
+# Compose rules (https://mrmans0n.github.io/compose-rules): the theme's token locals are the only
+# CompositionLocals; everything else is passed as parameters.
+compose_allowed_composition_locals = LocalSpacing,LocalSizes
+
+[*.{xml,yml,toml,md}]
+indent_size = 2
+
+[*.{xml,toml}]
+indent_size = 4

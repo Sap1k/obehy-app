@@ -9,13 +9,18 @@ sealed interface LegEnrichment {
     data object Pending : LegEnrichment
 
     /** Oběhy knows the trip: `/api/v1/trips/{tripId}/{serviceDate}`. */
-    data class Resolved(val tripId: String, val serviceDate: String) : LegEnrichment
+    data class Resolved(
+        val tripId: String,
+        val serviceDate: String,
+    ) : LegEnrichment
 
     /**
      * Oběhy has nothing for this leg (a foreign trip, a feed without keys, or no answer): the
      * leg shows MOTIS data with a quiet note.
      */
-    data class Unavailable(val reason: Reason) : LegEnrichment
+    data class Unavailable(
+        val reason: Reason,
+    ) : LegEnrichment
 
     enum class Reason { NotCovered, NotFound, Failed }
 }

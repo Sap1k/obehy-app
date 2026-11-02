@@ -18,10 +18,11 @@ class ObehyApi(
      */
     suspend fun enrich(legs: List<EnrichLegRequest>): Enrichment {
         require(legs.size in 1..MAX_LEGS) { "1 to $MAX_LEGS legs, not ${legs.size}" }
-        return client.post("${baseUrl}journeys/enrich") {
-            contentType(ContentType.Application.Json)
-            setBody(EnrichRequest(legs))
-        }.body()
+        return client
+            .post("${baseUrl}journeys/enrich") {
+                contentType(ContentType.Application.Json)
+                setBody(EnrichRequest(legs))
+            }.body()
     }
 
     companion object {

@@ -28,27 +28,45 @@ dependencies {
 gradlePlugin {
     plugins {
         register("androidApplication") {
-            id = libs.plugins.obehy.android.application.get().pluginId
+            id =
+                libs.plugins.obehy.android.application
+                    .get()
+                    .pluginId
             implementationClass = "AndroidApplicationConventionPlugin"
         }
         register("androidLibrary") {
-            id = libs.plugins.obehy.android.library.get().pluginId
+            id =
+                libs.plugins.obehy.android.library
+                    .get()
+                    .pluginId
             implementationClass = "AndroidLibraryConventionPlugin"
         }
         register("androidCompose") {
-            id = libs.plugins.obehy.android.compose.get().pluginId
+            id =
+                libs.plugins.obehy.android.compose
+                    .get()
+                    .pluginId
             implementationClass = "AndroidComposeConventionPlugin"
         }
         register("androidFeature") {
-            id = libs.plugins.obehy.android.feature.get().pluginId
+            id =
+                libs.plugins.obehy.android.feature
+                    .get()
+                    .pluginId
             implementationClass = "AndroidFeatureConventionPlugin"
         }
         register("hilt") {
-            id = libs.plugins.obehy.hilt.get().pluginId
+            id =
+                libs.plugins.obehy.hilt
+                    .get()
+                    .pluginId
             implementationClass = "HiltConventionPlugin"
         }
         register("jvmLibrary") {
-            id = libs.plugins.obehy.jvm.library.get().pluginId
+            id =
+                libs.plugins.obehy.jvm.library
+                    .get()
+                    .pluginId
             implementationClass = "JvmLibraryConventionPlugin"
         }
     }

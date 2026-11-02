@@ -12,6 +12,7 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteItem
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination.Companion.hasRoute
@@ -44,25 +45,30 @@ private data class TopLevel(
 )
 
 /** The top-level destinations per mode: the live map only in Enhanced mode. */
-private fun destinations(mode: AppMode): List<TopLevel> = buildList {
-    add(TopLevel(PlannerRoute, PlannerRoute::class, R.string.nav_journeys, Icons.Outlined.Directions))
-    add(TopLevel(DeparturesRoute, DeparturesRoute::class, R.string.nav_departures, Icons.Outlined.DepartureBoard))
-    if (mode == AppMode.Enhanced) {
-        add(TopLevel(MapRoute, MapRoute::class, R.string.nav_map, Icons.Outlined.Map))
+private fun destinations(mode: AppMode): List<TopLevel> =
+    buildList {
+        add(TopLevel(PlannerRoute, PlannerRoute::class, R.string.nav_journeys, Icons.Outlined.Directions))
+        add(TopLevel(DeparturesRoute, DeparturesRoute::class, R.string.nav_departures, Icons.Outlined.DepartureBoard))
+        if (mode == AppMode.Enhanced) {
+            add(TopLevel(MapRoute, MapRoute::class, R.string.nav_map, Icons.Outlined.Map))
+        }
+        add(TopLevel(SettingsRoute, SettingsRoute::class, R.string.nav_settings, Icons.Outlined.Settings))
     }
-    add(TopLevel(SettingsRoute, SettingsRoute::class, R.string.nav_settings, Icons.Outlined.Settings))
-}
 
 /**
  * The app's frame in Material 3 Expressive: the short bottom bar on phones, the wide navigation
  * rail on tablets and other wide windows (NavigationSuiteScaffold picks by window size).
  */
 @Composable
-fun ObehyShell(mode: AppMode) {
+fun ObehyShell(
+    mode: AppMode,
+    modifier: Modifier = Modifier,
+) {
     val nav = rememberNavController()
     val entry by nav.currentBackStackEntryAsState()
     val current = entry?.destination
     NavigationSuiteScaffold(
+        modifier = modifier,
         navigationItems = {
             destinations(mode).forEach { top ->
                 NavigationSuiteItem(

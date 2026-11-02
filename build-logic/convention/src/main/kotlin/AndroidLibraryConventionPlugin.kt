@@ -20,6 +20,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                 testOptions.unitTests.isReturnDefaultValues = true
             }
             configureKotlin()
+            addDesignSystemLint()
             dependencies {
                 "testImplementation"(library("junit"))
             }

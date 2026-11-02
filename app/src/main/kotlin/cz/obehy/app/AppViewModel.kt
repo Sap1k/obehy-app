@@ -13,13 +13,22 @@ import javax.inject.Inject
 
 sealed interface AppState {
     data object Loading : AppState
+
     data object NeedsOnboarding : AppState
-    data class Ready(val mode: AppMode) : AppState
+
+    data class Ready(
+        val mode: AppMode,
+    ) : AppState
 }
 
 @HiltViewModel
-class AppViewModel @Inject constructor(settings: SettingsRepository) : ViewModel() {
-    val state: StateFlow<AppState> = settings.settings
-        .map { s -> if (s.isOnboarded) AppState.Ready(s.mode!!) else AppState.NeedsOnboarding }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AppState.Loading)
-}
+class AppViewModel
+    @Inject
+    constructor(
+        settings: SettingsRepository,
+    ) : ViewModel() {
+        val state: StateFlow<AppState> =
+            settings.settings
+                .map { s -> if (s.isOnboarded) AppState.Ready(s.mode!!) else AppState.NeedsOnboarding }
+                .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AppState.Loading)
+    }

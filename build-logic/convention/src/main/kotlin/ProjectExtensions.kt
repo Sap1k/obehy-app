@@ -4,7 +4,9 @@ import org.gradle.api.artifacts.MinimalExternalModuleDependency
 import org.gradle.api.artifacts.VersionCatalog
 import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.provider.Provider
+import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.getByType
+import org.gradle.kotlin.dsl.project
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
@@ -16,7 +18,11 @@ internal fun Project.library(alias: String): Provider<MinimalExternalModuleDepen
     libs.findLibrary(alias).orElseThrow { IllegalArgumentException("No library $alias") }
 
 internal fun Project.sdkLevel(name: String): Int =
-    libs.findVersion(name).orElseThrow().requiredVersion.toInt()
+    libs
+        .findVersion(name)
+        .orElseThrow()
+        .requiredVersion
+        .toInt()
 
 internal val JAVA_VERSION = JavaVersion.VERSION_17
 
@@ -27,5 +33,16 @@ internal fun Project.configureKotlin() {
             jvmTarget.set(JvmTarget.JVM_17)
             freeCompilerArgs.add("-Xjsr305=strict")
         }
+    }
+}
+
+/**
+ * Our design-system lint checks (:lint-rules) on every Android module but core:ui, which is
+ * where colours, type, tokens and components are defined.
+ */
+internal fun Project.addDesignSystemLint() {
+    if (path == ":core:ui") return
+    dependencies {
+        "lintChecks"(project(":lint-rules"))
     }
 }
