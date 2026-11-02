@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Brand palette (Figma "Oběhy – marketing"); Compose has its own copy in core:ui Theme.kt. -->
     <color name="window_background">#F4F7EF</color>
-    <color name="petrol">#246568</color>
+    <color name="night">#102B2D</color>
     <color name="lime">#C5ED62</color>
 </resources>

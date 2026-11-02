@@ -21,10 +21,14 @@ enum class RoutingProvider(val baseUrl: String) {
     Obehy("https://motis.obehy.cz/"),
 }
 
-/** The user's choices; both are null until onboarding is finished. */
+/**
+ * The user's choices. Onboarding saves each as it is picked and sets [onboardingFinished] only
+ * when the user confirms, so the app stays in onboarding until then.
+ */
 data class AppSettings(
     val mode: AppMode? = null,
     val routingProvider: RoutingProvider? = null,
+    val onboardingFinished: Boolean = false,
 ) {
-    val isOnboarded: Boolean get() = mode != null && routingProvider != null
+    val isOnboarded: Boolean get() = onboardingFinished && mode != null && routingProvider != null
 }

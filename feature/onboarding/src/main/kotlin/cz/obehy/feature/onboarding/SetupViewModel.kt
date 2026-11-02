@@ -28,4 +28,9 @@ class SetupViewModel @Inject constructor(
     fun choose(provider: RoutingProvider) {
         viewModelScope.launch { settings.setRoutingProvider(provider) }
     }
+
+    /** Ends onboarding; the app then shows its main screens. */
+    fun finishOnboarding() {
+        viewModelScope.launch { settings.finishOnboarding() }
+    }
 }

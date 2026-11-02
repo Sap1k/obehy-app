@@ -2,6 +2,7 @@ package cz.obehy.core.data
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import cz.obehy.core.model.AppMode
@@ -13,7 +14,7 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
-/** The user's mode and routing provider, kept in DataStore by enum name. */
+/** The user's mode and routing provider (by enum name) and whether onboarding is done, in DataStore. */
 @Singleton
 class SettingsRepository @Inject constructor(
     private val store: DataStore<Preferences>,
@@ -24,6 +25,7 @@ class SettingsRepository @Inject constructor(
             routingProvider = prefs[PROVIDER]?.let { name ->
                 RoutingProvider.entries.firstOrNull { it.name == name }
             },
+            onboardingFinished = prefs[ONBOARDED] ?: false,
         )
     }
 
@@ -37,8 +39,13 @@ class SettingsRepository @Inject constructor(
         store.edit { it[PROVIDER] = provider.name }
     }
 
+    suspend fun finishOnboarding() {
+        store.edit { it[ONBOARDED] = true }
+    }
+
     private companion object {
         val MODE = stringPreferencesKey("mode")
         val PROVIDER = stringPreferencesKey("routing_provider")
+        val ONBOARDED = booleanPreferencesKey("onboarding_finished")
     }
 }

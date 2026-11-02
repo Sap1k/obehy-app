@@ -1,21 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="onboarding_title">Welcome to Oběhy</string>
-    <string name="onboarding_intro">Plan journeys across Europe, with everything Oběhy knows about Czech trains and buses.</string>
-    <string name="onboarding_changeable">You can change both later in Settings.</string>
-    <string name="onboarding_continue">Continue</string>
+    <string name="onboarding_welcome_title">Your next connection.</string>
+    <string name="onboarding_welcome_body">Oběhy finds your route and tells you everything about the train or bus that takes you there.</string>
+    <string name="onboarding_start">Get started</string>
+    <string name="onboarding_next">Continue</string>
+    <string name="onboarding_finish">Start planning</string>
+    <string name="onboarding_back">Back</string>
+    <string name="onboarding_step">Step %1$d of %2$d</string>
+    <string name="onboarding_changeable">You can change this anytime in Settings.</string>
 
-    <string name="mode_title">How much do you want to see?</string>
-    <string name="mode_enhanced">Everything (Oběhy)</string>
-    <string name="mode_enhanced_description">Journeys and departures plus the live vehicle map, vehicles, train compositions and other detail. Best for travelling in Czechia.</string>
-    <string name="mode_transitous">Journey planner</string>
-    <string name="mode_transitous_description">A simpler international planner with departures. Czech trips still get live delays and vehicles.</string>
+    <string name="mode_title">How do you want to use Oběhy?</string>
+    <string name="mode_subtitle">Both plan journeys and show departures. Pick what fits how you travel.</string>
+    <string name="mode_enhanced">Full Oběhy</string>
+    <string name="mode_enhanced_description">A live map of every train and bus in Czechia, the actual vehicles, train formations and everything known about each trip.</string>
+    <string name="mode_transitous">Just journeys</string>
+    <string name="mode_transitous_description">A clean planner for all of Europe. Czech trips still show live delays and vehicles.</string>
 
-    <string name="provider_title">Journey search</string>
+    <string name="provider_title">Where should we search?</string>
+    <string name="provider_subtitle">This server plans your journeys.</string>
+    <string name="provider_recommended">Recommended</string>
     <string name="provider_transitous">Transitous</string>
-    <string name="provider_transitous_description">Community service covering most of Europe. Includes all of Oběhy\'s Czech data.</string>
+    <string name="provider_transitous_description">Covers most of Europe. Run by the community, with Czech data from Oběhy.</string>
     <string name="provider_obehy">Oběhy</string>
-    <string name="provider_obehy_description">Oběhy\'s own server: Czechia only, with the freshest Czech timetables.</string>
+    <string name="provider_obehy_description">Czechia only, with the very latest timetables.</string>
 
     <string name="settings_title">Settings</string>
+    <string name="settings_mode">App mode</string>
+    <string name="settings_provider">Journey search</string>
 </resources>

@@ -8,6 +8,7 @@ import androidx.compose.material.icons.outlined.Map
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteItem
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -53,8 +54,8 @@ private fun destinations(mode: AppMode): List<TopLevel> = buildList {
 }
 
 /**
- * The app's frame: a bottom bar on phones, a navigation rail on tablets and other wide
- * windows (NavigationSuiteScaffold picks by window size).
+ * The app's frame in Material 3 Expressive: the short bottom bar on phones, the wide navigation
+ * rail on tablets and other wide windows (NavigationSuiteScaffold picks by window size).
  */
 @Composable
 fun ObehyShell(mode: AppMode) {
@@ -62,9 +63,9 @@ fun ObehyShell(mode: AppMode) {
     val entry by nav.currentBackStackEntryAsState()
     val current = entry?.destination
     NavigationSuiteScaffold(
-        navigationSuiteItems = {
+        navigationItems = {
             destinations(mode).forEach { top ->
-                item(
+                NavigationSuiteItem(
                     selected = current?.hasRoute(top.routeClass) == true,
                     onClick = {
                         nav.navigate(top.route) {

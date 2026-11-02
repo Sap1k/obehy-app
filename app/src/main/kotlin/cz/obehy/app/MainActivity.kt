@@ -28,8 +28,8 @@ class MainActivity : ComponentActivity() {
                     val state by app.state.collectAsStateWithLifecycle()
                     when (val s = state) {
                         AppState.Loading -> Box(Modifier.fillMaxSize())
-                        // Onboarding writes the settings; the state then turns Ready by itself.
-                        AppState.NeedsOnboarding -> OnboardingScreen(onDone = {})
+                        // Onboarding finishes by saving the settings; the state then turns Ready by itself.
+                        AppState.NeedsOnboarding -> OnboardingScreen()
                         is AppState.Ready -> ObehyShell(s.mode)
                     }
                 }

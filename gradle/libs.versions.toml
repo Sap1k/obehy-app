@@ -11,6 +11,8 @@ androidxHiltLifecycleViewModel = "1.4.0"
 androidxLifecycle = "2.11.0"
 androidxNavigation = "2.10.2"
 composeBom = "2026.09.00"
+# Ahead of the BOM for the Material 3 Expressive components (stable 1.4 does not have them).
+material3 = "1.5.0-beta02"
 
 kotlinxCoroutines = "1.11.0"
 kotlinxSerialization = "1.11.0"
@@ -33,8 +35,8 @@ androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "androidxNavigation" }
 
 androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
-androidx-compose-material3 = { module = "androidx.compose.material3:material3" }
-androidx-compose-material3-adaptive-navigation-suite = { module = "androidx.compose.material3:material3-adaptive-navigation-suite" }
+androidx-compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
+androidx-compose-material3-adaptive-navigation-suite = { module = "androidx.compose.material3:material3-adaptive-navigation-suite", version.ref = "material3" }
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 androidx-compose-ui = { module = "androidx.compose.ui:ui" }
 androidx-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
