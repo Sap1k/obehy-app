@@ -6,3 +6,7 @@ plugins {
 android {
     namespace = "cz.obehy.core.ui"
 }
+
+dependencies {
+    api(project(":core:model"))
+}

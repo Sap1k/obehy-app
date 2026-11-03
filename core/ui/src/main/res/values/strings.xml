@@ -2,4 +2,30 @@
 <resources>
     <string name="brand_name" translatable="false">Oběhy</string>
     <string name="coming_soon">Coming soon</string>
+
+    <string name="mode_walk">Walk</string>
+    <string name="mode_subway">Metro</string>
+    <string name="mode_tram">Tram</string>
+    <string name="mode_train">Train</string>
+    <string name="mode_bus">Bus</string>
+    <string name="mode_coach">Coach</string>
+    <string name="mode_ferry">Ferry</string>
+    <string name="mode_other">Other transport</string>
+
+    <string name="type_metro">Metro</string>
+    <string name="type_tram">Trams</string>
+    <string name="type_regional_rail">Regional trains</string>
+    <string name="type_long_distance_rail">Long-distance trains</string>
+    <string name="type_regional_bus">Buses and trolleybuses</string>
+    <string name="type_long_distance_bus">Coaches</string>
+
+    <string name="delay_late">%d min late</string>
+    <string name="delay_short">+%d min</string>
+    <string name="platform">Pl. %s</string>
+    <string name="platform_changed">Platform changed to %s</string>
+    <string name="low_floor">Low-floor</string>
+    <string name="back">Back</string>
+    <string name="live">live</string>
+    <string name="time_moved">%1$s, live, planned for %2$s</string>
+    <string name="time_live">%s, live</string>
 </resources>

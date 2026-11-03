@@ -1,4 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="planner_title">Spojení</string>
+
+    <string name="from">Odkud</string>
+    <string name="to">Kam</string>
+    <string name="via">Přes</string>
+    <string name="from_placeholder">Odkud jedete?</string>
+    <string name="to_placeholder">Kam jedete?</string>
+    <string name="swap">Prohodit směr</string>
+    <string name="add_via">Přes</string>
+    <string name="remove_via">Odebrat zastávku</string>
+    <string name="options">Možnosti</string>
+    <string name="options_changed">Možnosti (%d)</string>
+    <string name="search">Hledat spojení</string>
+
+    <string name="leave_now">Odjezd teď</string>
+    <string name="leave_at">Odjezd %s</string>
+    <string name="arrive_by">Příjezd do %s</string>
+    <string name="depart">Odjezd</string>
+    <string name="arrive">Příjezd</string>
+    <string name="now">Teď</string>
+    <string name="done">Hotovo</string>
+    <string name="cancel">Zrušit</string>
+    <string name="date_pattern">EEE d. M.</string>
+
+    <string name="options_title">Možnosti hledání</string>
+    <string name="types_title">Druhy dopravy</string>
+    <string name="types_keep_one">Nechte zapnutý aspoň jeden.</string>
+    <string name="low_floor_title">Jen nízkopodlažní spoje</string>
+    <string name="low_floor_body">Bezbariérová vozidla a cesty bez schodů.</string>
+    <string name="routed_title">Přestupy po skutečných cestách</string>
+    <string name="routed_body">Chůze při přestupu vede podle mapy, takže časy sedí přesněji.</string>
+    <string name="reset">Obnovit výchozí</string>
+
+    <string name="place_hint">Zastávka, adresa nebo místo</string>
+    <string name="place_hint_stop">Zastávka po cestě</string>
+    <string name="place_clear">Smazat</string>
+    <string name="place_none">Nic jsme nenašli. Zkuste to napsat jinak.</string>
+    <string name="place_error">Hledání se nepovedlo. Zkontrolujte připojení.</string>
+
+    <string name="times">%1$s → %2$s</string>
+    <string name="duration_hours">%1$d h %2$d min</string>
+    <string name="duration_minutes">%d min</string>
+    <string name="direct">Přímé spojení</string>
+    <plurals name="transfers">
+        <item quantity="one">%d přestup</item>
+        <item quantity="few">%d přestupy</item>
+        <item quantity="many">%d přestupu</item>
+        <item quantity="other">%d přestupů</item>
+    </plurals>
+    <string name="earlier">Dřívější</string>
+    <string name="later">Pozdější</string>
+    <string name="results_none">Žádné spojení jsme nenašli. Zkuste jiný čas nebo méně omezení.</string>
+    <string name="results_error">Spojení se nepodařilo najít. Zkontrolujte připojení a zkuste to znovu.</string>
+    <string name="retry">Zkusit znovu</string>
+
+    <string name="towards">směr %s</string>
+    <plurals name="stops_between">
+        <item quantity="one">%1$d zastávka · %2$s</item>
+        <item quantity="few">%1$d zastávky · %2$s</item>
+        <item quantity="many">%1$d zastávky · %2$s</item>
+        <item quantity="other">%1$d zastávek · %2$s</item>
+    </plurals>
+    <string name="walk">%s chůze</string>
+    <string name="spare">%s rezerva</string>
+    <string name="stay_seated">Zůstaňte sedět, pokračuje jako %s.</string>
+    <string name="pick_journey">Vyberte spojení a zobrazí se tady.</string>
+    <string name="new_search">Nové hledání</string>
+    <string name="map_title">Mapa</string>
+    <string name="updated">Aktualizováno %s</string>
+    <string name="ago">před %s</string>
+    <string name="just_now">teď</string>
+    <string name="refresh_failed">Nelze aktualizovat</string>
 </resources>

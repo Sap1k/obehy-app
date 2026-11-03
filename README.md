@@ -16,6 +16,7 @@ delays, vehicles, compositions, alerts). See [PLAN.md](PLAN.md) for the architec
 | `feature:onboarding` | First-start choice of mode and routing provider; Settings |
 | `feature:planner` | Journey search (placeholder) |
 | `feature:trip` | Trip detail (placeholder) |
+| `core:map` | The MapLibre route map, drawn in the web app's map style |
 | `lint-rules` | Android Lint checks that keep colours, type, sizes, shapes and text out of everything but `core:ui` |
 
 Build configuration lives in the convention plugins under `build-logic/`; versions in
@@ -30,5 +31,6 @@ JDK 21+ (Android Studio's bundled Java works) and the Android SDK (platform 37).
 `ANDROID_HOME` is not set.
 
 ```bash
-./gradlew spotlessCheck testDebugUnitTest :core:model:test :core:network:test :lint-rules:test lintDebug assembleDebug
+./gradlew spotlessCheck
+./gradlew testDebugUnitTest :core:model:test :core:network:test :lint-rules:test lintDebug assembleDebug
 ```

@@ -15,9 +15,9 @@ ij_kotlin_allow_trailing_comma = true
 ij_kotlin_allow_trailing_comma_on_call_site = true
 # Composables are PascalCase.
 ktlint_function_naming_ignore_when_annotated_with = Composable
-# Compose rules (https://mrmans0n.github.io/compose-rules): the theme's token locals are the only
-# CompositionLocals; everything else is passed as parameters.
-compose_allowed_composition_locals = LocalSpacing,LocalSizes
+# Compose rules (https://mrmans0n.github.io/compose-rules): the theme's token locals and the
+# shared-motion scopes are the only CompositionLocals; everything else is passed as parameters.
+compose_allowed_composition_locals = LocalSpacing,LocalSizes,LocalSharedTransitionScope,LocalNavAnimatedScope
 
 [*.{xml,yml,toml,md}]
 indent_size = 2

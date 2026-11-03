@@ -7,13 +7,19 @@ the convention plugins); the rest are on you. [PLAN.md](PLAN.md) has the product
 
 ```
 app ──► feature:* ──► core:data ──► core:network ──► core:model
+  │          ├──────► core:map ──► core:ui
   └──────────┴──────► core:ui
 ```
+
+`core:ui` and `core:map` use `core:model`'s types too.
 
 - `core:model`: plain Kotlin domain types. No Android, no network types.
 - `core:network`: Ktor clients and DTOs. DTOs never leave this module; map them to `core:model` types.
 - `core:data`: repositories and DataStore, bound with Hilt. Screens get data only through repositories.
 - `core:ui`: **the design system**: theme, tokens, shared components. The only place styling is defined.
+- `core:map`: the MapLibre map (`RouteMap`). Its base style is the web's (`repo/web/src/features/map/style.ts`),
+  exported to `core/map/src/main/assets` by `node core/map/tools/export-style.mjs <web folder>`; rerun it
+  when the web style changes, never edit the JSON by hand.
 - `feature:*`: one user-facing area each (screens, view models, its routes). **A feature never depends on
   another feature** (the build fails if it does). Shared code goes down into a core module; moving between
   features is navigation, wired in `app`.
@@ -35,6 +41,9 @@ The look is defined once, in `core:ui`, and everything else reads it:
 | Size | `ObehyTheme.sizes.<name>` (add one if missing) | `Dimens.kt` |
 | Shape | `MaterialTheme.shapes`, `MaterialShapes`, or the component's default | Material |
 | A screen | `ObehyScreen(title) { … }`: top bar, insets, readable width | `ObehyScreen.kt` |
+| A screen led by a map | `ObehyHeroScreen(title, hero = { … }) { … }`: the hero collapses on scroll | `ObehyHeroScreen.kt` |
+| Chips in a row | `ScrollingChipRow { … }`: scrolls sideways, edge to edge, fades where more wait | `components/` |
+| One thing on two screens | `SharedBounds(key) { … }` on both: it morphs between them | `SharedMotion.kt` |
 | Pick-one options | `ChoiceList` | `components/` |
 | Logo | `ObehyLogo()` | `Logo.kt` |
 
@@ -79,7 +88,8 @@ Use Android Studio's Java 25 (the Gradle daemon asks for it):
 ```bash
 export JAVA_HOME="/c/Program Files/Android/Android Studio/jbr"
 ./gradlew spotlessApply                       # format before committing
-./gradlew spotlessCheck testDebugUnitTest :core:model:test :core:network:test :lint-rules:test lintDebug assembleDebug
+./gradlew spotlessCheck                       # on its own: it can trip over build/ while the build writes it
+./gradlew testDebugUnitTest :core:model:test :core:network:test :lint-rules:test lintDebug assembleDebug
 ```
 
 Check UI changes on the phone (connected over wireless adb), not an emulator:

@@ -5,16 +5,19 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import cz.obehy.core.model.AppMode
 import cz.obehy.core.model.AppSettings
 import cz.obehy.core.model.RoutingProvider
+import cz.obehy.core.model.SearchOptions
+import cz.obehy.core.model.TransportType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
-/** The user's mode and routing provider (by enum name) and whether onboarding is done, in DataStore. */
+/** The user's mode, routing provider and search options (by enum name) and whether onboarding is done. */
 @Singleton
 class SettingsRepository
     @Inject
@@ -47,9 +50,36 @@ class SettingsRepository
             store.edit { it[ONBOARDED] = true }
         }
 
+        /** The journey search options, remembered between searches. */
+        val searchOptions: Flow<SearchOptions> =
+            store.data.map { prefs ->
+                SearchOptions(
+                    lowFloor = prefs[LOW_FLOOR] ?: false,
+                    routedTransfers = prefs[ROUTED_TRANSFERS] ?: false,
+                    types =
+                        prefs[TRANSPORT_TYPES]
+                            ?.mapNotNullTo(
+                                mutableSetOf(),
+                            ) { name -> TransportType.entries.firstOrNull { it.name == name } }
+                            ?.takeIf { it.isNotEmpty() }
+                            ?: TransportType.entries.toSet(),
+                )
+            }
+
+        suspend fun setSearchOptions(options: SearchOptions) {
+            store.edit {
+                it[LOW_FLOOR] = options.lowFloor
+                it[ROUTED_TRANSFERS] = options.routedTransfers
+                it[TRANSPORT_TYPES] = options.types.mapTo(mutableSetOf()) { type -> type.name }
+            }
+        }
+
         private companion object {
             val MODE = stringPreferencesKey("mode")
             val PROVIDER = stringPreferencesKey("routing_provider")
             val ONBOARDED = booleanPreferencesKey("onboarding_finished")
+            val LOW_FLOOR = booleanPreferencesKey("search_low_floor")
+            val ROUTED_TRANSFERS = booleanPreferencesKey("search_routed_transfers")
+            val TRANSPORT_TYPES = stringSetPreferencesKey("search_transport_types")
         }
     }

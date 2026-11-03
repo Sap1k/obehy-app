@@ -15,11 +15,15 @@ jobs:
           distribution: temurin
           java-version: 21
       - uses: gradle/actions/setup-gradle@v6
-      # spotlessCheck: formatting and Compose conventions; lintDebug: Android Lint plus the
-      # design-system checks in :lint-rules (no colours, sizes, shapes or text outside core:ui).
-      - name: Format, unit tests, lint and debug build
+      # Formatting and Compose conventions. A step of its own: Spotless walks the module folders,
+      # and the build rewriting build/ at the same time can make it fail to read one.
+      - name: Format
+        run: ./gradlew spotlessCheck
+      # lintDebug: Android Lint plus the design-system checks in :lint-rules (no colours, sizes,
+      # shapes or text outside core:ui).
+      - name: Unit tests, lint and debug build
         run: >
-          ./gradlew spotlessCheck testDebugUnitTest :core:model:test :core:network:test :lint-rules:test
+          ./gradlew testDebugUnitTest :core:model:test :core:network:test :lint-rules:test
           lintDebug assembleDebug
       - uses: actions/upload-artifact@v7
         if: always()

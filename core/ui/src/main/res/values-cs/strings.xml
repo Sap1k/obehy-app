@@ -1,4 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="coming_soon">Připravujeme</string>
+
+    <string name="mode_walk">Pěšky</string>
+    <string name="mode_subway">Metro</string>
+    <string name="mode_tram">Tramvaj</string>
+    <string name="mode_train">Vlak</string>
+    <string name="mode_bus">Autobus</string>
+    <string name="mode_coach">Dálkový autobus</string>
+    <string name="mode_ferry">Přívoz</string>
+    <string name="mode_other">Jiná doprava</string>
+
+    <string name="type_metro">Metro</string>
+    <string name="type_tram">Tramvaje</string>
+    <string name="type_regional_rail">Regionální vlaky</string>
+    <string name="type_long_distance_rail">Dálkové vlaky</string>
+    <string name="type_regional_bus">Autobusy a trolejbusy</string>
+    <string name="type_long_distance_bus">Dálkové autobusy</string>
+
+    <string name="delay_late">Zpoždění %d min</string>
+    <string name="delay_short">+%d min</string>
+    <string name="platform">nást. %s</string>
+    <string name="platform_changed">Změna nástupiště na %s</string>
+    <string name="low_floor">Nízkopodlažní</string>
+    <string name="back">Zpět</string>
+    <string name="live">podle polohy</string>
+    <string name="time_moved">%1$s podle polohy, podle jízdního řádu %2$s</string>
+    <string name="time_live">%s podle polohy</string>
 </resources>

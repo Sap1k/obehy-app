@@ -1,4 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="planner_title">Journeys</string>
+
+    <string name="from">From</string>
+    <string name="to">To</string>
+    <string name="via">Via</string>
+    <string name="from_placeholder">Where are you starting?</string>
+    <string name="to_placeholder">Where are you going?</string>
+    <string name="swap">Swap direction</string>
+    <string name="add_via">Via</string>
+    <string name="remove_via">Remove this stop</string>
+    <string name="options">Options</string>
+    <string name="options_changed">Options (%d)</string>
+    <string name="search">Find connections</string>
+
+    <string name="leave_now">Leave now</string>
+    <string name="leave_at">Leave %s</string>
+    <string name="arrive_by">Arrive by %s</string>
+    <string name="depart">Leave</string>
+    <string name="arrive">Arrive</string>
+    <string name="now">Now</string>
+    <string name="done">Done</string>
+    <string name="cancel">Cancel</string>
+    <string name="date_pattern">EEE d MMM</string>
+
+    <string name="options_title">Search options</string>
+    <string name="types_title">Transport</string>
+    <string name="types_keep_one">Keep at least one on.</string>
+    <string name="low_floor_title">Low-floor only</string>
+    <string name="low_floor_body">Step-free vehicles, and walks without stairs.</string>
+    <string name="routed_title">Walk along real paths</string>
+    <string name="routed_body">Changes follow the map, so walking times are more accurate.</string>
+    <string name="reset">Reset to default</string>
+
+    <string name="place_hint">Stop, address or place</string>
+    <string name="place_hint_stop">Stop on the way</string>
+    <string name="place_clear">Clear</string>
+    <string name="place_none">Nothing found. Try writing it differently.</string>
+    <string name="place_error">The search didn\'t work. Check your connection.</string>
+
+    <string name="times">%1$s → %2$s</string>
+    <string name="duration_hours">%1$d h %2$d min</string>
+    <string name="duration_minutes">%d min</string>
+    <string name="direct">Direct</string>
+    <plurals name="transfers">
+        <item quantity="one">%d change</item>
+        <item quantity="other">%d changes</item>
+    </plurals>
+    <string name="earlier">Earlier</string>
+    <string name="later">Later</string>
+    <string name="results_none">No connections found. Try another time or fewer limits.</string>
+    <string name="results_error">We couldn\'t find connections. Check your connection and try again.</string>
+    <string name="retry">Try again</string>
+
+    <string name="towards">towards %s</string>
+    <plurals name="stops_between">
+        <item quantity="one">%1$d stop · %2$s</item>
+        <item quantity="other">%1$d stops · %2$s</item>
+    </plurals>
+    <string name="walk">%s walk</string>
+    <string name="spare">%s to spare</string>
+    <string name="stay_seated">Stay on board: it goes on as %s.</string>
+    <string name="pick_journey">Pick a connection to see it here.</string>
+    <string name="new_search">New search</string>
+    <string name="map_title">Map</string>
+    <string name="updated">Updated %s</string>
+    <string name="ago">%s ago</string>
+    <string name="just_now">just now</string>
+    <string name="refresh_failed">Can’t be refreshed</string>
 </resources>

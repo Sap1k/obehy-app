@@ -41,6 +41,21 @@ data class Sizes(
     val readableWidth: Dp = 560.dp,
     /** The widest a centred paragraph gets. */
     val paragraphWidth: Dp = 420.dp,
+    /** An icon inside a line badge, chip or label. */
+    val iconSmall: Dp = 16.dp,
+    /** The proportional journey bar in a result card. */
+    val journeyBar: Dp = 24.dp,
+    /** The column the route line is drawn in, beside places and stops. */
+    val routeGutter: Dp = 20.dp,
+    /** A stop on the route line, and the line's thickness. */
+    val routeMarker: Dp = 12.dp,
+    val routeStroke: Dp = 4.dp,
+    /** A column of times in front of the route line in a journey's detail. */
+    val timeColumn: Dp = 48.dp,
+    /** A journey's map at the head of its screen, before it collapses. */
+    val heroMap: Dp = 240.dp,
+    /** The widest the results stay when a journey's detail is open beside them. */
+    val listPane: Dp = 400.dp,
 )
 
 internal val LocalSpacing = staticCompositionLocalOf { Spacing() }
