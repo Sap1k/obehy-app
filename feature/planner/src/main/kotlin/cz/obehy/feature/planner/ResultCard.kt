@@ -22,7 +22,6 @@ import cz.obehy.core.ui.components.DelayLabel
 import cz.obehy.core.ui.components.JourneyBar
 import cz.obehy.core.ui.components.LowFloorIcon
 import cz.obehy.core.ui.components.TimeLabel
-import cz.obehy.core.ui.components.TimeLabelSize
 import cz.obehy.core.ui.components.clock
 
 /** One connection in the results: when, how long, the bar of its legs, changes and delays. */
@@ -53,9 +52,9 @@ internal fun ResultCard(
                     horizontalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.s),
                     verticalAlignment = Alignment.Bottom,
                 ) {
-                    TimeLabel(itinerary.start, size = TimeLabelSize.Inline)
+                    TimeLabel(itinerary.start)
                     Icon(Icons.AutoMirrored.Rounded.ArrowForward, contentDescription = null)
-                    TimeLabel(itinerary.end, size = TimeLabelSize.Inline)
+                    TimeLabel(itinerary.end)
                 }
                 Text(
                     itinerary.duration.spoken(),

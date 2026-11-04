@@ -41,7 +41,7 @@ The look is defined once, in `core:ui`, and everything else reads it:
 | Size | `ObehyTheme.sizes.<name>` (add one if missing) | `Dimens.kt` |
 | Shape | `MaterialTheme.shapes`, `MaterialShapes`, or the component's default | Material |
 | A screen | `ObehyScreen(title) { … }`: top bar, insets, readable width | `ObehyScreen.kt` |
-| A screen led by a map | `ObehyHeroScreen(title, hero = { … }) { … }`: the hero collapses on scroll | `ObehyHeroScreen.kt` |
+| A screen led by a map | `ObehyHeroScreen(title, hero = { … }) { … }`: the hero scrolls away with the content | `ObehyHeroScreen.kt` |
 | Chips in a row | `ScrollingChipRow { … }`: scrolls sideways, edge to edge, fades where more wait | `components/` |
 | One thing on two screens | `SharedBounds(key) { … }` on both: it morphs between them | `SharedMotion.kt` |
 | Pick-one options | `ChoiceList` | `components/` |

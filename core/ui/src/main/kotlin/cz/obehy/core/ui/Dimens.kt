@@ -50,10 +50,12 @@ data class Sizes(
     /** A stop on the route line, and the line's thickness. */
     val routeMarker: Dp = 12.dp,
     val routeStroke: Dp = 4.dp,
-    /** A column of times in front of the route line in a journey's detail. */
-    val timeColumn: Dp = 48.dp,
-    /** A journey's map at the head of its screen, before it collapses. */
+    /** A stop passed on the way, on the route line. */
+    val routePassMarker: Dp = 10.dp,
+    /** A journey's map at the head of its screen. */
     val heroMap: Dp = 240.dp,
+    /** The small button that opens a map's credits. */
+    val mapCredits: Dp = 28.dp,
     /** The widest the results stay when a journey's detail is open beside them. */
     val listPane: Dp = 400.dp,
 )

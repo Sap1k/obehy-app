@@ -83,6 +83,15 @@ internal fun Color.blendsInto(background: Color): Boolean {
     return maxOf(a, b) / minOf(a, b) < 1.6f
 }
 
+/** Whether the route colour [hex] would all but disappear on [backgroundHex] (both `RRGGBB`). */
+fun routeBlendsInto(
+    hex: String?,
+    backgroundHex: String,
+): Boolean {
+    val background = parseHex(backgroundHex) ?: return false
+    return parseHex(hex)?.blendsInto(background) == true
+}
+
 private fun Modifier.edge(
     color: Color?,
     shape: Shape,

@@ -201,6 +201,23 @@ class MotisApiTest {
         }
 
     @Test
+    fun `a blank headsign counts as none`() =
+        runTest {
+            val blank =
+                fixture("motis/refresh-itinerary.json")
+                    .replace(Regex(""""headsign"\s*:\s*"[^"]*""""), """"headsign":" """")
+
+            val ride =
+                api(blank)
+                    .refreshItinerary("CugB==")
+                    .toDomain()
+                    .rides
+                    .first()
+
+            assertNull(ride.headsign)
+        }
+
+    @Test
     fun `a low-floor plan has only accessible rides`() =
         runTest {
             val page =

@@ -88,7 +88,7 @@ internal fun MotisLeg.toLeg(): Leg {
         end = end,
         name = name,
         line = routeShortName?.takeIf { it.isNotBlank() && it != name },
-        headsign = headsign,
+        headsign = headsign?.takeIf { it.isNotBlank() },
         agency = agencyName,
         color = routeColor?.takeIf { it.isNotBlank() },
         textColor = routeTextColor?.takeIf { it.isNotBlank() },

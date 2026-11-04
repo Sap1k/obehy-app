@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import cz.obehy.core.ui.ObehyTheme
 
@@ -34,7 +35,7 @@ enum class RouteMark {
     /** Where the journey ends: a filled dot. */
     End,
 
-    /** A stop passed on the way: a small dot on the line. */
+    /** A stop passed on the way: a small ring on the line. */
     Pass,
 
     /** Nothing: the line runs straight through (a ride, a walk). */
@@ -56,6 +57,8 @@ fun walkStroke(): RouteStroke = RouteStroke(MaterialTheme.colorScheme.outline, d
  * One row along a route line, shared by the search form (from, via, to) and a journey's detail
  * (stops, rides, walks), so both draw the same line. The line comes in [above] the [mark] and
  * leaves [below] it; [leading] (e.g. a time) sits in front of the line, [content] after it.
+ * With [markAt], everything is aligned to the top and the mark sits that far down, so it stays on
+ * a stop's first line when the row grows.
  */
 @Composable
 fun RouteRow(
@@ -64,13 +67,17 @@ fun RouteRow(
     above: RouteStroke? = null,
     below: RouteStroke? = null,
     markColor: Color = above?.color ?: below?.color ?: MaterialTheme.colorScheme.primary,
+    markAt: Dp? = null,
     leading: @Composable () -> Unit = {},
     content: @Composable RowScope.() -> Unit,
 ) {
     val sizes = ObehyTheme.sizes
     val surface = MaterialTheme.colorScheme.surface
     val edge = MaterialTheme.colorScheme.outline
-    Row(modifier.height(IntrinsicSize.Min), verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        modifier.height(IntrinsicSize.Min),
+        verticalAlignment = if (markAt == null) Alignment.CenterVertically else Alignment.Top,
+    ) {
         leading()
         Box(
             Modifier
@@ -78,7 +85,7 @@ fun RouteRow(
                 .fillMaxHeight()
                 .drawBehind {
                     val x = size.width / 2
-                    val y = size.height / 2
+                    val y = markAt?.toPx() ?: (size.height / 2)
                     val width = sizes.routeStroke.toPx()
                     above?.let {
                         stroke(
@@ -105,7 +112,7 @@ fun RouteRow(
                     marker(
                         mark,
                         Offset(x, y),
-                        sizes.routeMarker.toPx() / 2,
+                        (if (mark == RouteMark.Pass) sizes.routePassMarker else sizes.routeMarker).toPx() / 2,
                         markColor,
                         surface,
                         edge.takeIf {
@@ -144,24 +151,20 @@ private fun DrawScope.marker(
     surface: Color,
     edge: Color?,
 ) {
-    val ring = 3.dp.toPx()
-    if (edge != null && mark != RouteMark.None && mark != RouteMark.Pass) drawCircle(edge, radius + 1.dp.toPx(), centre)
+    val ring = (if (mark == RouteMark.Pass) 2.dp else 3.dp).toPx()
+    if (edge != null && mark != RouteMark.None) drawCircle(edge, radius + 1.dp.toPx(), centre)
     when (mark) {
         RouteMark.None -> {
             Unit
         }
 
-        RouteMark.Stop -> {
+        RouteMark.Stop, RouteMark.Pass -> {
             drawCircle(surface, radius, centre)
             drawCircle(color, radius - ring / 2, centre, style = Stroke(ring))
         }
 
         RouteMark.End -> {
             drawCircle(color, radius, centre)
-        }
-
-        RouteMark.Pass -> {
-            drawCircle(surface, radius / 2, centre)
         }
 
         RouteMark.Via -> {

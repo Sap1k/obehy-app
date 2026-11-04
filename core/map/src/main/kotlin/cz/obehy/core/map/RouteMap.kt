@@ -1,22 +1,41 @@
 package cz.obehy.core.map
 
 import android.content.Context
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.style.TextDecoration
 import cz.obehy.core.model.LatLon
 import cz.obehy.core.model.Leg
 import cz.obehy.core.ui.ObehyTheme
+import cz.obehy.core.ui.components.routeBlendsInto
 import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.addJsonArray
@@ -24,14 +43,17 @@ import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
 import kotlinx.serialization.json.putJsonObject
 import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.interaction.MapInteractions
+import org.maplibre.compose.map.MapState
 import org.maplibre.compose.map.MaplibreMap
 import org.maplibre.compose.map.rememberMapState
-import org.maplibre.compose.overlay.ExpandingAttributionButton
+import org.maplibre.compose.overlay.AttributionLinks
+import org.maplibre.compose.overlay.attributions
 import org.maplibre.compose.style.BaseStyle
 import org.maplibre.spatialk.geojson.Position
 import kotlin.math.PI
@@ -70,10 +92,49 @@ fun RouteMap(
             state = state,
             interactions = if (interactive) MapInteractions.Standard else MapInteractions.None,
             // The map data's credits (OpenStreetMap, OpenMapTiles), without MapLibre's logo.
-            overlay = {
-                ExpandingAttributionButton(Modifier.align(Alignment.BottomEnd).padding(ObehyTheme.spacing.s))
-            },
+            overlay = { MapCredits(state, Modifier.align(Alignment.BottomEnd).padding(ObehyTheme.spacing.s)) },
         )
+    }
+}
+
+/** A small (i) that opens the map data's credits, readable on any map. */
+@Composable
+private fun MapCredits(
+    state: MapState,
+    modifier: Modifier = Modifier,
+) {
+    var open by rememberSaveable { mutableStateOf(false) }
+    FilledTonalIconButton(onClick = { open = true }, modifier.size(ObehyTheme.sizes.mapCredits)) {
+        Icon(
+            Icons.Outlined.Info,
+            contentDescription = stringResource(R.string.map_credits),
+            modifier = Modifier.size(ObehyTheme.sizes.iconSmall),
+        )
+    }
+    if (open) {
+        ModalBottomSheet(onDismissRequest = { open = false }) {
+            Column(
+                Modifier.padding(
+                    start = ObehyTheme.spacing.l,
+                    end = ObehyTheme.spacing.l,
+                    bottom = ObehyTheme.spacing.xl,
+                ),
+                verticalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.s),
+            ) {
+                Text(stringResource(R.string.map_credits), style = MaterialTheme.typography.titleMedium)
+                AttributionLinks(
+                    state.style.attributions(),
+                    Modifier,
+                    MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface),
+                    TextLinkStyles(
+                        SpanStyle(color = MaterialTheme.colorScheme.primary, textDecoration = TextDecoration.Underline),
+                    ),
+                    ObehyTheme.spacing.s,
+                    // Wrap the credits instead of scrolling them sideways on one line.
+                    true,
+                )
+            }
+        }
     }
 }
 
@@ -85,7 +146,7 @@ private fun Color.hex(): String = "#%06X".format(toArgb() and 0xFFFFFF)
 /**
  * The web's map style (exported to the assets by `tools/export-style.mjs`) with the journey in
  * its `trip` source: rides as paths in their colours, walks as a dashed line under them, and the
- * stops where you board or alight.
+ * stops where you board or alight. A route colour that would vanish into the map is edged in [walk].
  */
 private fun journeyStyle(
     context: Context,
@@ -103,18 +164,32 @@ private fun journeyStyle(
                     .bufferedReader()
                     .use { it.readText() },
             ).jsonObject
+    val land =
+        base
+            .getValue("layers")
+            .jsonArray
+            .first { it.jsonObject["id"] == JsonPrimitive("land") }
+            .jsonObject
+            .getValue("paint")
+            .jsonObject
+            .getValue("background-color")
+            .jsonPrimitive.content
+
+    fun vanishes(ride: Leg.Transit) = routeBlendsInto(ride.color, land.removePrefix("#"))
     val features =
         buildJsonArray {
             legs.forEach { leg ->
                 val points = leg.shape()
                 if (points.size < 2) return@forEach
                 val colour = (leg as? Leg.Transit)?.color?.let { "#$it" } ?: primary
-                add(feature(if (leg is Leg.Walk) "walk" else "path", points, colour, null))
+                val casing = if (leg is Leg.Transit && vanishes(leg)) walk else land
+                add(feature(if (leg is Leg.Walk) "walk" else "path", points, colour, null, casing = casing))
             }
             val stops = legs.filterIsInstance<Leg.Transit>().flatMap { listOf(it.from to it, it.to to it) }
             stops.forEachIndexed { rank, (call, ride) ->
                 val at = call.position ?: return@forEachIndexed
-                add(feature("stop", listOf(at), ride.color?.let { "#$it" } ?: primary, call.name, rank))
+                val colour = if (vanishes(ride)) walk else ride.color?.let { "#$it" } ?: primary
+                add(feature("stop", listOf(at), colour, call.name, rank))
             }
         }
     val sources =
@@ -159,11 +234,26 @@ private fun journeyStyle(
     val layers =
         buildJsonArray {
             base.getValue("layers").jsonArray.forEach { layer ->
-                if (layer.jsonObject["id"] == JsonPrimitive("trip-casing")) add(walkLayer)
-                add(layer)
+                if (layer.jsonObject["id"] == JsonPrimitive("trip-casing")) {
+                    add(walkLayer)
+                    add(layer.withCasingColour())
+                } else {
+                    add(layer)
+                }
             }
         }
     return JsonObject(base + mapOf("sources" to sources, "layers" to layers)).toString()
+}
+
+/** This casing layer, coloured per path by its `casing` property. */
+private fun JsonElement.withCasingColour(): JsonObject {
+    val casing =
+        buildJsonArray {
+            add(JsonPrimitive("get"))
+            add(JsonPrimitive("casing"))
+        }
+    val paint = JsonObject(jsonObject.getValue("paint").jsonObject + ("line-color" to casing))
+    return JsonObject(jsonObject + ("paint" to paint))
 }
 
 private fun feature(
@@ -172,6 +262,7 @@ private fun feature(
     colour: String,
     name: String?,
     rank: Int = 0,
+    casing: String? = null,
 ): JsonObject =
     buildJsonObject {
         put("type", "Feature")
@@ -181,6 +272,7 @@ private fun feature(
             put("passed", false)
             put("rank", rank)
             name?.let { put("name", it) }
+            casing?.let { put("casing", it) }
         }
         putJsonObject("geometry") {
             if (points.size == 1) {
