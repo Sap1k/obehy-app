@@ -3,7 +3,6 @@ package cz.obehy.feature.planner
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -45,11 +44,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import cz.obehy.core.model.JourneyQuery
 import cz.obehy.core.model.Place
@@ -60,6 +62,7 @@ import cz.obehy.core.ui.components.RouteMark
 import cz.obehy.core.ui.components.RouteRow
 import cz.obehy.core.ui.components.RouteStroke
 import cz.obehy.core.ui.components.ScrollingChipRow
+import kotlin.math.roundToInt
 import cz.obehy.core.ui.R as UiR
 
 /**
@@ -159,14 +162,16 @@ internal fun SearchForm(
         }
         val height = ButtonDefaults.MediumContainerHeight
         val searchingText = stringResource(R.string.searching)
+        val circle by animateFloatAsState(if (searching) 1f else 0f, MaterialTheme.motionScheme.defaultSpatialSpec())
         Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             Button(
                 onClick = { if (!searching) onAction(PlannerAction.Search) },
                 enabled = query.isComplete,
                 modifier =
                     Modifier
-                        .animateContentSize(MaterialTheme.motionScheme.defaultSpatialSpec())
-                        .then(if (searching) Modifier.size(height) else Modifier.fillMaxWidth().height(height))
+                        .height(height)
+                        .then(if (searching) Modifier else Modifier.clip(ButtonDefaults.shape))
+                        .closingToCircle(searching) { circle }
                         .semantics { if (searching) stateDescription = searchingText },
                 shapes = ButtonDefaults.shapesFor(height),
                 contentPadding = if (searching) PaddingValues(0.dp) else ButtonDefaults.contentPaddingFor(height),
@@ -187,6 +192,23 @@ internal fun SearchForm(
         }
     }
 }
+
+/**
+ * Lays the content out at its final size straight away, in a box going from the full width at a
+ * [progress] of 0 to as wide as it is tall at 1. Whatever is outside the box is up to the caller to clip:
+ * unlike with `animateContentSize`, a spring going past the circle doesn't slice into it.
+ */
+private fun Modifier.closingToCircle(
+    closed: Boolean,
+    progress: () -> Float,
+): Modifier =
+    layout { measurable, constraints ->
+        val fullWidth = constraints.maxWidth
+        val height = constraints.maxHeight
+        val width = (fullWidth + (height - fullWidth) * progress()).roundToInt().coerceAtMost(fullWidth)
+        val placeable = measurable.measure(Constraints.fixed(if (closed) height else fullWidth, height))
+        layout(width, height) { placeable.place(0, 0) }
+    }
 
 /** A place on the route line: its label above, the place (or a prompt) below. */
 @Composable
