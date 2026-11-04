@@ -10,6 +10,7 @@ import cz.obehy.core.model.SearchOptions
 import cz.obehy.core.model.TransportType
 import cz.obehy.core.network.motis.MotisApi
 import cz.obehy.core.network.motis.MotisPlanRequest
+import cz.obehy.core.network.motis.MotisRouting
 import cz.obehy.core.network.motis.decodePolyline
 import cz.obehy.core.network.motis.motisPlanRequest
 import cz.obehy.core.network.motis.toDomain
@@ -64,9 +65,12 @@ class MotisApiTest {
                     via = listOf("v1", "v2"),
                     time = Instant.parse("2026-11-03T07:00:00Z"),
                     arriveBy = true,
-                    wheelchair = true,
-                    routedTransfers = true,
-                    transitModes = listOf("BUS", "TRAM"),
+                    routing =
+                        MotisRouting(
+                            wheelchair = true,
+                            routedTransfers = true,
+                            transitModes = listOf("BUS", "TRAM"),
+                        ),
                     language = "cs",
                 ),
             )
@@ -99,7 +103,7 @@ class MotisApiTest {
     fun `the request follows the query and the options`() {
         val query = JourneyQuery(stop("A"), Place("x", "Doma", null, PlaceKind.Address, 50.1, 14.4), listOf(stop("V")))
 
-        assertNull(motisPlanRequest(query, SearchOptions(), "cs").transitModes)
+        assertNull(motisPlanRequest(query, SearchOptions(), "cs").routing.transitModes)
 
         val noTrains = SearchOptions(types = setOf(TransportType.Tram, TransportType.RegionalBus))
         val request = motisPlanRequest(query, noTrains, "cs")
@@ -108,7 +112,7 @@ class MotisApiTest {
         assertEquals(listOf("V"), request.via)
         assertEquals(
             listOf("AERIAL_LIFT", "BUS", "FERRY", "FUNICULAR", "ODM", "OTHER", "TRAM"),
-            request.transitModes,
+            request.routing.transitModes,
         )
     }
 
@@ -198,6 +202,20 @@ class MotisApiTest {
             // MOTIS sometimes answers with the ride's trip, stops and realtime gone.
             assertNull(stripped.rides.first().tripId)
             assertFalse(good.isRefreshedBy(stripped))
+        }
+
+    @Test
+    fun `a journey is looked up again the way it was found`() =
+        runTest {
+            val routing = MotisRouting(wheelchair = true, routedTransfers = true, transitModes = listOf("BUS", "TRAM"))
+
+            api(fixture("motis/refresh-itinerary.json")).refreshItinerary("CugB==", routing)
+
+            val parameters = seen.single().url.parameters
+            assertEquals("true", parameters["useRoutedTransfers"])
+            assertEquals("true", parameters["detailedTransfers"])
+            assertEquals("WHEELCHAIR", parameters["pedestrianProfile"])
+            assertEquals("BUS,TRAM", parameters["transitModes"])
         }
 
     @Test

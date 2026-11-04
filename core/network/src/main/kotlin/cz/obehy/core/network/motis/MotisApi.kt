@@ -54,44 +54,46 @@ class MotisApi(
                     if (via.isNotEmpty()) parameter("via", via.joinToString(","))
                     time?.let { parameter("time", it.toString()) }
                     if (arriveBy) parameter("arriveBy", true)
-                    if (wheelchair) parameter("pedestrianProfile", "WHEELCHAIR")
-                    if (routedTransfers) parameter("useRoutedTransfers", true)
-                    transitModes?.let { parameter("transitModes", it.joinToString(",")) }
                     pageCursor?.let { parameter("pageCursor", it) }
                     language?.let { parameter("language", it) }
                 }
-                details(request.routedTransfers)
+                routing(request.routing)
             }.body()
 
     /**
      * [id] (an itinerary's `id`) again, with the latest realtime data. MOTIS calls this
      * experimental, and it sometimes answers with rides stripped of their trip and stops: callers
-     * check what comes back before trusting it.
+     * check what comes back before trusting it. [routing] has to be what the journey was found
+     * with: MOTIS doesn't remember it, and rebuilds routed walks as estimates or without a path.
      */
     suspend fun refreshItinerary(
         id: String,
-        routedTransfers: Boolean = false,
+        routing: MotisRouting = MotisRouting(),
         language: String? = null,
     ): MotisItinerary =
         client
             .get("${baseUrl()}api/v6/refresh-itinerary") {
                 parameter("itineraryId", id)
                 language?.let { parameter("language", it) }
-                details(routedTransfers)
+                routing(routing)
             }.body()
 
     /** Every train keeps its own number; rides come with their path for the map, walks only when routed. */
-    private fun HttpRequestBuilder.details(routedTransfers: Boolean) {
+    private fun HttpRequestBuilder.routing(routing: MotisRouting) {
+        with(routing) {
+            if (wheelchair) parameter("pedestrianProfile", "WHEELCHAIR")
+            if (routedTransfers) parameter("useRoutedTransfers", true)
+            transitModes?.let { parameter("transitModes", it.joinToString(",")) }
+            parameter("detailedTransfers", routedTransfers)
+        }
         parameter("joinInterlinedLegs", false)
         parameter("detailedLegs", true)
-        parameter("detailedTransfers", routedTransfers)
     }
 }
 
 /**
  * A journey search. Places are MOTIS stop IDs or `lat,lon`; [via] takes stop IDs only (at most
- * two). [time] is the departure, or the arrival with [arriveBy]; null means now. [transitModes]
- * are MOTIS mode names, null for all.
+ * two). [time] is the departure, or the arrival with [arriveBy]; null means now.
  */
 data class MotisPlanRequest(
     val from: String,
@@ -99,9 +101,14 @@ data class MotisPlanRequest(
     val via: List<String> = emptyList(),
     val time: Instant? = null,
     val arriveBy: Boolean = false,
+    val routing: MotisRouting = MotisRouting(),
+    val pageCursor: String? = null,
+    val language: String? = null,
+)
+
+/** How a journey is routed, for a search and for looking it up again. [transitModes] are MOTIS mode names, null for all. */
+data class MotisRouting(
     val wheelchair: Boolean = false,
     val routedTransfers: Boolean = false,
     val transitModes: List<String>? = null,
-    val pageCursor: String? = null,
-    val language: String? = null,
 )

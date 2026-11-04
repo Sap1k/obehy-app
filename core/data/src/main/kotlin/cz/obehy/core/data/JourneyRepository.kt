@@ -10,6 +10,7 @@ import cz.obehy.core.network.motis.MotisApi
 import cz.obehy.core.network.motis.motisPlanRequest
 import cz.obehy.core.network.motis.toDomain
 import cz.obehy.core.network.motis.toJourneyPage
+import cz.obehy.core.network.motis.toRouting
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CoroutineDispatcher
@@ -94,7 +95,7 @@ class JourneyRepository
                                             .withPermit {
                                                 motis.refreshItinerary(
                                                     id,
-                                                    options.routedTransfers,
+                                                    options.toRouting(),
                                                     language,
                                                 )
                                             }.toDomain()

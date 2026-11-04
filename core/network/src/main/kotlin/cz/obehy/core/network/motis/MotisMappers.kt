@@ -55,15 +55,21 @@ fun motisPlanRequest(
         via = query.vias.map { it.routingRef },
         time = query.time,
         arriveBy = query.arriveBy,
-        wheelchair = options.lowFloor,
-        routedTransfers = options.routedTransfers,
+        routing = options.toRouting(),
+        pageCursor = pageCursor,
+        language = language,
+    )
+
+/** [SearchOptions] as MOTIS takes them. */
+fun SearchOptions.toRouting(): MotisRouting =
+    MotisRouting(
+        wheelchair = lowFloor,
+        routedTransfers = routedTransfers,
         transitModes =
-            options.allowedModes
+            allowedModes
                 ?.flatMap { motisNames(it) }
                 ?.distinct()
                 ?.sorted(),
-        pageCursor = pageCursor,
-        language = language,
     )
 
 fun MotisPlan.toJourneyPage(): JourneyPage =
