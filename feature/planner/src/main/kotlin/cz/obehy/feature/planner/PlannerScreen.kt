@@ -11,13 +11,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.RestartAlt
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -26,6 +27,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -40,7 +42,10 @@ import cz.obehy.core.ui.ObehyScreen
 import cz.obehy.core.ui.ObehyTheme
 import cz.obehy.core.ui.SharedBounds
 import cz.obehy.core.ui.TitleBar
+import cz.obehy.core.ui.components.StaggeredEntry
 import cz.obehy.core.ui.isWideWindow
+import java.time.Duration
+import java.time.Instant
 
 @Composable
 internal fun PlannerDestination(
@@ -73,6 +78,9 @@ internal fun PlannerDestination(
 
 private enum class Sheet { Time, Options }
 
+/** How soon after a search its results may still animate in. */
+private val ARRIVAL: Duration = Duration.ofSeconds(1)
+
 /**
  * The search form with the results under it. On a wide window the journey picked from the
  * results opens beside them.
@@ -102,7 +110,7 @@ internal fun PlannerScreen(
         },
     ) {
         val results: @Composable (Modifier) -> Unit = { paneModifier ->
-            ResultsList(state, onAction, onOpen, onTime = {
+            ResultsList(state, wide, onAction, onOpen, onTime = {
                 sheet = Sheet.Time
             }, onOptions = { sheet = Sheet.Options }, paneModifier)
         }
@@ -143,6 +151,7 @@ internal fun PlannerScreen(
 @Composable
 private fun ResultsList(
     state: PlannerState,
+    wide: Boolean,
     onAction: (PlannerAction) -> Unit,
     onOpen: (Itinerary) -> Unit,
     onTime: () -> Unit,
@@ -155,11 +164,12 @@ private fun ResultsList(
         onRefresh = { onAction(PlannerAction.RefreshResults) },
         modifier = modifier,
     ) {
-        LazyColumn(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.s)) {
+        LazyColumn(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)) {
             item(key = "form") {
                 SearchForm(
                     state.query,
                     state.options,
+                    searching = state.results is Results.Loading,
                     onAction,
                     onTime,
                     onOptions,
@@ -167,12 +177,8 @@ private fun ResultsList(
                 )
             }
             when (val results = state.results) {
-                Results.Idle -> {
+                Results.Idle, Results.Loading -> {
                     Unit
-                }
-
-                Results.Loading -> {
-                    item(key = "loading") { Centered { LoadingIndicator() } }
                 }
 
                 Results.Failed -> {
@@ -184,7 +190,10 @@ private fun ResultsList(
                         item(key = "none") { Note(R.string.results_none) }
                     } else {
                         item(key = "fresh") {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
+                            Row(
+                                Modifier.padding(bottom = ObehyTheme.spacing.xs),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
                                 Text(
                                     if (results.failed) {
                                         stringResource(R.string.refresh_failed) + " · " +
@@ -204,13 +213,24 @@ private fun ResultsList(
                             }
                         }
                     }
-                    items(results.itineraries, key = { it.key }) { itinerary ->
-                        SharedBounds(itinerary.key) {
-                            ResultCard(
-                                itinerary,
-                                selected = itinerary.key == state.open?.itinerary?.key,
-                                onClick = { onOpen(itinerary) },
-                            )
+                    itemsIndexed(results.itineraries, key = { _, it -> it.key }) { index, itinerary ->
+                        // Only a search that just landed arrives; coming back to the list doesn't replay it.
+                        val arriving = remember { Duration.between(results.fetchedAt, Instant.now()) < ARRIVAL }
+                        StaggeredEntry(
+                            index,
+                            enabled = arriving,
+                            Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null),
+                        ) {
+                            SharedBounds(itinerary.key) {
+                                ResultCard(
+                                    itinerary,
+                                    index,
+                                    results.itineraries.size,
+                                    // Only beside the list is the open journey still in view to point at.
+                                    selected = wide && itinerary.key == state.open?.itinerary?.key,
+                                    onClick = { onOpen(itinerary) },
+                                )
+                            }
                         }
                     }
                     if (results.loadingMore) {

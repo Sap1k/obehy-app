@@ -2,6 +2,9 @@ package cz.obehy.feature.onboarding
 
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.BrightnessAuto
+import androidx.compose.material.icons.rounded.DarkMode
+import androidx.compose.material.icons.rounded.LightMode
 import androidx.compose.material.icons.rounded.Map
 import androidx.compose.material.icons.rounded.Public
 import androidx.compose.material.icons.rounded.Route
@@ -11,6 +14,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import cz.obehy.core.model.AppMode
 import cz.obehy.core.model.RoutingProvider
+import cz.obehy.core.model.ThemeMode
 import cz.obehy.core.ui.components.ChoiceItem
 import cz.obehy.core.ui.R as UiR
 
@@ -49,6 +53,15 @@ internal val providerChoices =
             R.string.provider_obehy_description,
             { ImageVector.vectorResource(UiR.drawable.obehy_symbol) },
         ),
+    )
+
+internal val themeChoices =
+    listOf(
+        Choice(ThemeMode.System, R.string.theme_system, R.string.theme_system_description, {
+            Icons.Rounded.BrightnessAuto
+        }),
+        Choice(ThemeMode.Light, R.string.theme_light, R.string.theme_light_description, { Icons.Rounded.LightMode }),
+        Choice(ThemeMode.Dark, R.string.theme_dark, R.string.theme_dark_description, { Icons.Rounded.DarkMode }),
     )
 
 @Composable

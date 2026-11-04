@@ -27,4 +27,11 @@
     <string name="settings_title">Settings</string>
     <string name="settings_mode">App mode</string>
     <string name="settings_provider">Journey search</string>
+    <string name="settings_theme">Appearance</string>
+    <string name="theme_system">Follow the phone</string>
+    <string name="theme_system_description">Light or dark, whichever your phone is set to.</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_light_description">Easy to read outdoors.</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_dark_description">Easier on your eyes at night.</string>
 </resources>

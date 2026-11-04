@@ -1,66 +1,84 @@
 package cz.obehy.feature.planner
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.graphics.graphicsLayer
 import cz.obehy.core.model.Itinerary
 import cz.obehy.core.ui.ObehyTheme
 import cz.obehy.core.ui.components.DelayLabel
 import cz.obehy.core.ui.components.JourneyBar
 import cz.obehy.core.ui.components.LowFloorIcon
 import cz.obehy.core.ui.components.TimeLabel
-import cz.obehy.core.ui.components.clock
 
-/** One connection in the results: when, how long, the bar of its legs, changes and delays. */
+/** How far a connection sinks in while it is pressed. */
+private const val PRESSED_SCALE = 0.97f
+
+/**
+ * One connection in a connected list of [count] results: when, then the bar of its legs, then how
+ * long, the changes and any delay. Its corners morph and it sinks in when pressed.
+ */
 @Composable
 internal fun ResultCard(
     itinerary: Itinerary,
+    index: Int,
+    count: Int,
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val container =
-        when {
-            selected -> MaterialTheme.colorScheme.secondaryContainer
-            else -> MaterialTheme.colorScheme.surfaceContainerLowest
-        }
-    Card(
+    val press = remember { MutableInteractionSource() }
+    val pressed by press.collectIsPressedAsState()
+    val scale by animateFloatAsState(
+        if (pressed) PRESSED_SCALE else 1f,
+        MaterialTheme.motionScheme.fastSpatialSpec(),
+    )
+    SegmentedListItem(
+        selected = selected,
         onClick = onClick,
-        modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = container),
+        shapes = ListItemDefaults.segmentedShapes(index, count),
+        modifier =
+            modifier.fillMaxWidth().graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+            },
+        colors =
+            ListItemDefaults.segmentedColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+                selectedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+            ),
+        interactionSource = press,
     ) {
-        Column(
-            Modifier.padding(horizontal = ObehyTheme.spacing.l, vertical = ObehyTheme.spacing.m),
-            verticalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.s),
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Row(
-                    Modifier.weight(1f),
-                    horizontalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.s),
-                    verticalAlignment = Alignment.Bottom,
-                ) {
-                    TimeLabel(itinerary.start)
-                    Icon(Icons.AutoMirrored.Rounded.ArrowForward, contentDescription = null)
-                    TimeLabel(itinerary.end)
-                }
-                Text(
-                    itinerary.duration.spoken(),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+        Column(verticalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.s)) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.s),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                TimeLabel(itinerary.start)
+                Icon(
+                    Icons.AutoMirrored.Rounded.ArrowForward,
+                    contentDescription = null,
+                    modifier = Modifier.size(ObehyTheme.sizes.iconSmall),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+                TimeLabel(itinerary.end)
             }
             JourneyBar(itinerary.legs)
             Row(
@@ -68,7 +86,7 @@ internal fun ResultCard(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    transfersText(itinerary.transfers),
+                    listOf(itinerary.duration.spoken(), transfersText(itinerary.transfers)).joinToString(" · "),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

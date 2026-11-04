@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -49,7 +50,9 @@ import kotlinx.serialization.json.putJsonArray
 import kotlinx.serialization.json.putJsonObject
 import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.interaction.MapInteractions
+import org.maplibre.compose.map.AndroidRenderMode
 import org.maplibre.compose.map.MapState
+import org.maplibre.compose.map.MapUiOptions
 import org.maplibre.compose.map.MaplibreMap
 import org.maplibre.compose.map.rememberMapState
 import org.maplibre.compose.overlay.AttributionLinks
@@ -67,18 +70,21 @@ import kotlinx.serialization.json.Json as JsonParser
 /**
  * A journey on the Oběhy map: each ride in its route's colour, walks dashed, a dot at every stop
  * where you board or alight, framed to show the whole way. [interactive] lets it be panned and
- * zoomed; otherwise it is a still picture (a screen's header).
+ * zoomed; otherwise it is a still picture (a screen's header). A [fullscreen] map fills the
+ * window, edge to edge.
  */
 @Composable
 fun RouteMap(
     legs: List<Leg>,
     modifier: Modifier = Modifier,
     interactive: Boolean = false,
+    fullscreen: Boolean = false,
 ) {
     val context = LocalContext.current
     val dark = MaterialTheme.colorScheme.surface.luminance() < 0.5f
     val primary = MaterialTheme.colorScheme.primary.hex()
     val walk = MaterialTheme.colorScheme.outline.hex()
+    val loading = MaterialTheme.colorScheme.surfaceContainer
     val shape = remember(legs) { legs.map { it.shape() } }
     val style =
         remember(shape, dark, primary, walk) {
@@ -91,8 +97,23 @@ fun RouteMap(
             Modifier.fillMaxSize(),
             state = state,
             interactions = if (interactive) MapInteractions.Standard else MapInteractions.None,
+            // A texture, not a surface: only a texture scales, clips and fades with the screen
+            // around it, which the back gesture's preview and the card's morph both depend on.
+            uiOptions =
+                MapUiOptions(if (interactive) MapUiOptions.Standard else MapUiOptions.None) {
+                    renderMode = AndroidRenderMode.Texture
+                    loadColor = loading
+                },
             // The map data's credits (OpenStreetMap, OpenMapTiles), without MapLibre's logo.
-            overlay = { MapCredits(state, Modifier.align(Alignment.BottomEnd).padding(ObehyTheme.spacing.s)) },
+            overlay = {
+                MapCredits(
+                    state,
+                    Modifier
+                        .align(Alignment.BottomEnd)
+                        .then(if (fullscreen) Modifier.navigationBarsPadding() else Modifier)
+                        .padding(ObehyTheme.spacing.s),
+                )
+            },
         )
     }
 }

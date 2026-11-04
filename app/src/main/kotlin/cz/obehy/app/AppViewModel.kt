@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cz.obehy.core.data.SettingsRepository
 import cz.obehy.core.model.AppMode
+import cz.obehy.core.model.ThemeMode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -31,4 +32,9 @@ class AppViewModel
             settings.settings
                 .map { s -> if (s.isOnboarded) AppState.Ready(s.mode!!) else AppState.NeedsOnboarding }
                 .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AppState.Loading)
+
+        val theme: StateFlow<ThemeMode> =
+            settings.settings
+                .map { it.theme }
+                .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ThemeMode.System)
     }

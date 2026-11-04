@@ -151,7 +151,7 @@ fun JourneyBar(
     val density = LocalDensity.current
     val sizes = ObehyTheme.sizes
     val padding = ObehyTheme.spacing.xs
-    BoxWithConstraints(modifier.fillMaxWidth().height(sizes.journeyBar)) {
+    BoxWithConstraints(modifier.fillMaxWidth().height(sizes.journeyBar).clip(MaterialTheme.shapes.small)) {
         val widths =
             segmentWidths(
                 legs.map { it.duration.seconds.coerceAtLeast(1) },

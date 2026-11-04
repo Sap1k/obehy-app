@@ -17,6 +17,10 @@
     <string name="leave_now">Leave now</string>
     <string name="leave_at">Leave %s</string>
     <string name="arrive_by">Arrive by %s</string>
+    <string name="searching">Searching</string>
+    <string name="pick_time">Pick a time</string>
+    <string name="show_stops">Show stops</string>
+    <string name="hide_stops">Hide stops</string>
     <string name="depart">Leave</string>
     <string name="arrive">Arrive</string>
     <string name="now">Now</string>
@@ -55,15 +59,14 @@
 
     <string name="towards">towards %s</string>
     <plurals name="stops_between">
-        <item quantity="one">%1$d stop · %2$s</item>
-        <item quantity="other">%1$d stops · %2$s</item>
+        <item quantity="one">%d stop</item>
+        <item quantity="other">%d stops</item>
     </plurals>
     <string name="walk">%s walk</string>
     <string name="spare">%s to spare</string>
     <string name="stay_seated">Stay on board: it goes on as %s.</string>
     <string name="pick_journey">Pick a connection to see it here.</string>
     <string name="new_search">New search</string>
-    <string name="map_title">Map</string>
     <string name="updated">Updated %s</string>
     <string name="ago">%s ago</string>
     <string name="just_now">just now</string>

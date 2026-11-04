@@ -1,6 +1,9 @@
 package cz.obehy.app
 
+import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.material.icons.Icons
@@ -13,7 +16,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteItem
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
+import androidx.compose.material3.adaptive.navigationsuite.rememberNavigationSuiteScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -26,10 +31,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import cz.obehy.core.model.AppMode
+import cz.obehy.core.ui.BACK_MS
+import cz.obehy.core.ui.BackEasing
 import cz.obehy.core.ui.ComingSoon
+import cz.obehy.core.ui.HoldDuringMorph
 import cz.obehy.core.ui.SharedMotion
 import cz.obehy.feature.onboarding.SettingsRoute
 import cz.obehy.feature.onboarding.settingsScreen
+import cz.obehy.feature.planner.JourneyMapRoute
 import cz.obehy.feature.planner.PlannerRoute
 import cz.obehy.feature.planner.plannerScreen
 import cz.obehy.feature.trip.tripScreen
@@ -72,8 +81,13 @@ fun ObehyShell(
     val nav = rememberNavController()
     val entry by nav.currentBackStackEntryAsState()
     val current = entry?.destination
+    val onMap = current?.hasRoute(JourneyMapRoute::class) == true
+    val bar = rememberNavigationSuiteScaffoldState()
+    // The bar slides away for the map, and back along with its shrinking into the journey.
+    LaunchedEffect(onMap) { if (onMap) bar.hide() else bar.show() }
     NavigationSuiteScaffold(
         modifier = modifier,
+        state = bar,
         navigationItems = {
             destinations(mode).forEach { top ->
                 NavigationSuiteItem(
@@ -91,18 +105,37 @@ fun ObehyShell(
             }
         },
     ) {
-        // Screens fade through each other; a journey's card grows into its detail on top of that
-        // (SharedBounds), and the back gesture plays it in reverse as you drag.
+        // Screens fade through each other. A journey's card grows into its detail and the header
+        // map into the full map on top of that (SharedBounds), and the back gesture plays those
+        // morphs in reverse as you drag, so it has no animation of its own to add.
         val fadeIn = fadeIn(MaterialTheme.motionScheme.defaultEffectsSpec())
         val fadeOut = fadeOut(MaterialTheme.motionScheme.fastEffectsSpec())
         SharedMotion {
             NavHost(
                 nav,
                 startDestination = PlannerRoute,
-                enterTransition = { fadeIn },
-                exitTransition = { fadeOut },
+                enterTransition = {
+                    if (targetState.destination.hasRoute(
+                            JourneyMapRoute::class,
+                        )
+                    ) {
+                        EnterTransition.None
+                    } else {
+                        fadeIn
+                    }
+                },
+                // The journey stays behind its map as it grows to fill the screen.
+                exitTransition = {
+                    if (targetState.destination.hasRoute(JourneyMapRoute::class)) {
+                        HoldDuringMorph
+                    } else {
+                        fadeOut
+                    }
+                },
                 popEnterTransition = { fadeIn },
                 popExitTransition = { fadeOut },
+                predictivePopEnterTransition = { EnterTransition.None },
+                predictivePopExitTransition = { fadeOut(tween(BACK_MS, easing = BackEasing)) },
             ) {
                 plannerScreen(nav)
                 tripScreen()
@@ -110,6 +143,13 @@ fun ObehyShell(
                 composable<DeparturesRoute> { ComingSoon(stringResource(R.string.nav_departures)) }
                 composable<MapRoute> { ComingSoon(stringResource(R.string.nav_map)) }
             }
+            // Tabs are peers, with nothing to morph into: leaving one back to the start is the
+            // same fade as switching tabs, once the gesture is done, with no preview to drag.
+            val inOtherTab =
+                destinations(mode).any { top ->
+                    top.routeClass != PlannerRoute::class && current?.hasRoute(top.routeClass) == true
+                }
+            BackHandler(enabled = inOtherTab) { nav.popBackStack() }
         }
     }
 }

@@ -1,6 +1,12 @@
 package cz.obehy.feature.planner
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -15,13 +21,13 @@ import androidx.lifecycle.repeatOnLifecycle
 import cz.obehy.core.map.RouteMap
 import cz.obehy.core.model.JourneyQuery
 import cz.obehy.core.ui.ObehyHeroScreen
-import cz.obehy.core.ui.ObehyScreen
+import cz.obehy.core.ui.ObehyTheme
 import cz.obehy.core.ui.SharedBounds
-import cz.obehy.core.ui.TitleBar
 import cz.obehy.core.ui.components.clock
 import kotlinx.coroutines.delay
 import java.time.Duration
 import java.time.Instant
+import cz.obehy.core.ui.R as UiR
 
 /** How often an open journey asks for fresh times while it is on screen. */
 private val REFRESH_EVERY: Duration = Duration.ofMinutes(1)
@@ -29,6 +35,7 @@ private val REFRESH_EVERY: Duration = Duration.ofMinutes(1)
 @Composable
 internal fun ItineraryDestination(
     viewModel: PlannerViewModel,
+    mapOpen: Boolean,
     onBack: () -> Unit,
     onMap: () -> Unit,
 ) {
@@ -52,7 +59,7 @@ internal fun ItineraryDestination(
             }
         }
     }
-    ItineraryScreen(open, state.query, onBack, onMap, onRefresh = { viewModel.act(PlannerAction.Refresh) })
+    ItineraryScreen(open, state.query, mapOpen, onBack, onMap, onRefresh = { viewModel.act(PlannerAction.Refresh) })
 }
 
 /** One journey: its map at the head, collapsing into the bar as the timeline scrolls. */
@@ -60,18 +67,21 @@ internal fun ItineraryDestination(
 internal fun ItineraryScreen(
     open: OpenJourney,
     query: JourneyQuery,
+    mapOpen: Boolean,
     onBack: () -> Unit,
     onMap: () -> Unit,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val itinerary = open.itinerary
-    SharedBounds(itinerary.key, modifier) {
+    SharedBounds(itinerary.key, modifier, holdOnExit = mapOpen) {
         ObehyHeroScreen(
             title = stringResource(R.string.times, itinerary.start.expected.clock(), itinerary.end.expected.clock()),
             subtitle = journeySummary(open),
             onBack = onBack,
-            hero = { RouteMap(itinerary.legs, Modifier.fillMaxSize()) },
+            hero = {
+                SharedBounds(mapKey(open), Modifier.fillMaxSize()) { RouteMap(itinerary.legs, Modifier.fillMaxSize()) }
+            },
             onHeroClick = onMap,
             refreshing = open.refreshing,
             onRefresh = onRefresh,
@@ -81,6 +91,9 @@ internal fun ItineraryScreen(
     }
 }
 
+/** The header map and the full-screen map are one thing, morphing between the two screens. */
+private fun mapKey(open: OpenJourney): String = "map:" + open.itinerary.key
+
 @Composable
 internal fun JourneyMapDestination(
     viewModel: PlannerViewModel,
@@ -88,8 +101,15 @@ internal fun JourneyMapDestination(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val open = state.open ?: return
-    ObehyScreen(stringResource(R.string.map_title), titleBar = TitleBar.Small, onBack = onBack, scrollable = false) {
-        RouteMap(open.itinerary.legs, Modifier.fillMaxSize(), interactive = true)
+    // Edge to edge, so it leaves ObehyScreen's frame: only the back button floats over the map.
+    SharedBounds(mapKey(open), Modifier.fillMaxSize()) {
+        RouteMap(open.itinerary.legs, Modifier.fillMaxSize(), interactive = true, fullscreen = true)
+        FilledTonalIconButton(
+            onClick = onBack,
+            modifier = Modifier.safeDrawingPadding().padding(ObehyTheme.spacing.s),
+        ) {
+            Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(UiR.string.back))
+        }
     }
 }
 

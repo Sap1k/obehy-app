@@ -17,6 +17,10 @@
     <string name="leave_now">Odjezd teď</string>
     <string name="leave_at">Odjezd %s</string>
     <string name="arrive_by">Příjezd do %s</string>
+    <string name="searching">Hledáme</string>
+    <string name="pick_time">Vybrat čas</string>
+    <string name="show_stops">Zobrazit zastávky</string>
+    <string name="hide_stops">Skrýt zastávky</string>
     <string name="depart">Odjezd</string>
     <string name="arrive">Příjezd</string>
     <string name="now">Teď</string>
@@ -57,17 +61,16 @@
 
     <string name="towards">směr %s</string>
     <plurals name="stops_between">
-        <item quantity="one">%1$d zastávka · %2$s</item>
-        <item quantity="few">%1$d zastávky · %2$s</item>
-        <item quantity="many">%1$d zastávky · %2$s</item>
-        <item quantity="other">%1$d zastávek · %2$s</item>
+        <item quantity="one">%d zastávka</item>
+        <item quantity="few">%d zastávky</item>
+        <item quantity="many">%d zastávky</item>
+        <item quantity="other">%d zastávek</item>
     </plurals>
     <string name="walk">%s chůze</string>
     <string name="spare">%s rezerva</string>
     <string name="stay_seated">Zůstaňte sedět, pokračuje jako %s.</string>
     <string name="pick_journey">Vyberte spojení a zobrazí se tady.</string>
     <string name="new_search">Nové hledání</string>
-    <string name="map_title">Mapa</string>
     <string name="updated">Aktualizováno %s</string>
     <string name="ago">před %s</string>
     <string name="just_now">teď</string>

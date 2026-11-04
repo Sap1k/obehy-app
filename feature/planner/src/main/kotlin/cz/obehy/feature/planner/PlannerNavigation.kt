@@ -1,10 +1,13 @@
 package cz.obehy.feature.planner
 
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
 import cz.obehy.core.ui.AnimatedDestination
 import kotlinx.serialization.Serializable
@@ -20,9 +23,9 @@ internal data object SearchRoute
 @Serializable
 internal data object ItineraryRoute
 
-/** The open journey on a full-screen map. */
+/** The open journey on a full-screen map; the app's navigation bar makes way for it. */
 @Serializable
-internal data object JourneyMapRoute
+data object JourneyMapRoute
 
 /**
  * Journey search, results, a journey's detail and its map (PLAN.md, milestone 1). The screens
@@ -38,9 +41,11 @@ fun NavGraphBuilder.plannerScreen(nav: NavController) {
         }
         composable<ItineraryRoute> { entry ->
             val graph = remember(entry) { nav.getBackStackEntry<PlannerRoute>() }
+            val top by nav.currentBackStackEntryAsState()
             AnimatedDestination(this) {
                 ItineraryDestination(
                     hiltViewModel(graph),
+                    mapOpen = top?.destination?.hasRoute<JourneyMapRoute>() == true,
                     onBack = { nav.popBackStack() },
                     onMap = { nav.navigate(JourneyMapRoute) },
                 )
@@ -48,7 +53,9 @@ fun NavGraphBuilder.plannerScreen(nav: NavController) {
         }
         composable<JourneyMapRoute> { entry ->
             val graph = remember(entry) { nav.getBackStackEntry<PlannerRoute>() }
-            JourneyMapDestination(hiltViewModel(graph), onBack = { nav.popBackStack() })
+            AnimatedDestination(this) {
+                JourneyMapDestination(hiltViewModel(graph), onBack = { nav.popBackStack() })
+            }
         }
     }
 }

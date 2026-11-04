@@ -6,6 +6,7 @@ import cz.obehy.core.data.SettingsRepository
 import cz.obehy.core.model.AppMode
 import cz.obehy.core.model.AppSettings
 import cz.obehy.core.model.RoutingProvider
+import cz.obehy.core.model.ThemeMode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -29,6 +30,10 @@ class SetupViewModel
 
         fun choose(provider: RoutingProvider) {
             viewModelScope.launch { settings.setRoutingProvider(provider) }
+        }
+
+        fun choose(theme: ThemeMode) {
+            viewModelScope.launch { settings.setTheme(theme) }
         }
 
         /** Ends onboarding; the app then shows its main screens. */

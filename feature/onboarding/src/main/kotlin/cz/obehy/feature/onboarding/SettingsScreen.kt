@@ -18,6 +18,7 @@ import androidx.navigation.compose.composable
 import cz.obehy.core.model.AppMode
 import cz.obehy.core.model.AppSettings
 import cz.obehy.core.model.RoutingProvider
+import cz.obehy.core.model.ThemeMode
 import cz.obehy.core.ui.ObehyScreen
 import cz.obehy.core.ui.ObehyTheme
 import cz.obehy.core.ui.components.ChoiceList
@@ -33,7 +34,7 @@ fun NavGraphBuilder.settingsScreen() {
 @Composable
 private fun SettingsDestination(viewModel: SetupViewModel = hiltViewModel()) {
     val settings by viewModel.state.collectAsStateWithLifecycle()
-    SettingsScreen(settings, onMode = viewModel::choose, onProvider = viewModel::choose)
+    SettingsScreen(settings, onMode = viewModel::choose, onProvider = viewModel::choose, onTheme = viewModel::choose)
 }
 
 /** The onboarding choices, changeable at any time; they apply immediately. */
@@ -42,6 +43,7 @@ internal fun SettingsScreen(
     settings: AppSettings,
     onMode: (AppMode) -> Unit,
     onProvider: (RoutingProvider) -> Unit,
+    onTheme: (ThemeMode) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     ObehyScreen(title = stringResource(R.string.settings_title), modifier = modifier) {
@@ -49,6 +51,7 @@ internal fun SettingsScreen(
         Section(
             R.string.settings_provider,
         ) { ChoiceList(providerChoices.toItems(), settings.routingProvider, onProvider) }
+        Section(R.string.settings_theme) { ChoiceList(themeChoices.toItems(), settings.theme, onTheme) }
     }
 }
 

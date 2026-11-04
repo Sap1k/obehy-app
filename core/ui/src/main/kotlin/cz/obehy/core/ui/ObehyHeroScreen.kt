@@ -51,7 +51,12 @@ fun ObehyHeroScreen(
             TopAppBar(
                 title = {
                     Column {
-                        Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text(
+                            title,
+                            style = MaterialTheme.typography.titleLargeEmphasized,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
                         subtitle?.let {
                             Text(
                                 it,

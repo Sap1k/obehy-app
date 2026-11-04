@@ -43,6 +43,7 @@ The look is defined once, in `core:ui`, and everything else reads it:
 | A screen | `ObehyScreen(title) { … }`: top bar, insets, readable width | `ObehyScreen.kt` |
 | A screen led by a map | `ObehyHeroScreen(title, hero = { … }) { … }`: the hero scrolls away with the content | `ObehyHeroScreen.kt` |
 | Chips in a row | `ScrollingChipRow { … }`: scrolls sideways, edge to edge, fades where more wait | `components/` |
+| A list arriving | `StaggeredEntry(order, enabled) { … }`: items rise in one after another | `components/` |
 | One thing on two screens | `SharedBounds(key) { … }` on both: it morphs between them | `SharedMotion.kt` |
 | Pick-one options | `ChoiceList` | `components/` |
 | Logo | `ObehyLogo()` | `Logo.kt` |

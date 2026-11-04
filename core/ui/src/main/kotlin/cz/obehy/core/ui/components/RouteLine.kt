@@ -161,6 +161,11 @@ private fun DrawScope.marker(
         RouteMark.Stop, RouteMark.Pass -> {
             drawCircle(surface, radius, centre)
             drawCircle(color, radius - ring / 2, centre, style = Stroke(ring))
+            // A ring that would vanish needs its edge on the inside too.
+            if (edge != null) {
+                val width = 1.dp.toPx()
+                drawCircle(edge, radius - ring - width / 2, centre, style = Stroke(width))
+            }
         }
 
         RouteMark.End -> {

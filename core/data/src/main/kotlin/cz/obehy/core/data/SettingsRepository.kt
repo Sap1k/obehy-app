@@ -10,6 +10,7 @@ import cz.obehy.core.model.AppMode
 import cz.obehy.core.model.AppSettings
 import cz.obehy.core.model.RoutingProvider
 import cz.obehy.core.model.SearchOptions
+import cz.obehy.core.model.ThemeMode
 import cz.obehy.core.model.TransportType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -33,6 +34,7 @@ class SettingsRepository
                             RoutingProvider.entries.firstOrNull { it.name == name }
                         },
                     onboardingFinished = prefs[ONBOARDED] ?: false,
+                    theme = ThemeMode.entries.firstOrNull { it.name == prefs[THEME] } ?: ThemeMode.System,
                 )
             }
 
@@ -44,6 +46,10 @@ class SettingsRepository
 
         suspend fun setRoutingProvider(provider: RoutingProvider) {
             store.edit { it[PROVIDER] = provider.name }
+        }
+
+        suspend fun setTheme(theme: ThemeMode) {
+            store.edit { it[THEME] = theme.name }
         }
 
         suspend fun finishOnboarding() {
@@ -78,6 +84,7 @@ class SettingsRepository
             val MODE = stringPreferencesKey("mode")
             val PROVIDER = stringPreferencesKey("routing_provider")
             val ONBOARDED = booleanPreferencesKey("onboarding_finished")
+            val THEME = stringPreferencesKey("theme")
             val LOW_FLOOR = booleanPreferencesKey("search_low_floor")
             val ROUTED_TRANSFERS = booleanPreferencesKey("search_routed_transfers")
             val TRANSPORT_TYPES = stringSetPreferencesKey("search_transport_types")

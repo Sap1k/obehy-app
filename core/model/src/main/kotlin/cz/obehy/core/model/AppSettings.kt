@@ -23,6 +23,14 @@ enum class RoutingProvider(
     Obehy("https://motis.obehy.cz/"),
 }
 
+/** Whether the app is light or dark. */
+enum class ThemeMode {
+    /** Whatever the phone is set to. */
+    System,
+    Light,
+    Dark,
+}
+
 /**
  * The user's choices. Onboarding saves each as it is picked and sets [onboardingFinished] only
  * when the user confirms, so the app stays in onboarding until then.
@@ -31,6 +39,7 @@ data class AppSettings(
     val mode: AppMode? = null,
     val routingProvider: RoutingProvider? = null,
     val onboardingFinished: Boolean = false,
+    val theme: ThemeMode = ThemeMode.System,
 ) {
     val isOnboarded: Boolean get() = onboardingFinished && mode != null && routingProvider != null
 }

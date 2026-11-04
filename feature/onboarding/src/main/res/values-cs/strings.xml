@@ -27,4 +27,11 @@
     <string name="settings_title">Nastavení</string>
     <string name="settings_mode">Režim aplikace</string>
     <string name="settings_provider">Vyhledávání spojení</string>
+    <string name="settings_theme">Vzhled</string>
+    <string name="theme_system">Podle telefonu</string>
+    <string name="theme_system_description">Světlý nebo tmavý podle nastavení telefonu.</string>
+    <string name="theme_light">Světlý</string>
+    <string name="theme_light_description">Dobře čitelný i venku.</string>
+    <string name="theme_dark">Tmavý</string>
+    <string name="theme_dark_description">Šetří oči v noci.</string>
 </resources>

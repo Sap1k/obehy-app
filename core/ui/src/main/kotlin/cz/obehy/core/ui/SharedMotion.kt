@@ -1,10 +1,18 @@
 package cz.obehy.core.ui
 
 import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.BoundsTransform
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.Easing
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
@@ -30,6 +38,19 @@ fun SharedMotion(
     }
 }
 
+/** How long a shared element takes to morph, and a screen to leave with it. */
+const val BACK_MS: Int = 350
+
+/**
+ * The curve of a morph. The back gesture scrubs through it by the finger, so the curve shapes the
+ * drag: a spring would do nearly all of it at the start and linear feels dead, while this eases
+ * in and out and stays with the finger.
+ */
+val BackEasing: Easing = FastOutSlowInEasing
+
+/** Leaves a thing fully there for as long as a morph over it takes, and only then gone. */
+val HoldDuringMorph: ExitTransition = fadeOut(tween(BACK_MS), targetAlpha = 1f)
+
 /** Marks [content] as one navigation destination's screen, the scope its shared elements animate in. */
 @Composable
 fun AnimatedDestination(
@@ -41,21 +62,40 @@ fun AnimatedDestination(
 
 /**
  * [content] as the same thing as every other [SharedBounds] with this [key] on another screen:
- * moving between the screens morphs one into the other. Without [SharedMotion] around, it is a
- * plain box.
+ * moving between the screens morphs one into the other. With [holdOnExit] it stays as it is when
+ * it leaves instead of fading, for something else growing over it. Without [SharedMotion] around,
+ * it is a plain box.
  */
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun SharedBounds(
     key: Any,
     modifier: Modifier = Modifier,
+    holdOnExit: Boolean = false,
     content: @Composable () -> Unit,
 ) {
     val shared = LocalSharedTransitionScope.current
     val animated = LocalNavAnimatedScope.current
     val bounds =
         if (shared != null && animated != null) {
-            with(shared) { Modifier.sharedBounds(rememberSharedContentState(key), animated) }
+            with(shared) {
+                // Rounded the whole way, so a card doesn't square off as it grows or shrinks.
+                Modifier.sharedBounds(
+                    rememberSharedContentState(key),
+                    animated,
+                    // Not a spring: the back gesture scrubs through this by the finger, and a spring
+                    // would do nearly all of it in the first bit of the drag.
+                    boundsTransform = BoundsTransform { _, _ -> tween(BACK_MS, easing = BackEasing) },
+                    enter = fadeIn(tween(BACK_MS, easing = BackEasing)),
+                    exit =
+                        if (holdOnExit) {
+                            HoldDuringMorph
+                        } else {
+                            fadeOut(tween(BACK_MS, easing = BackEasing))
+                        },
+                    clipInOverlayDuringTransition = OverlayClip(MaterialTheme.shapes.large),
+                )
+            }
         } else {
             Modifier
         }
