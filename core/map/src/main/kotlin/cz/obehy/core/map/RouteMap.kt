@@ -1,6 +1,7 @@
 package cz.obehy.core.map
 
 import android.content.Context
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -26,11 +27,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.DpSize
 import cz.obehy.core.model.LatLon
 import cz.obehy.core.model.Leg
 import cz.obehy.core.ui.ObehyTheme
@@ -51,7 +54,6 @@ import kotlinx.serialization.json.putJsonObject
 import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.interaction.MapInteractions
 import org.maplibre.compose.map.AndroidRenderMode
-import org.maplibre.compose.map.MapState
 import org.maplibre.compose.map.MapUiOptions
 import org.maplibre.compose.map.MaplibreMap
 import org.maplibre.compose.map.rememberMapState
@@ -81,47 +83,66 @@ fun RouteMap(
     fullscreen: Boolean = false,
 ) {
     val context = LocalContext.current
-    val dark = MaterialTheme.colorScheme.surface.luminance() < 0.5f
-    val primary = MaterialTheme.colorScheme.primary.hex()
-    val walk = MaterialTheme.colorScheme.outline.hex()
+    val look = mapLook()
     val loading = MaterialTheme.colorScheme.surfaceContainer
     val shape = remember(legs) { legs.map { it.shape() } }
-    val style =
-        remember(shape, dark, primary, walk) {
-            BaseStyle.Json(journeyStyle(context, dark, legs, primary, walk))
-        }
+    // Keyed on the text too: fresh times bring new legs, but the same map, which needn't reload.
+    val json = remember(legs, look) { journeyStyle(context, look, legs) }
+    val style = remember(json) { BaseStyle.Json(json) }
     BoxWithConstraints(modifier) {
-        val camera = remember(shape, maxWidth, maxHeight) { frame(shape.flatten(), maxWidth.value, maxHeight.value) }
-        val state = rememberMapState(baseStyle = style, initialCameraPosition = camera)
-        MaplibreMap(
-            Modifier.fillMaxSize(),
-            state = state,
-            interactions = if (interactive) MapInteractions.Standard else MapInteractions.None,
-            // A texture, not a surface: only a texture scales, clips and fades with the screen
-            // around it, which the back gesture's preview and the card's morph both depend on.
-            uiOptions =
-                MapUiOptions(if (interactive) MapUiOptions.Standard else MapUiOptions.None) {
-                    renderMode = AndroidRenderMode.Texture
-                    loadColor = loading
-                },
-            // The map data's credits (OpenStreetMap, OpenMapTiles), without MapLibre's logo.
-            overlay = {
-                MapCredits(
-                    state,
-                    Modifier
-                        .align(Alignment.BottomEnd)
-                        .then(if (fullscreen) Modifier.navigationBarsPadding() else Modifier)
-                        .padding(ObehyTheme.spacing.s),
-                )
-            },
-        )
+        val creditsModifier =
+            Modifier
+                .align(Alignment.BottomEnd)
+                .then(if (fullscreen) Modifier.navigationBarsPadding() else Modifier)
+                .padding(ObehyTheme.spacing.s)
+        val still =
+            remember(json, maxWidth, maxHeight, interactive) {
+                if (interactive) null else stillMap(json, DpSize(maxWidth, maxHeight))
+            }
+        if (still != null) {
+            Image(still.image, contentDescription = null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
+            MapCredits({ still.credits }, creditsModifier)
+        } else {
+            val camera =
+                remember(shape, maxWidth, maxHeight) { frame(shape.flatten(), maxWidth.value, maxHeight.value) }
+            val state = rememberMapState(baseStyle = style, initialCameraPosition = camera)
+            MaplibreMap(
+                Modifier.fillMaxSize(),
+                state = state,
+                interactions = if (interactive) MapInteractions.Standard else MapInteractions.None,
+                // A texture, not a surface: only a texture scales, clips and fades with the screen
+                // around it, which the back gesture's preview and the card's morph both depend on.
+                uiOptions =
+                    MapUiOptions(if (interactive) MapUiOptions.Standard else MapUiOptions.None) {
+                        renderMode = AndroidRenderMode.Texture
+                        loadColor = loading
+                    },
+                // The map data's credits (OpenStreetMap, OpenMapTiles), without MapLibre's logo.
+                overlay = { MapCredits({ state.style.attributions() }, creditsModifier) },
+            )
+        }
     }
 }
 
-/** A small (i) that opens the map data's credits, readable on any map. */
+/** What a journey's map takes from the app's theme. */
+internal data class MapLook(
+    val dark: Boolean,
+    val primary: String,
+    val walk: String,
+)
+
+@Composable
+internal fun mapLook(): MapLook =
+    MapLook(
+        dark = MaterialTheme.colorScheme.surface.luminance() < 0.5f,
+        primary = MaterialTheme.colorScheme.primary.hex(),
+        walk = MaterialTheme.colorScheme.outline.hex(),
+    )
+
+/** A small (i) that opens the map data's [credits], readable on any map. */
 @Composable
 private fun MapCredits(
-    state: MapState,
+    credits: () -> List<String>,
     modifier: Modifier = Modifier,
 ) {
     var open by rememberSaveable { mutableStateOf(false) }
@@ -144,7 +165,7 @@ private fun MapCredits(
             ) {
                 Text(stringResource(R.string.map_credits), style = MaterialTheme.typography.titleMedium)
                 AttributionLinks(
-                    state.style.attributions(),
+                    credits(),
                     Modifier,
                     MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface),
                     TextLinkStyles(
@@ -160,23 +181,24 @@ private fun MapCredits(
 }
 
 /** The points a leg is drawn through: its path, or a straight line between its stops. */
-private fun Leg.shape(): List<LatLon> = path.ifEmpty { listOfNotNull(from.position, to.position) }
+internal fun Leg.shape(): List<LatLon> = path.ifEmpty { listOfNotNull(from.position, to.position) }
 
 private fun Color.hex(): String = "#%06X".format(toArgb() and 0xFFFFFF)
 
 /**
  * The web's map style (exported to the assets by `tools/export-style.mjs`) with the journey in
  * its `trip` source: rides as paths in their colours, walks as a dashed line under them, and the
- * stops where you board or alight. A route colour that would vanish into the map is edged in [walk].
+ * stops where you board or alight. A route colour that would vanish into the map is edged in the
+ * walks' colour.
  */
-private fun journeyStyle(
+internal fun journeyStyle(
     context: Context,
-    dark: Boolean,
+    look: MapLook,
     legs: List<Leg>,
-    primary: String,
-    walk: String,
 ): String {
-    val asset = if (dark) "map-style-dark.json" else "map-style-light.json"
+    val primary = look.primary
+    val walk = look.walk
+    val asset = if (look.dark) "map-style-dark.json" else "map-style-light.json"
     val base =
         JsonParser
             .parseToJsonElement(
@@ -309,7 +331,7 @@ private fun feature(
 private fun LatLon.coordinates(): JsonArray = JsonArray(listOf(JsonPrimitive(lon), JsonPrimitive(lat)))
 
 /** A camera showing every one of [points] in a [width]×[height] dp map, with a margin. */
-private fun frame(
+internal fun frame(
     points: List<LatLon>,
     width: Float,
     height: Float,

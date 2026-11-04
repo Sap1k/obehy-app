@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import cz.obehy.core.map.PreloadRouteMaps
 import cz.obehy.core.map.RouteMap
 import cz.obehy.core.model.Itinerary
 import cz.obehy.core.model.JourneyQuery
@@ -159,6 +160,8 @@ private fun ResultsList(
     modifier: Modifier = Modifier,
 ) {
     val loaded = state.results as? Results.Loaded
+    // The detail pane of a wide screen has its own size, and is open anyway.
+    if (loaded != null && !wide) PreloadRouteMaps(remember(loaded.itineraries) { loaded.itineraries.map { it.legs } })
     PullToRefreshBox(
         isRefreshing = loaded?.refreshing == true,
         onRefresh = { onAction(PlannerAction.RefreshResults) },
