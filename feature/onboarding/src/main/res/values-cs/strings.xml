@@ -27,7 +27,7 @@
     <string name="server_title">Vlastní server</string>
     <string name="server_body">Zadejte adresu serveru MOTIS. Než ho začnete používat, vyzkoušíme ho.</string>
     <string name="server_address">Adresa serveru</string>
-    <string name="server_address_invalid">Tohle nevypadá jako adresa serveru.</string>
+    <string name="server_address_invalid">Zadejte adresu serveru s https.</string>
     <string name="server_check">Vyzkoušet</string>
     <string name="server_checking">Zkoušíme to…</string>
     <string name="server_step_server">Spojení se serverem</string>

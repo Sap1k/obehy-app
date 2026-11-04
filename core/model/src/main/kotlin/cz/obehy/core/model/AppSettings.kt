@@ -62,11 +62,11 @@ data class AppSettings(
 
 /**
  * [text] as a server address that request paths can be added to, or null if it can't be one.
- * Without a scheme, it's taken to be https.
+ * Only https will do, as searches give away where the user is; no scheme is taken to mean https.
  */
 fun motisUrlOf(text: String): String? {
     val url = text.trim().let { if ("://" in it) it else "https://$it" }
     val uri = runCatching { URI(url) }.getOrNull() ?: return null
-    val isWebAddress = uri.scheme?.lowercase() in setOf("http", "https") && uri.host != null
-    return if (isWebAddress && uri.query == null && uri.fragment == null) url.trimEnd('/') + "/" else null
+    val isSecure = uri.scheme?.lowercase() == "https" && uri.host != null
+    return if (isSecure && uri.query == null && uri.fragment == null) url.trimEnd('/') + "/" else null
 }

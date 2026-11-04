@@ -27,7 +27,7 @@
     <string name="server_title">Your own server</string>
     <string name="server_body">Enter the address of a MOTIS server. We\'ll try it out before you use it.</string>
     <string name="server_address">Server address</string>
-    <string name="server_address_invalid">That doesn\'t look like a server address.</string>
+    <string name="server_address_invalid">Enter a server address that uses https.</string>
     <string name="server_check">Try it out</string>
     <string name="server_checking">Trying it out…</string>
     <string name="server_step_server">Reaching the server</string>

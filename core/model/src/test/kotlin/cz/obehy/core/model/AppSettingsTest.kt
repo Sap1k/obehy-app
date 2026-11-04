@@ -34,7 +34,7 @@ class AppSettingsTest {
     fun `an address gets what requests need`() {
         assertEquals(own, motisUrlOf("  https://motis.example.org  "))
         assertEquals(own, motisUrlOf("motis.example.org/"))
-        assertEquals("http://192.168.1.5:8080/", motisUrlOf("http://192.168.1.5:8080"))
+        assertEquals("https://192.168.1.5:8080/", motisUrlOf("https://192.168.1.5:8080"))
         assertEquals("https://example.org/motis/", motisUrlOf("https://example.org/motis"))
     }
 
@@ -42,6 +42,7 @@ class AppSettingsTest {
     fun `what cannot be a server is refused`() {
         assertNull(motisUrlOf("not a url"))
         assertNull(motisUrlOf("ftp://example.org"))
+        assertNull(motisUrlOf("http://example.org"))
         assertNull(motisUrlOf("https://"))
         assertNull(motisUrlOf("https://example.org/?a=b"))
     }
