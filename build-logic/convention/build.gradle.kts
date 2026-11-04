@@ -23,6 +23,7 @@ dependencies {
     compileOnly(libs.compose.gradlePlugin)
     compileOnly(libs.ksp.gradlePlugin)
     compileOnly(libs.hilt.gradlePlugin)
+    implementation(libs.room.gradlePlugin)
 }
 
 gradlePlugin {
@@ -61,6 +62,13 @@ gradlePlugin {
                     .get()
                     .pluginId
             implementationClass = "HiltConventionPlugin"
+        }
+        register("room") {
+            id =
+                libs.plugins.obehy.room
+                    .get()
+                    .pluginId
+            implementationClass = "RoomConventionPlugin"
         }
         register("jvmLibrary") {
             id =

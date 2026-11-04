@@ -1,0 +1,137 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "916ebe823fb9f1517375038a714f8301",
+    "entities": [
+      {
+        "tableName": "journey_search",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `provider` TEXT NOT NULL, `at` INTEGER NOT NULL, `from_id` TEXT NOT NULL, `from_name` TEXT NOT NULL, `from_area` TEXT, `from_kind` TEXT NOT NULL, `from_lat` REAL NOT NULL, `from_lon` REAL NOT NULL, `from_modes` TEXT NOT NULL, `to_id` TEXT NOT NULL, `to_name` TEXT NOT NULL, `to_area` TEXT, `to_kind` TEXT NOT NULL, `to_lat` REAL NOT NULL, `to_lon` REAL NOT NULL, `to_modes` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "provider",
+            "columnName": "provider",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "at",
+            "columnName": "at",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "from.placeId",
+            "columnName": "from_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "from.name",
+            "columnName": "from_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "from.area",
+            "columnName": "from_area",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "from.kind",
+            "columnName": "from_kind",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "from.lat",
+            "columnName": "from_lat",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "from.lon",
+            "columnName": "from_lon",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "from.modes",
+            "columnName": "from_modes",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "to.placeId",
+            "columnName": "to_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "to.name",
+            "columnName": "to_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "to.area",
+            "columnName": "to_area",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "to.kind",
+            "columnName": "to_kind",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "to.lat",
+            "columnName": "to_lat",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "to.lon",
+            "columnName": "to_lon",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "to.modes",
+            "columnName": "to_modes",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_journey_search_provider_at",
+            "unique": false,
+            "columnNames": [
+              "provider",
+              "at"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_journey_search_provider_at` ON `${TABLE_NAME}` (`provider`, `at`)"
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '916ebe823fb9f1517375038a714f8301')"
+    ]
+  }
+}

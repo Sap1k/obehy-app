@@ -112,6 +112,13 @@ Refresh/replanning uses MOTIS (re-plan / `trip` endpoint) and never runs in-hous
    The mode decides how much is shown (composition/circulation only in Enhanced).
 6. Itinerary map with MapLibre (leg polylines from MOTIS `legGeometry`).
 
+## Shipped since milestone 1
+
+- **My location and nearby stops:** MOTIS `map/stops` grouped into stops, in the place picker. Coordinates
+  go to the routing provider rounded to about 100 m, except for the journey search itself.
+- **Search history:** Room, on the phone only, per provider, excluded from backups. `JourneySuggester`
+  ranks past searches by recency, time of day, kind of day and where the phone is, and offers the way back.
+
 ## Later milestones
 
 - **M2 Boards:** MOTIS `stoptimes` (both modes, enriched via the same endpoint), plus the
@@ -121,7 +128,7 @@ Refresh/replanning uses MOTIS (re-plan / `trip` endpoint) and never runs in-hous
 
 ## Verified against live services (2026-11-02)
 
-- Both `api.transitous.org` and `motis.obehy.cz` serve MOTIS **`/api/v5/plan`** and `/api/v1/geocode`.
+- Both `api.transitous.org` and `motis.obehy.cz` serve MOTIS `/api/v6/plan`, `/api/v1/geocode` and `/api/v1/map/stops`.
 - Leg `tripId` format: **`{YYYYMMDD}_{HH:MM}_{dataset tag}_{feed trip_id}`**. The date is the
   **GTFS service date** and the time the **local GTFS time** of the trip's first departure (it
   can pass 24:00, e.g. `24:01`), so the service date comes straight from the ID.

@@ -55,6 +55,7 @@ import cz.obehy.core.model.JourneyQuery
 import cz.obehy.core.model.Place
 import cz.obehy.core.model.SearchOptions
 import cz.obehy.core.ui.ObehyTheme
+import cz.obehy.core.ui.SwapBounds
 import cz.obehy.core.ui.components.LowFloorIcon
 import cz.obehy.core.ui.components.RouteMark
 import cz.obehy.core.ui.components.RouteRow
@@ -85,6 +86,7 @@ internal fun SearchForm(
             Column(Modifier.weight(1f)) {
                 RouteRow(RouteMark.Stop, below = line) {
                     PlaceField(
+                        PlaceTarget.From,
                         R.string.from,
                         query.from,
                         R.string.from_placeholder,
@@ -95,6 +97,7 @@ internal fun SearchForm(
                 query.vias.forEachIndexed { index, via ->
                     RouteRow(RouteMark.Via, above = line, below = line) {
                         PlaceField(
+                            PlaceTarget.Via(index),
                             R.string.via,
                             via,
                             R.string.place_hint_stop,
@@ -105,6 +108,7 @@ internal fun SearchForm(
                 }
                 RouteRow(RouteMark.End, above = line) {
                     PlaceField(
+                        PlaceTarget.To,
                         R.string.to,
                         query.to,
                         R.string.to_placeholder,
@@ -191,6 +195,7 @@ internal fun SearchForm(
 /** A place on the route line: its label above, the place (or a prompt) below. */
 @Composable
 private fun PlaceField(
+    target: PlaceTarget,
     @StringRes label: Int,
     place: Place?,
     @StringRes placeholder: Int,
@@ -200,60 +205,64 @@ private fun PlaceField(
     arrivesFromBelow: Boolean = false,
 ) {
     val motion = MaterialTheme.motionScheme
-    Surface(
-        onClick = onClick,
-        modifier =
-            modifier.fillMaxWidth().padding(
-                start = ObehyTheme.spacing.s,
-                top = ObehyTheme.spacing.xs / 2,
-                bottom =
-                    ObehyTheme.spacing.xs / 2,
-            ),
-        shape = MaterialTheme.shapes.large,
-        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+    SwapBounds(
+        target,
+        modifier.fillMaxWidth().padding(
+            start = ObehyTheme.spacing.s,
+            top = ObehyTheme.spacing.xs / 2,
+            bottom = ObehyTheme.spacing.xs / 2,
+        ),
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Column(
-                Modifier
-                    .weight(1f)
-                    .padding(horizontal = ObehyTheme.spacing.l, vertical = ObehyTheme.spacing.s),
-            ) {
-                Text(
-                    stringResource(label),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                // The name slides in the way the places trade when they are swapped.
-                AnimatedContent(
-                    place?.label(),
-                    transitionSpec = {
-                        val height = { full: Int -> if (arrivesFromBelow) full else -full }
-                        val leaving = { full: Int -> -height(full) }
-                        (slideInVertically(motion.defaultSpatialSpec(), height) + fadeIn(motion.defaultEffectsSpec()))
-                            .togetherWith(
-                                slideOutVertically(motion.defaultSpatialSpec(), leaving) +
-                                    fadeOut(motion.defaultEffectsSpec()),
-                            )
-                    },
-                    contentAlignment = Alignment.CenterStart,
-                ) { name ->
+        Surface(
+            onClick = onClick,
+            modifier = Modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.large,
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(
+                    Modifier
+                        .weight(1f)
+                        .padding(horizontal = ObehyTheme.spacing.l, vertical = ObehyTheme.spacing.s),
+                ) {
                     Text(
-                        name ?: stringResource(placeholder),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color =
-                            if (name != null) {
-                                MaterialTheme.colorScheme.onSurface
-                            } else {
-                                MaterialTheme.colorScheme.onSurfaceVariant
-                            },
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
+                        stringResource(label),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
+                    // The name slides in the way the places trade when they are swapped.
+                    AnimatedContent(
+                        place?.label(),
+                        transitionSpec = {
+                            val height = { full: Int -> if (arrivesFromBelow) full else -full }
+                            val leaving = { full: Int -> -height(full) }
+                            val arriving = slideInVertically(motion.defaultSpatialSpec(), height)
+                            (arriving + fadeIn(motion.defaultEffectsSpec()))
+                                .togetherWith(
+                                    slideOutVertically(motion.defaultSpatialSpec(), leaving) +
+                                        fadeOut(motion.defaultEffectsSpec()),
+                                )
+                        },
+                        contentAlignment = Alignment.CenterStart,
+                    ) { name ->
+                        Text(
+                            name ?: stringResource(placeholder),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color =
+                                if (name != null) {
+                                    MaterialTheme.colorScheme.onSurface
+                                } else {
+                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                },
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
                 }
-            }
-            if (onRemove != null) {
-                IconButton(onClick = onRemove) {
-                    Icon(Icons.Rounded.Close, contentDescription = stringResource(R.string.remove_via))
+                if (onRemove != null) {
+                    IconButton(onClick = onRemove) {
+                        Icon(Icons.Rounded.Close, contentDescription = stringResource(R.string.remove_via))
+                    }
                 }
             }
         }

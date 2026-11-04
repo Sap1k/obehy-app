@@ -13,6 +13,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -29,7 +30,10 @@ class JourneyRepositoryTest {
                 val json = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
                 respond("""{"itineraries":[]}""", status(from), json)
             }
-        return JourneyRepository(MotisApi(apiClient(engine, MotisJson, "test")) { "https://motis.test/" })
+        return JourneyRepository(
+            MotisApi(apiClient(engine, MotisJson, "test")) { "https://motis.test/" },
+            Dispatchers.Default,
+        )
     }
 
     private val gone = Place("gone", "Old stop", null, PlaceKind.Stop, 50.0, 14.0)

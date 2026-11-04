@@ -28,6 +28,14 @@
     <string name="settings_mode">App mode</string>
     <string name="settings_provider">Journey search</string>
     <string name="settings_theme">Appearance</string>
+    <string name="settings_history">Your searches</string>
+    <string name="history_body">Past searches are kept on this phone only. They are how we suggest journeys.</string>
+    <string name="history_clear">Clear search history</string>
+    <string name="history_clear_title">Clear your search history?</string>
+    <string name="history_clear_body">Recent places and suggested journeys will start over. You can\'t undo this.</string>
+    <string name="history_clear_confirm">Clear</string>
+    <string name="history_clear_cancel">Keep it</string>
+    <string name="history_cleared">Search history cleared.</string>
     <string name="theme_system">Follow the phone</string>
     <string name="theme_system_description">Light or dark, whichever your phone is set to.</string>
     <string name="theme_light">Light</string>

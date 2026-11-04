@@ -7,8 +7,13 @@ import android.provider.Settings
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
@@ -16,11 +21,13 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -59,13 +66,15 @@ import androidx.core.app.ActivityCompat
 import cz.obehy.core.model.Place
 import cz.obehy.core.model.PlaceKind
 import cz.obehy.core.ui.ObehyTheme
+import cz.obehy.core.ui.components.StaggeredEntry
 import cz.obehy.core.ui.distinctModeIcons
 import cz.obehy.core.ui.icon
+import kotlinx.coroutines.delay
 import cz.obehy.core.ui.R as UiR
 
 /**
  * Picking a place: type, and stops, addresses and places appear as you do. Before anything is
- * typed it offers "My location" and the stops around you. A search view takes the whole screen
+ * typed it offers "My location", the stops around you when picking a start, and your own places. A search view takes the whole screen
  * like Material's search, so it has its own frame instead of ObehyScreen.
  */
 @Composable
@@ -73,6 +82,7 @@ internal fun PlaceSearchScreen(
     search: PlaceSearch,
     onType: (String) -> Unit,
     onChoose: (Place) -> Unit,
+    onForget: (Place) -> Unit,
     onClose: () -> Unit,
     onLocationAnswer: () -> Unit,
     modifier: Modifier = Modifier,
@@ -148,7 +158,7 @@ internal fun PlaceSearchScreen(
                 }
             }
             if (search.text.isBlank()) {
-                startingPoints(search, location, onChoose)
+                startingPoints(search, location, onChoose, onForget)
             }
             items(search.results, key = { it.id }) { place ->
                 PlaceRow(place, onClick = { onChoose(place) })
@@ -162,6 +172,7 @@ private fun LazyListScope.startingPoints(
     search: PlaceSearch,
     location: LocationAsk,
     onChoose: (Place) -> Unit,
+    onForget: (Place) -> Unit,
 ) {
     if (!search.target.stopsOnly) {
         item(key = "my-location") {
@@ -180,16 +191,36 @@ private fun LazyListScope.startingPoints(
             )
         }
     }
+    // Where you are going, or going through, is rarely right here.
+    if (search.target == PlaceTarget.From) nearby(search, location, onChoose)
+    recents(search, onChoose, onForget)
+}
+
+private fun LazyListScope.recents(
+    search: PlaceSearch,
+    onChoose: (Place) -> Unit,
+    onForget: (Place) -> Unit,
+) {
+    if (search.recents.isNotEmpty()) item(key = "recent-title") { SectionTitle(R.string.recent) }
+    itemsIndexed(search.recents, key = { _, it -> "recent-${it.id}" }) { index, place ->
+        StaggeredEntry(index, enabled = true) {
+            PlaceRow(place, onClick = { onChoose(place) }, onLongClick = { onForget(place) })
+        }
+    }
+}
+
+private fun LazyListScope.nearby(
+    search: PlaceSearch,
+    location: LocationAsk,
+    onChoose: (Place) -> Unit,
+) {
     when (search.nearbyStatus) {
         NearbyStatus.Unknown -> {
             Unit
         }
 
         NearbyStatus.Loading -> {
-            item(key = "near-loading") {
-                SectionTitle()
-                LinearWavyProgressIndicator(Modifier.fillMaxWidth().padding(horizontal = ObehyTheme.spacing.l))
-            }
+            item(key = "near-loading") { NearbyLoading() }
         }
 
         NearbyStatus.NeedsPermission -> {
@@ -228,18 +259,46 @@ private fun LazyListScope.startingPoints(
         }
 
         NearbyStatus.Ready -> {
-            if (search.nearby.isNotEmpty()) item(key = "near-title") { SectionTitle() }
-            items(search.nearby, key = { "near-${it.place.id}" }) { stop ->
-                PlaceRow(stop.place, detail = distanceText(stop.metres), onClick = { onChoose(stop.place) })
+            if (search.nearby.isNotEmpty()) item(key = "near-title") { SectionTitle(R.string.near_you) }
+            itemsIndexed(search.nearby, key = { _, it -> "near-${it.place.id}" }) { index, stop ->
+                StaggeredEntry(index, enabled = true) {
+                    PlaceRow(stop.place, detail = distanceText(stop.metres), onClick = { onChoose(stop.place) })
+                }
             }
         }
     }
 }
 
+/**
+ * The user beat the stops here. Something redrawing every frame keeps the keyboard waiting, so the
+ * animation holds back until the keyboard is on its way, or plainly isn't coming.
+ */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun SectionTitle(modifier: Modifier = Modifier) {
+private fun NearbyLoading(modifier: Modifier = Modifier) {
+    var noKeyboard by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        delay(KEYBOARD_ARRIVAL_MS)
+        noKeyboard = true
+    }
+    Column(modifier) {
+        SectionTitle(R.string.near_you)
+        AnimatedVisibility(WindowInsets.isImeVisible || noKeyboard) {
+            LinearWavyProgressIndicator(Modifier.fillMaxWidth().padding(horizontal = ObehyTheme.spacing.l))
+        }
+    }
+}
+
+private const val KEYBOARD_ARRIVAL_MS = 1_000L
+
+/** The title over a group of rows. */
+@Composable
+internal fun SectionTitle(
+    @StringRes title: Int,
+    modifier: Modifier = Modifier,
+) {
     Text(
-        stringResource(R.string.near_you),
+        stringResource(title),
         modifier.padding(
             start = ObehyTheme.spacing.l,
             end = ObehyTheme.spacing.l,
@@ -258,6 +317,7 @@ private fun PlaceRow(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     detail: String? = place.area,
+    onLongClick: (() -> Unit)? = null,
 ) {
     ListItem(
         headlineContent = { Text(place.label()) },
@@ -279,7 +339,12 @@ private fun PlaceRow(
                 }
             },
         colors = rowColors(),
-        modifier = modifier.clickable(onClick = onClick),
+        modifier =
+            modifier.combinedClickable(
+                onLongClickLabel = onLongClick?.let { stringResource(R.string.forget) },
+                onLongClick = onLongClick,
+                onClick = onClick,
+            ),
     )
 }
 

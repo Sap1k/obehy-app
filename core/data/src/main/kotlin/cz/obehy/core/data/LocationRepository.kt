@@ -14,10 +14,12 @@ import androidx.core.content.getSystemService
 import androidx.core.location.LocationManagerCompat
 import cz.obehy.core.model.LatLon
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import java.time.Duration
 import javax.inject.Inject
@@ -30,13 +32,13 @@ interface LocationRepository {
     val allowed: StateFlow<Boolean>
 
     /** Whether the phone's location is switched on. */
-    val enabled: Boolean
+    suspend fun isEnabled(): Boolean
 
     /** Looks at the permission again: it changes outside the app. */
     fun recheck()
 
     /** The latest position the phone already knows, however old; quick, for ranking. */
-    fun lastKnown(): LatLon?
+    suspend fun lastKnown(): LatLon?
 
     /** The position now, or a recent one when none comes in time; null when there is neither. */
     suspend fun current(): LatLon?
@@ -53,22 +55,24 @@ internal class AndroidLocationRepository
 
         override val allowed: StateFlow<Boolean> = permission.asStateFlow()
 
-        override val enabled: Boolean get() = LocationManagerCompat.isLocationEnabled(manager)
+        override suspend fun isEnabled(): Boolean =
+            withContext(Dispatchers.IO) { LocationManagerCompat.isLocationEnabled(manager) }
 
         override fun recheck() {
             permission.value = hasPermission()
         }
 
-        override fun lastKnown(): LatLon? = newest()?.toLatLon()
+        override suspend fun lastKnown(): LatLon? = known()?.toLatLon()
 
         // The permission is checked first, in recheck().
         @SuppressLint("MissingPermission")
         override suspend fun current(): LatLon? {
-            recheck()
+            withContext(Dispatchers.IO) { recheck() }
             if (!permission.value) return null
-            val known = newest()
+            val known = known()
             if (known != null && known.age() < FRESH) return known.toLatLon()
-            val provider = provider() ?: return known?.takeIf { it.age() < USABLE }?.toLatLon()
+            val provider =
+                withContext(Dispatchers.IO) { provider() } ?: return known?.takeIf { it.age() < USABLE }?.toLatLon()
             val fix =
                 withTimeoutOrNull(TIMEOUT.toMillis()) {
                     suspendCancellableCoroutine { waiting ->
@@ -84,6 +88,9 @@ internal class AndroidLocationRepository
                 }
             return (fix ?: known?.takeIf { it.age() < USABLE })?.toLatLon()
         }
+
+        /** Asking the system blocks, so it never happens on the main thread. */
+        private suspend fun known(): Location? = withContext(Dispatchers.IO) { newest() }
 
         /** The phone's combined provider where there is one, otherwise whichever is on. */
         private fun provider(): String? {

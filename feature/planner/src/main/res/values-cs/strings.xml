@@ -61,6 +61,10 @@
     <string name="retry">Zkusit znovu</string>
     <string name="my_location">Moje poloha</string>
     <string name="near_you">Ve vašem okolí</string>
+    <string name="recent">Nedávné</string>
+    <string name="suggested">Navrhované</string>
+    <string name="suggested_journey">%1$s → %2$s</string>
+    <string name="forget">Zapomenout</string>
     <string name="near_you_ask">Zobrazit zastávky v okolí</string>
     <string name="near_you_ask_body">Uvidíte nejbližší zastávky a jak daleko jsou.</string>
     <string name="near_you_blocked_body">Poloha je pro Oběhy zablokovaná. Povolte ji v nastavení aplikace.</string>

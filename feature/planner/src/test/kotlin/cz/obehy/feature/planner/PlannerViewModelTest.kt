@@ -5,13 +5,18 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.emptyPreferences
 import cz.obehy.core.data.JourneyRepository
 import cz.obehy.core.data.LocationRepository
+import cz.obehy.core.data.PastSearch
 import cz.obehy.core.data.PlaceRepository
+import cz.obehy.core.data.SearchHistoryRepository
+import cz.obehy.core.data.SearchHistoryStore
 import cz.obehy.core.data.SettingsRepository
 import cz.obehy.core.model.JourneyQuery
 import cz.obehy.core.model.LatLon
 import cz.obehy.core.model.Place
 import cz.obehy.core.model.PlaceKind
+import cz.obehy.core.model.RoutingProvider
 import cz.obehy.core.model.SearchOptions
+import cz.obehy.core.model.Suggestion
 import cz.obehy.core.model.TransportType
 import cz.obehy.core.network.MotisJson
 import cz.obehy.core.network.apiClient
@@ -24,16 +29,20 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
@@ -42,6 +51,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import java.time.Duration
 import java.time.Instant
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -54,6 +64,7 @@ class PlannerViewModelTest {
     private var stripped = false
     private var clock = Instant.parse("2026-11-03T08:00:00Z")
     private val location = FakeLocation()
+    private val store = FakeHistoryStore()
 
     @Before
     fun setUp() = Dispatchers.setMain(dispatcher)
@@ -98,7 +109,14 @@ class PlannerViewModelTest {
             )
         val motis = MotisApi(apiClient(engine, MotisJson, "test")) { "https://motis.test/" }
         val settings = SettingsRepository(MemoryStore())
-        val viewModel = PlannerViewModel(settings, PlaceRepository(motis), JourneyRepository(motis), location)
+        val viewModel =
+            PlannerViewModel(
+                settings,
+                PlaceRepository(motis, dispatcher),
+                JourneyRepository(motis, dispatcher),
+                location,
+                SearchHistoryRepository(store, settings),
+            )
         viewModel.now = { clock }
         backgroundScope.launch(dispatcher) { viewModel.state.collect {} }
         return viewModel to settings
@@ -236,6 +254,7 @@ class PlannerViewModelTest {
 
             vm.act(PlannerAction.ClosePlaceSearch)
             location.enabled = false
+            clock += Duration.ofMinutes(3)
             vm.act(PlannerAction.Pick(PlaceTarget.From))
             advanceUntilIdle()
             assertEquals(
@@ -243,6 +262,221 @@ class PlannerViewModelTest {
                 vm.state.value.placeSearch
                     ?.nearbyStatus,
             )
+        }
+
+    private fun stopRequests() = requests.count { it.url.encodedPath.endsWith("map/stops") }
+
+    @Test
+    fun `stops fetched ahead are there the moment the picker opens`() =
+        runTest(dispatcher) {
+            allowLocation()
+            val (vm, _) = viewModel()
+            vm.act(PlannerAction.CheckLocation)
+            advanceUntilIdle()
+            val fetched = stopRequests()
+
+            vm.act(PlannerAction.Pick(PlaceTarget.From))
+            runCurrent()
+
+            assertEquals(
+                NearbyStatus.Ready,
+                vm.state.value.placeSearch
+                    ?.nearbyStatus,
+            )
+            assertEquals(
+                listOf("Muzeum"),
+                vm.state.value.placeSearch
+                    ?.nearby
+                    ?.map { it.place.name },
+            )
+            assertEquals(fetched, stopRequests())
+        }
+
+    @Test
+    fun `opening before the stops have come waits for that same fetch`() =
+        runTest(dispatcher) {
+            allowLocation()
+            val fix = CompletableDeferred<Unit>()
+            location.waitFor = fix
+            val (vm, _) = viewModel()
+            vm.act(PlannerAction.CheckLocation)
+            vm.act(PlannerAction.Pick(PlaceTarget.From))
+            advanceUntilIdle()
+            assertEquals(
+                NearbyStatus.Loading,
+                vm.state.value.placeSearch
+                    ?.nearbyStatus,
+            )
+
+            fix.complete(Unit)
+            advanceUntilIdle()
+
+            assertEquals(
+                NearbyStatus.Ready,
+                vm.state.value.placeSearch
+                    ?.nearbyStatus,
+            )
+            assertEquals(1, location.fixes)
+        }
+
+    @Test
+    fun `stops from a while ago are fetched again`() =
+        runTest(dispatcher) {
+            allowLocation()
+            val (vm, _) = viewModel()
+            vm.act(PlannerAction.CheckLocation)
+            advanceUntilIdle()
+            val fetched = stopRequests()
+
+            clock += Duration.ofMinutes(3)
+            vm.act(PlannerAction.Pick(PlaceTarget.From))
+            advanceUntilIdle()
+
+            assertEquals(
+                NearbyStatus.Ready,
+                vm.state.value.placeSearch
+                    ?.nearbyStatus,
+            )
+            assertTrue(stopRequests() > fetched)
+        }
+
+    @Test
+    fun `stops from another provider are not kept`() =
+        runTest(dispatcher) {
+            allowLocation()
+            val (vm, settings) = viewModel()
+            settings.setRoutingProvider(RoutingProvider.Transitous)
+            advanceUntilIdle()
+            vm.act(PlannerAction.CheckLocation)
+            advanceUntilIdle()
+            val fetched = stopRequests()
+
+            settings.setRoutingProvider(RoutingProvider.Obehy)
+            advanceUntilIdle()
+            vm.act(PlannerAction.Pick(PlaceTarget.From))
+            advanceUntilIdle()
+
+            assertTrue(stopRequests() > fetched)
+        }
+
+    @Test
+    fun `nearby stops are only for the start`() =
+        runTest(dispatcher) {
+            allowLocation()
+            val (vm, _) = viewModel()
+            advanceUntilIdle()
+
+            vm.act(PlannerAction.Pick(PlaceTarget.To))
+            advanceUntilIdle()
+            assertEquals(
+                emptyList<Any>(),
+                vm.state.value.placeSearch
+                    ?.nearby,
+            )
+            vm.act(PlannerAction.ClosePlaceSearch)
+            vm.act(PlannerAction.Pick(PlaceTarget.Via(0)))
+            advanceUntilIdle()
+
+            assertEquals(
+                emptyList<Any>(),
+                vm.state.value.placeSearch
+                    ?.nearby,
+            )
+            assertTrue(requests.none { it.url.encodedPath.endsWith("map/stops") })
+        }
+
+    @Test
+    fun `a search that finds journeys is remembered, one that fails is not`() =
+        runTest(dispatcher) {
+            val (vm, _) = viewModel()
+            vm.fill()
+
+            failing = true
+            vm.act(PlannerAction.Search)
+            advanceUntilIdle()
+            assertTrue(store.rows.value.isEmpty())
+
+            failing = false
+            vm.act(PlannerAction.Search)
+            advanceUntilIdle()
+            assertEquals(listOf("A>D"), store.rows.value.map { "${it.from.id}>${it.to.id}" })
+        }
+
+    @Test
+    fun `my location is remembered with where the phone was`() =
+        runTest(dispatcher) {
+            allowLocation()
+            val (vm, _) = viewModel()
+            advanceUntilIdle()
+            vm.act(PlannerAction.Pick(PlaceTarget.To))
+            vm.act(PlannerAction.Choose(stop("D")))
+
+            vm.act(PlannerAction.Search)
+            advanceUntilIdle()
+
+            val from =
+                store.rows.value
+                    .single()
+                    .from
+            assertEquals(PlaceKind.MyLocation, from.kind)
+            assertEquals(HERE, from.position)
+        }
+
+    @Test
+    fun `a suggestion searches at once, and forgetting it takes it away`() =
+        runTest(dispatcher) {
+            store.rows.value = listOf(PastSearch(1, clock, stop("A"), stop("D")))
+            val (vm, _) = viewModel()
+            advanceUntilIdle()
+            val suggestion: Suggestion =
+                vm.state.value.suggestions
+                    .single()
+
+            vm.act(PlannerAction.UseSuggestion(suggestion))
+            advanceUntilIdle()
+            assertEquals(
+                "A",
+                vm.state.value.query.from
+                    ?.id,
+            )
+            assertEquals(
+                "D",
+                vm.state.value.query.to
+                    ?.id,
+            )
+            assertTrue(vm.state.value.results is Results.Loaded)
+
+            vm.act(PlannerAction.ForgetSuggestion(suggestion))
+            advanceUntilIdle()
+            assertTrue(
+                vm.state.value.suggestions
+                    .none { it.to.id == "D" && it.searches.contains(1) },
+            )
+        }
+
+    @Test
+    fun `the picker offers your places, and forgetting one drops it`() =
+        runTest(dispatcher) {
+            store.rows.value = listOf(PastSearch(1, clock, stop("A"), stop("D")))
+            val (vm, _) = viewModel()
+
+            vm.act(PlannerAction.Pick(PlaceTarget.To))
+            advanceUntilIdle()
+            val recents =
+                vm.state.value.placeSearch
+                    ?.recents
+                    .orEmpty()
+            assertEquals(listOf("D", "A"), recents.map { it.id })
+
+            vm.act(PlannerAction.ForgetPlace(recents.first()))
+            advanceUntilIdle()
+            assertEquals(
+                listOf("A"),
+                vm.state.value.placeSearch
+                    ?.recents
+                    ?.map { it.id },
+            )
+            assertTrue(store.rows.value.isEmpty())
         }
 
     @Test
@@ -452,14 +686,50 @@ private const val MAP_STOPS =
 
 private class FakeLocation : LocationRepository {
     var fix: LatLon? = null
+
+    /** Holds a fix back until the test lets it through. */
+    var waitFor: CompletableDeferred<Unit>? = null
+    var fixes = 0
     override val allowed = MutableStateFlow(false)
-    override var enabled = true
+    var enabled = true
+
+    override suspend fun isEnabled() = enabled
 
     override fun recheck() = Unit
 
-    override fun lastKnown(): LatLon? = fix
+    override suspend fun lastKnown(): LatLon? = fix
 
-    override suspend fun current(): LatLon? = fix
+    override suspend fun current(): LatLon? {
+        fixes++
+        waitFor?.await()
+        return fix
+    }
+}
+
+private class FakeHistoryStore : SearchHistoryStore {
+    val rows = MutableStateFlow<List<PastSearch>>(emptyList())
+
+    override fun searches(provider: String): Flow<List<PastSearch>> = rows.map { it.sortedByDescending(PastSearch::at) }
+
+    override suspend fun add(
+        provider: String,
+        search: PastSearch,
+    ) {
+        rows.value += search.copy(id = rows.value.size + 1L)
+    }
+
+    override suspend fun trim(
+        oldest: Instant,
+        keep: Int,
+    ) = Unit
+
+    override suspend fun delete(ids: Set<Long>) {
+        rows.value = rows.value.filter { it.id !in ids }
+    }
+
+    override suspend fun clear() {
+        rows.value = emptyList()
+    }
 }
 
 private class MemoryStore : DataStore<Preferences> {

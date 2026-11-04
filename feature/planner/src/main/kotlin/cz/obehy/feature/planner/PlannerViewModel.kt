@@ -2,9 +2,12 @@ package cz.obehy.feature.planner
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import cz.obehy.core.data.JourneyEnd
 import cz.obehy.core.data.JourneyRepository
+import cz.obehy.core.data.JourneySuggester
 import cz.obehy.core.data.LocationRepository
 import cz.obehy.core.data.PlaceRepository
+import cz.obehy.core.data.SearchHistoryRepository
 import cz.obehy.core.data.SettingsRepository
 import cz.obehy.core.model.Itinerary
 import cz.obehy.core.model.JourneyQuery
@@ -13,6 +16,7 @@ import cz.obehy.core.model.NearbyStop
 import cz.obehy.core.model.Place
 import cz.obehy.core.model.PlaceKind
 import cz.obehy.core.model.SearchOptions
+import cz.obehy.core.model.Suggestion
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
@@ -23,12 +27,16 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.Duration
 import java.time.Instant
+import java.time.ZoneId
 import javax.inject.Inject
 
 /** Which place of the search is being picked. */
@@ -48,6 +56,12 @@ sealed interface PlaceTarget {
 /** Whether nearby stops can be shown, and if not, what would make them appear. */
 enum class NearbyStatus { Unknown, Loading, Ready, NeedsPermission, Off }
 
+/** Nearby stops fetched ahead of the picker opening. */
+private class PreloadedStops(
+    val stops: List<NearbyStop>,
+    val at: Instant,
+)
+
 /** The place search while a place is being picked. */
 data class PlaceSearch(
     val target: PlaceTarget,
@@ -58,6 +72,7 @@ data class PlaceSearch(
     /** Shown while nothing has been typed. */
     val nearby: List<NearbyStop> = emptyList(),
     val nearbyStatus: NearbyStatus = NearbyStatus.Unknown,
+    val recents: List<Place> = emptyList(),
 )
 
 /** The journeys found for the current search. */
@@ -100,6 +115,8 @@ data class PlannerState(
     val placeSearch: PlaceSearch? = null,
     /** The journey open in the detail (beside the results on wide screens). */
     val open: OpenJourney? = null,
+    /** Journeys to offer before a search. */
+    val suggestions: List<Suggestion> = emptyList(),
 ) {
     /** Whether there is anything to clear with a new search. */
     val canReset: Boolean
@@ -120,6 +137,19 @@ sealed interface PlannerAction {
     ) : PlannerAction
 
     data class Choose(
+        val place: Place,
+    ) : PlannerAction
+
+    /** Fills the search with this journey and searches. */
+    data class UseSuggestion(
+        val suggestion: Suggestion,
+    ) : PlannerAction
+
+    data class ForgetSuggestion(
+        val suggestion: Suggestion,
+    ) : PlannerAction
+
+    data class ForgetPlace(
         val place: Place,
     ) : PlannerAction
 
@@ -174,21 +204,40 @@ class PlannerViewModel
         private val places: PlaceRepository,
         private val journeys: JourneyRepository,
         private val location: LocationRepository,
+        private val history: SearchHistoryRepository,
     ) : ViewModel() {
         private val local = MutableStateFlow(PlannerState())
         private var searchJob: Job? = null
         private var refreshJob: Job? = null
         private var nearbyJob: Job? = null
+        private var preloadJob: Job? = null
+        private var preloaded: PreloadedStops? = null
 
         /** The clock; tests set their own. */
         internal var now: () -> Instant = Instant::now
 
+        /** Bumped when the app comes back: the time, and perhaps the place, have moved on. */
+        private val moment = MutableStateFlow(0)
+
+        private val suggestions =
+            combine(history.searches, moment) { searches, _ ->
+                JourneySuggester.suggestions(searches, now().atZone(ZoneId.systemDefault()), location.lastKnown())
+            }.onStart { emit(emptyList()) }
+
         val state: StateFlow<PlannerState> =
-            combine(local, settings.searchOptions) { state, options -> state.copy(options = options) }
-                .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PlannerState())
+            combine(local, settings.searchOptions, suggestions) { state, options, suggested ->
+                state.copy(options = options, suggestions = suggested)
+            }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PlannerState())
 
         init {
             viewModelScope.launch { location.allowed.collect { startFromHere() } }
+            viewModelScope.launch {
+                // Stop IDs mean nothing to another provider.
+                settings.settings.map { it.routingProvider }.distinctUntilChanged().drop(1).collect {
+                    preloadJob?.cancel()
+                    preloaded = null
+                }
+            }
             viewModelScope.launch {
                 local
                     .map { state -> state.placeSearch?.let { it.target to it.text } }
@@ -222,6 +271,7 @@ class PlannerViewModel
                 is PlannerAction.Pick -> {
                     local.update { it.copy(placeSearch = PlaceSearch(action.target)) }
                     loadNearby()
+                    loadRecents(action.target)
                 }
 
                 is PlannerAction.Type -> {
@@ -244,8 +294,28 @@ class PlannerViewModel
                     choose(action.place)
                 }
 
+                is PlannerAction.UseSuggestion -> {
+                    val (from, to) = action.suggestion
+                    local.update { it.copy(query = it.query.copy(from = from, to = to, vias = emptyList())) }
+                    search()
+                }
+
+                is PlannerAction.ForgetSuggestion -> {
+                    viewModelScope.launch { history.forget(action.suggestion) }
+                }
+
+                is PlannerAction.ForgetPlace -> {
+                    local.update { state ->
+                        val search = state.placeSearch ?: return@update state
+                        state.copy(placeSearch = search.copy(recents = search.recents - action.place))
+                    }
+                    viewModelScope.launch { history.forget(action.place) }
+                }
+
                 PlannerAction.CheckLocation -> {
                     location.recheck()
+                    moment.update { it + 1 }
+                    if (location.allowed.value && freshStops() == null) preloadStops()
                     val status = local.value.placeSearch?.nearbyStatus
                     if (status != null && status != NearbyStatus.Ready && status != NearbyStatus.Loading) loadNearby()
                 }
@@ -321,24 +391,42 @@ class PlannerViewModel
             }
         }
 
-        /** The stops around the phone, for the picker before anything is typed. */
+        /** The stops around the phone, for picking a start before anything is typed. */
         private fun loadNearby() {
             nearbyJob?.cancel()
-            val status =
-                when {
-                    !location.allowed.value -> NearbyStatus.NeedsPermission
-                    !location.enabled -> NearbyStatus.Off
-                    else -> NearbyStatus.Loading
-                }
-            updateNearby(status)
-            if (status != NearbyStatus.Loading) return
+            val fromHere = location.allowed.value && local.value.placeSearch?.target == PlaceTarget.From
+            val ready = freshStops()?.takeIf { fromHere }
+            if (ready != null) {
+                updateNearby(NearbyStatus.Ready, ready)
+                return
+            }
             nearbyJob =
                 viewModelScope.launch {
-                    val fix = location.current()
-                    val stops = fix?.let { places.nearby(it).getOrNull() }
+                    val status =
+                        when {
+                            !location.allowed.value -> NearbyStatus.NeedsPermission
+                            !location.isEnabled() -> NearbyStatus.Off
+                            local.value.placeSearch?.target == PlaceTarget.From -> NearbyStatus.Loading
+                            else -> NearbyStatus.Unknown
+                        }
+                    updateNearby(status)
+                    if (status != NearbyStatus.Loading) return@launch
+                    preloadStops().join()
+                    val stops = freshStops()
                     updateNearby(if (stops != null) NearbyStatus.Ready else NearbyStatus.Unknown, stops.orEmpty())
                 }
         }
+
+        /** Gets the stops ready for the picker, joining a fetch already under way. */
+        private fun preloadStops(): Job =
+            preloadJob?.takeIf { it.isActive } ?: viewModelScope
+                .launch {
+                    val stops = location.current()?.let { places.nearby(it).getOrNull() }
+                    preloaded = stops?.let { PreloadedStops(it, now()) }
+                }.also { preloadJob = it }
+
+        private fun freshStops(): List<NearbyStop>? =
+            preloaded?.takeIf { Duration.between(it.at, now()) < STOPS_STAY_FRESH }?.stops
 
         private fun updateNearby(
             status: NearbyStatus,
@@ -346,6 +434,30 @@ class PlannerViewModel
         ) {
             local.update { state ->
                 state.copy(placeSearch = state.placeSearch?.copy(nearbyStatus = status, nearby = stops))
+            }
+        }
+
+        /** The user's own places for the picker, those that go with the other end first. */
+        private fun loadRecents(target: PlaceTarget) {
+            viewModelScope.launch {
+                val query = local.value.query
+                val recents =
+                    JourneySuggester.places(
+                        history.searches.first(),
+                        now().atZone(ZoneId.systemDefault()),
+                        location.lastKnown(),
+                        if (target == PlaceTarget.From) JourneyEnd.From else JourneyEnd.To,
+                        when (target) {
+                            PlaceTarget.From -> query.to
+                            PlaceTarget.To -> query.from
+                            is PlaceTarget.Via -> null
+                        },
+                        target.stopsOnly,
+                    )
+                local.update { state ->
+                    val search = state.placeSearch?.takeIf { it.target == target } ?: return@update state
+                    state.copy(placeSearch = search.copy(recents = recents))
+                }
             }
         }
 
@@ -461,6 +573,11 @@ class PlannerViewModel
                                 ),
                         )
                     }
+                    val from = located.from
+                    val to = located.to
+                    if (from != null && to != null && !page.getOrNull()?.itineraries.isNullOrEmpty()) {
+                        history.record(from, to, at)
+                    }
                 }
         }
 
@@ -521,5 +638,6 @@ class PlannerViewModel
         private companion object {
             const val PLACE_SEARCH_DELAY_MS = 250L
             const val MIN_PLACE_TEXT = 2
+            val STOPS_STAY_FRESH: Duration = Duration.ofMinutes(2)
         }
     }

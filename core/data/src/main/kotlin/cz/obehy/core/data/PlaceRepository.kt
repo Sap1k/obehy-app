@@ -10,9 +10,12 @@ import cz.obehy.core.network.motis.MotisMatch
 import cz.obehy.core.network.motis.MotisStop
 import cz.obehy.core.network.motis.domainModes
 import cz.obehy.core.network.motis.toPlace
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import java.text.Normalizer
 import java.util.Locale
 import javax.inject.Inject
+import javax.inject.Named
 import javax.inject.Singleton
 import kotlin.math.cos
 
@@ -22,6 +25,7 @@ class PlaceRepository
     @Inject
     constructor(
         private val motis: MotisApi,
+        @param:Named("computation") private val computation: CoroutineDispatcher,
     ) {
         /**
          * Places matching [text], ranked around [near]; only stops with [stopsOnly] (vias must be
@@ -33,16 +37,20 @@ class PlaceRepository
             near: LatLon? = null,
         ): Result<List<Place>> =
             runCatching {
-                val bias = near?.rounded()?.let { "${it.lat},${it.lon}" } ?: CZECHIA_CENTRE
-                val matches = motis.geocode(text.trim(), appLanguage(), stopsOnly, bias)
-                mergeDuplicateStops(matches)
+                withContext(computation) {
+                    val bias = near?.rounded()?.let { "${it.lat},${it.lon}" } ?: CZECHIA_CENTRE
+                    val matches = motis.geocode(text.trim(), appLanguage(), stopsOnly, bias)
+                    mergeDuplicateStops(matches)
+                }
             }
 
         /** The closest stops to [at], nearest first; it looks further out where they are sparse. */
         suspend fun nearby(at: LatLon): Result<List<NearbyStop>> =
             runCatching {
-                val close = stopsAround(at, NEAR_METRES)
-                if (close.size >= ENOUGH_STOPS) close else stopsAround(at, FAR_METRES)
+                withContext(computation) {
+                    val close = stopsAround(at, NEAR_METRES)
+                    if (close.size >= ENOUGH_STOPS) close else stopsAround(at, FAR_METRES)
+                }
             }
 
         private suspend fun stopsAround(
@@ -116,38 +124,47 @@ internal fun groupNearbyStops(
     stops: List<MotisStop>,
     at: LatLon,
 ): List<NearbyStop> {
-    val groups = mutableListOf<MutableList<MotisStop>>()
-    for (stop in stops.sortedBy { LatLon(it.lat, it.lon).metresTo(at) }) {
-        if (stop.stopId == null) continue
-        val group = groups.firstOrNull { group -> group.any { sameStop(it, stop) } }
+    val groups = mutableListOf<MutableList<MapStop>>()
+    val found =
+        stops
+            .filter { it.stopId != null }
+            .map { MapStop(it, stationKey(it.name), LatLon(it.lat, it.lon)) }
+            .sortedBy { it.position.metresTo(at) }
+    for (stop in found) {
+        val group = groups.firstOrNull { group -> group.any { it.isSameStop(stop) } }
         if (group != null) group += stop else groups += mutableListOf(stop)
     }
     return groups
         .map { group ->
             val feed =
                 group
-                    .groupingBy { feedTag(it) }
+                    .groupingBy { feedTag(it.stop) }
                     .eachCount()
                     .maxBy { it.value }
                     .key
-            val best = group.first { feedTag(it) == feed }
-            val modes: Set<Mode> = group.flatMapTo(mutableSetOf()) { it.domainModes() }
+            val best = group.first { feedTag(it.stop) == feed }.stop
+            val modes: Set<Mode> = group.flatMapTo(mutableSetOf()) { it.stop.domainModes() }
             NearbyStop(
                 best.toPlace(best.parentId ?: requireNotNull(best.stopId), modes),
-                LatLon(group.first().lat, group.first().lon).metresTo(at).toInt(),
+                group
+                    .first()
+                    .position
+                    .metresTo(at)
+                    .toInt(),
             )
         }.distinctBy { it.place.id }
 }
 
-private fun sameStop(
-    a: MotisStop,
-    b: MotisStop,
-): Boolean =
-    (a.parentId != null && a.parentId == b.parentId) ||
-        (
-            stationKey(a.name) == stationKey(b.name) &&
-                LatLon(a.lat, a.lon).metresTo(LatLon(b.lat, b.lon)) < SAME_STATION_METRES
-        )
+/** A stop with what comparing it needs worked out once: there can be hundreds in a city. */
+private class MapStop(
+    val stop: MotisStop,
+    val key: String,
+    val position: LatLon,
+) {
+    fun isSameStop(other: MapStop): Boolean =
+        (stop.parentId != null && stop.parentId == other.stop.parentId) ||
+            (key == other.key && position.metresTo(other.position) < SAME_STATION_METRES)
+}
 
 /** The feed tag IDs start with: `cz-PID` in `cz-PID_U850Z1P`. */
 private fun feedTag(stop: MotisStop): String = stop.stopId.orEmpty().substringBefore('_')
@@ -162,9 +179,13 @@ private fun MotisMatch.isDomestic(): Boolean {
 private fun stationKey(name: String): String =
     Normalizer
         .normalize(name.lowercase(), Normalizer.Form.NFD)
-        .replace(Regex("\\p{M}"), "")
-        .replace(Regex("\\bhl\\.\\s*n\\.?"), "hlavni nadrazi")
-        .replace(Regex("[^a-z0-9]"), "")
+        .replace(MARKS, "")
+        .replace(SHORT_MAIN_STATION, "hlavni nadrazi")
+        .replace(PUNCTUATION, "")
+
+private val MARKS = Regex("\\p{M}")
+private val SHORT_MAIN_STATION = Regex("\\bhl\\.\\s*n\\.?")
+private val PUNCTUATION = Regex("[^a-z0-9]")
 
 private fun closeTo(
     a: MotisMatch,

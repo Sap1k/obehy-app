@@ -10,6 +10,7 @@ androidxDatastore = "1.2.1"
 androidxHiltLifecycleViewModel = "1.4.0"
 androidxLifecycle = "2.11.0"
 androidxNavigation = "2.10.2"
+androidxRoom = "2.8.5"
 composeBom = "2026.09.00"
 # Ahead of the BOM for the Material 3 Expressive components (stable 1.4 does not have them).
 material3 = "1.5.0-beta02"
@@ -43,6 +44,8 @@ androidx-hilt-lifecycle-viewmodel-compose = { module = "androidx.hilt:hilt-lifec
 androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidxLifecycle" }
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "androidxLifecycle" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "androidxNavigation" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "androidxRoom" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "androidxRoom" }
 
 androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
 androidx-compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
@@ -79,6 +82,7 @@ kotlin-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", ve
 compose-gradlePlugin = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
 ksp-gradlePlugin = { module = "com.google.devtools.ksp:symbol-processing-gradle-plugin", version.ref = "ksp" }
 hilt-gradlePlugin = { module = "com.google.dagger:hilt-android-gradle-plugin", version.ref = "hilt" }
+room-gradlePlugin = { module = "androidx.room:room-gradle-plugin", version.ref = "androidxRoom" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
@@ -88,6 +92,7 @@ kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "ko
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+room = { id = "androidx.room", version.ref = "androidxRoom" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 
 # Convention plugins (build-logic/convention).
@@ -96,4 +101,5 @@ obehy-android-library = { id = "obehy.android.library" }
 obehy-android-compose = { id = "obehy.android.compose" }
 obehy-android-feature = { id = "obehy.android.feature" }
 obehy-hilt = { id = "obehy.hilt" }
+obehy-room = { id = "obehy.room" }
 obehy-jvm-library = { id = "obehy.jvm.library" }

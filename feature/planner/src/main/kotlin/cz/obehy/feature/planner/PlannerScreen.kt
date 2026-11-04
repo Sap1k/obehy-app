@@ -1,6 +1,13 @@
 package cz.obehy.feature.planner
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,13 +18,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.History
 import androidx.compose.material.icons.rounded.RestartAlt
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
@@ -25,6 +35,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,17 +43,24 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cz.obehy.core.map.PreloadRouteMaps
 import cz.obehy.core.map.RouteMap
 import cz.obehy.core.model.Itinerary
 import cz.obehy.core.model.JourneyQuery
+import cz.obehy.core.model.Suggestion
+import cz.obehy.core.ui.AnimatedSwap
+import cz.obehy.core.ui.BACK_MS
 import cz.obehy.core.ui.ContentWidth
+import cz.obehy.core.ui.HoldDuringMorph
 import cz.obehy.core.ui.ObehyScreen
 import cz.obehy.core.ui.ObehyTheme
 import cz.obehy.core.ui.SharedBounds
+import cz.obehy.core.ui.SwapBounds
 import cz.obehy.core.ui.TitleBar
 import cz.obehy.core.ui.components.StaggeredEntry
 import cz.obehy.core.ui.isWideWindow
@@ -62,24 +80,46 @@ internal fun PlannerDestination(
         viewModel.act(PlannerAction.CheckLocation)
         onPauseOrDispose {}
     }
-    if (search != null) {
-        PlaceSearchScreen(
-            search,
-            onType = { viewModel.act(PlannerAction.Type(it)) },
-            onChoose = { viewModel.act(PlannerAction.Choose(it)) },
-            onClose = { viewModel.act(PlannerAction.ClosePlaceSearch) },
-            onLocationAnswer = { viewModel.act(PlannerAction.CheckLocation) },
-        )
-    } else {
-        PlannerScreen(
-            state,
-            wide = wide,
-            onAction = viewModel::act,
-            onOpen = {
-                viewModel.act(PlannerAction.Select(it))
-                if (!wide) onOpen()
-            },
-        )
+    val keyboard = LocalSoftwareKeyboardController.current
+    LaunchedEffect(search == null) { if (search == null) keyboard?.hide() }
+    // The field grows into the picker and the picker shrinks back into it. What leaves stays on
+    // screen for the morph, so the picker it shrinks is still the one that was open.
+    AnimatedContent(
+        search,
+        contentKey = { it != null },
+        transitionSpec = {
+            if (targetState != null) {
+                (fadeIn(tween(BACK_MS)) togetherWith HoldDuringMorph).apply { targetContentZIndex = 1f }
+            } else {
+                EnterTransition.None togetherWith fadeOut(tween(BACK_MS))
+            }
+        },
+        label = "place picker",
+    ) { shown ->
+        AnimatedSwap(this) {
+            if (shown != null) {
+                SwapBounds(shown.target, Modifier.fillMaxSize()) {
+                    PlaceSearchScreen(
+                        shown,
+                        onType = { viewModel.act(PlannerAction.Type(it)) },
+                        onChoose = { viewModel.act(PlannerAction.Choose(it)) },
+                        onForget = { viewModel.act(PlannerAction.ForgetPlace(it)) },
+                        onClose = { viewModel.act(PlannerAction.ClosePlaceSearch) },
+                        onLocationAnswer = { viewModel.act(PlannerAction.CheckLocation) },
+                    )
+                }
+            } else {
+                PlannerScreen(
+                    state,
+                    wide = wide,
+                    onAction = viewModel::act,
+                    onOpen = {
+                        viewModel.act(PlannerAction.Select(it))
+                        if (!wide) onOpen()
+                    },
+                )
+            }
+        }
     }
 }
 
@@ -186,7 +226,20 @@ private fun ResultsList(
                 )
             }
             when (val results = state.results) {
-                Results.Idle, Results.Loading -> {
+                Results.Idle -> {
+                    if (state.suggestions.isNotEmpty()) {
+                        item(key = "suggested") { SectionTitle(R.string.suggested) }
+                    }
+                    items(state.suggestions, key = { "${it.from.id}>${it.to.id}" }) { suggestion ->
+                        SuggestionRow(
+                            suggestion,
+                            onClick = { onAction(PlannerAction.UseSuggestion(suggestion)) },
+                            onLongClick = { onAction(PlannerAction.ForgetSuggestion(suggestion)) },
+                        )
+                    }
+                }
+
+                Results.Loading -> {
                     Unit
                 }
 
@@ -261,6 +314,33 @@ private fun ResultsList(
             }
         }
     }
+}
+
+/** A journey to search for with one tap; a long press stops offering it. */
+@Composable
+private fun SuggestionRow(
+    suggestion: Suggestion,
+    onClick: () -> Unit,
+    onLongClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    ListItem(
+        headlineContent = {
+            Text(
+                stringResource(R.string.suggested_journey, suggestion.from.label(), suggestion.to.label()),
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
+        },
+        leadingContent = { Icon(Icons.Rounded.History, contentDescription = null) },
+        colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surface),
+        modifier =
+            modifier.combinedClickable(
+                onLongClickLabel = stringResource(R.string.forget),
+                onLongClick = onLongClick,
+                onClick = onClick,
+            ),
+    )
 }
 
 @Composable

@@ -15,7 +15,7 @@ app ──► feature:* ──► core:data ──► core:network ──► cor
 
 - `core:model`: plain Kotlin domain types. No Android, no network types.
 - `core:network`: Ktor clients and DTOs. DTOs never leave this module; map them to `core:model` types.
-- `core:data`: repositories and DataStore, bound with Hilt. Screens get data only through repositories.
+- `core:data`: repositories, DataStore and Room (`obehy.room`, schemas in `core/data/schemas`), bound with Hilt. Screens get data only through repositories.
 - `core:ui`: **the design system**: theme, tokens, shared components. The only place styling is defined.
 - `core:map`: the MapLibre map (`RouteMap`). Its base style is the web's (`repo/web/src/features/map/style.ts`),
   exported to `core/map/src/main/assets` by `node core/map/tools/export-style.mjs <web folder>`; rerun it

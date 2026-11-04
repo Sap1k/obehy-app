@@ -44,6 +44,10 @@
     <string name="place_error">The search didn\'t work. Check your connection.</string>
     <string name="my_location">My location</string>
     <string name="near_you">Near you</string>
+    <string name="recent">Recent</string>
+    <string name="suggested">Suggested</string>
+    <string name="suggested_journey">%1$s → %2$s</string>
+    <string name="forget">Forget this</string>
     <string name="near_you_ask">Show stops near you</string>
     <string name="near_you_ask_body">See the closest stops and how far away they are.</string>
     <string name="near_you_blocked_body">Location is blocked for Oběhy. Allow it in the app\'s settings.</string>

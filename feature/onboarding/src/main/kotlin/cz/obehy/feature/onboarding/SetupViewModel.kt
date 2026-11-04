@@ -2,6 +2,7 @@ package cz.obehy.feature.onboarding
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import cz.obehy.core.data.SearchHistoryRepository
 import cz.obehy.core.data.SettingsRepository
 import cz.obehy.core.model.AppMode
 import cz.obehy.core.model.AppSettings
@@ -20,6 +21,7 @@ class SetupViewModel
     @Inject
     constructor(
         private val settings: SettingsRepository,
+        private val history: SearchHistoryRepository,
     ) : ViewModel() {
         val state: StateFlow<AppSettings> =
             settings.settings.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AppSettings())
@@ -34,6 +36,10 @@ class SetupViewModel
 
         fun choose(theme: ThemeMode) {
             viewModelScope.launch { settings.setTheme(theme) }
+        }
+
+        fun clearHistory() {
+            viewModelScope.launch { history.clear() }
         }
 
         /** Ends onboarding; the app then shows its main screens. */

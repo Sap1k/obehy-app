@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Where someone travels stays on their phone. -->
+<full-backup-content>
+    <exclude domain="database" path="search-history.db" />
+    <exclude domain="database" path="search-history.db-shm" />
+    <exclude domain="database" path="search-history.db-wal" />
+</full-backup-content>

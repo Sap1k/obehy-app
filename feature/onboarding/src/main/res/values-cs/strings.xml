@@ -28,6 +28,14 @@
     <string name="settings_mode">Režim aplikace</string>
     <string name="settings_provider">Vyhledávání spojení</string>
     <string name="settings_theme">Vzhled</string>
+    <string name="settings_history">Vaše hledání</string>
+    <string name="history_body">Minulá hledání zůstávají jen v tomto telefonu. Podle nich navrhujeme spojení.</string>
+    <string name="history_clear">Vymazat historii hledání</string>
+    <string name="history_clear_title">Vymazat historii hledání?</string>
+    <string name="history_clear_body">Nedávná místa a navrhovaná spojení začnou znovu od začátku. Nejde to vrátit zpět.</string>
+    <string name="history_clear_confirm">Vymazat</string>
+    <string name="history_clear_cancel">Ponechat</string>
+    <string name="history_cleared">Historie hledání je vymazaná.</string>
     <string name="theme_system">Podle telefonu</string>
     <string name="theme_system_description">Světlý nebo tmavý podle nastavení telefonu.</string>
     <string name="theme_light">Světlý</string>

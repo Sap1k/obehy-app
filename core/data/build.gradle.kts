@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.obehy.android.library)
     alias(libs.plugins.obehy.hilt)
+    alias(libs.plugins.obehy.room)
 }
 
 android {
@@ -16,5 +17,6 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
 
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.androidx.datastore.preferences)
     testImplementation(libs.ktor.client.mock)
 }

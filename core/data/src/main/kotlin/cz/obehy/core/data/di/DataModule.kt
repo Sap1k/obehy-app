@@ -5,8 +5,14 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
+import androidx.room.Room
 import cz.obehy.core.data.AndroidLocationRepository
+import cz.obehy.core.data.HISTORY_DATABASE
+import cz.obehy.core.data.HistoryDatabase
+import cz.obehy.core.data.JourneySearchDao
 import cz.obehy.core.data.LocationRepository
+import cz.obehy.core.data.RoomSearchHistoryStore
+import cz.obehy.core.data.SearchHistoryStore
 import cz.obehy.core.data.SettingsRepository
 import cz.obehy.core.model.RoutingProvider
 import cz.obehy.core.network.MotisJson
@@ -21,6 +27,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.ktor.client.engine.okhttp.OkHttp
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -33,6 +41,20 @@ object DataModule {
     fun dataStore(
         @ApplicationContext context: Context,
     ): DataStore<Preferences> = PreferenceDataStoreFactory.create { context.preferencesDataStoreFile("settings") }
+
+    @Provides
+    @Singleton
+    internal fun historyDatabase(
+        @ApplicationContext context: Context,
+    ): HistoryDatabase = Room.databaseBuilder(context, HistoryDatabase::class.java, HISTORY_DATABASE).build()
+
+    @Provides
+    internal fun journeySearches(database: HistoryDatabase): JourneySearchDao = database.searches()
+
+    /** Where answers are decoded and worked through, so a screen's animations keep their frames. */
+    @Provides
+    @Named("computation")
+    fun computation(): CoroutineDispatcher = Dispatchers.Default
 
     @Provides
     @Singleton
@@ -56,4 +78,7 @@ object DataModule {
 internal interface LocationModule {
     @Binds
     fun location(repository: AndroidLocationRepository): LocationRepository
+
+    @Binds
+    fun searchHistory(store: RoomSearchHistoryStore): SearchHistoryStore
 }
