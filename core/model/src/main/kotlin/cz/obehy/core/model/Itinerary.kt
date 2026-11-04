@@ -116,11 +116,12 @@ data class Itinerary(
      * Tells this journey apart from the others, and finds it again in a later search: the trips it
      * rides, which stay the same when their times change.
      */
-    val key: String
-        get() =
+    val key: String =
+        legs.filterIsInstance<Leg.Transit>().let { rides ->
             rides.mapNotNull { it.tripId }.joinToString("|").ifEmpty {
-                "${start.scheduled}-${rides.joinToString { it.name }}"
+                "${legs.firstOrNull()?.start?.scheduled}-${rides.joinToString { it.name }}"
             }
+        }
 
     /**
      * Whether [fresh] is this journey with newer times: the same trips, each ride still knowing

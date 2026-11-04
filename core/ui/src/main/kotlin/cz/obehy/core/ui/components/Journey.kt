@@ -35,6 +35,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextOverflow
@@ -140,13 +141,14 @@ fun LineBadge(
  * A journey as one bar, each leg exactly as long as it takes: rides in their route colours, walks
  * dotted. Each ride shows the longest label that fits its part of the bar: the mode icon with
  * the full name (`S49 (Os 25647)`), the full name, the line (`S49`), the icon alone, or nothing.
+ * A list of bars shares one [measurer], so a line's name is measured once rather than per row.
  */
 @Composable
 fun JourneyBar(
     legs: List<Leg>,
     modifier: Modifier = Modifier,
+    measurer: TextMeasurer = rememberTextMeasurer(),
 ) {
-    val measurer = rememberTextMeasurer()
     val style = MaterialTheme.typography.labelMedium
     val density = LocalDensity.current
     val sizes = ObehyTheme.sizes
@@ -175,10 +177,11 @@ fun JourneyBar(
                         val room = width - padding * 2
                         val withIcon = sizes.iconSmall + padding
                         val line = leg.line
+                        val nameWidth = textWidth(leg.name)
                         val label =
                             when {
-                                textWidth(leg.name) + withIcon <= room -> SegmentLabel(leg.name, icon = true)
-                                textWidth(leg.name) <= room -> SegmentLabel(leg.name, icon = false)
+                                nameWidth + withIcon <= room -> SegmentLabel(leg.name, icon = true)
+                                nameWidth <= room -> SegmentLabel(leg.name, icon = false)
                                 line != null && textWidth(line) <= room -> SegmentLabel(line, icon = false)
                                 sizes.iconSmall <= room -> SegmentLabel(null, icon = true)
                                 else -> SegmentLabel(null, icon = false)

@@ -26,8 +26,6 @@ private val LocalSharedTransitionScope = compositionLocalOf<SharedTransitionScop
 
 private val LocalNavAnimatedScope = compositionLocalOf<AnimatedVisibilityScope?> { null }
 
-private val LocalSwapScope = compositionLocalOf<AnimatedVisibilityScope?> { null }
-
 /** Wraps the app's navigation so screens inside can share elements ([SharedBounds]). */
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -63,28 +61,6 @@ fun AnimatedDestination(
 }
 
 /**
- * Marks [content] as one side of a swap within a screen, in an AnimatedContent's [scope]. Its
- * [SwapBounds] morph with the swap, while [SharedBounds] inside still move with the navigation.
- */
-@Composable
-fun AnimatedSwap(
-    scope: AnimatedVisibilityScope,
-    content: @Composable () -> Unit,
-) {
-    CompositionLocalProvider(LocalSwapScope provides scope) { content() }
-}
-
-/** Like [SharedBounds], for the two sides of an [AnimatedSwap]. */
-@Composable
-fun SwapBounds(
-    key: Any,
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit,
-) {
-    Morphing(key, LocalSwapScope.current, holdOnExit = false, modifier, content)
-}
-
-/**
  * [content] as the same thing as every other [SharedBounds] with this [key] on another screen:
  * moving between the screens morphs one into the other. With [holdOnExit] it stays as it is when
  * it leaves instead of fading, for something else growing over it. Without [SharedMotion] around,
@@ -98,19 +74,8 @@ fun SharedBounds(
     holdOnExit: Boolean = false,
     content: @Composable () -> Unit,
 ) {
-    Morphing(key, LocalNavAnimatedScope.current, holdOnExit, modifier, content)
-}
-
-@OptIn(ExperimentalSharedTransitionApi::class)
-@Composable
-private fun Morphing(
-    key: Any,
-    animated: AnimatedVisibilityScope?,
-    holdOnExit: Boolean,
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit,
-) {
     val shared = LocalSharedTransitionScope.current
+    val animated = LocalNavAnimatedScope.current
     val bounds =
         if (shared != null && animated != null) {
             with(shared) {

@@ -1,12 +1,13 @@
 package cz.obehy.feature.planner
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,6 +21,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -43,24 +45,23 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import cz.obehy.core.map.PreloadRouteMaps
 import cz.obehy.core.map.RouteMap
 import cz.obehy.core.model.Itinerary
 import cz.obehy.core.model.JourneyQuery
 import cz.obehy.core.model.Suggestion
-import cz.obehy.core.ui.AnimatedSwap
-import cz.obehy.core.ui.BACK_MS
 import cz.obehy.core.ui.ContentWidth
-import cz.obehy.core.ui.HoldDuringMorph
 import cz.obehy.core.ui.ObehyScreen
 import cz.obehy.core.ui.ObehyTheme
 import cz.obehy.core.ui.SharedBounds
-import cz.obehy.core.ui.SwapBounds
 import cz.obehy.core.ui.TitleBar
 import cz.obehy.core.ui.components.StaggeredEntry
 import cz.obehy.core.ui.isWideWindow
@@ -82,48 +83,56 @@ internal fun PlannerDestination(
     }
     val keyboard = LocalSoftwareKeyboardController.current
     LaunchedEffect(search == null) { if (search == null) keyboard?.hide() }
-    // The field grows into the picker and the picker shrinks back into it. What leaves stays on
-    // screen for the morph, so the picker it shrinks is still the one that was open.
-    AnimatedContent(
-        search,
-        contentKey = { it != null },
-        transitionSpec = {
-            if (targetState != null) {
-                (fadeIn(tween(BACK_MS)) togetherWith HoldDuringMorph).apply { targetContentZIndex = 1f }
-            } else {
-                EnterTransition.None togetherWith fadeOut(tween(BACK_MS))
-            }
-        },
-        label = "place picker",
-    ) { shown ->
-        AnimatedSwap(this) {
-            if (shown != null) {
-                SwapBounds(shown.target, Modifier.fillMaxSize()) {
-                    PlaceSearchScreen(
-                        shown,
-                        onType = { viewModel.act(PlannerAction.Type(it)) },
-                        onChoose = { viewModel.act(PlannerAction.Choose(it)) },
-                        onForget = { viewModel.act(PlannerAction.ForgetPlace(it)) },
-                        onClose = { viewModel.act(PlannerAction.ClosePlaceSearch) },
-                        onLocationAnswer = { viewModel.act(PlannerAction.CheckLocation) },
-                    )
-                }
-            } else {
-                PlannerScreen(
-                    state,
-                    wide = wide,
-                    onAction = viewModel::act,
-                    onOpen = {
-                        viewModel.act(PlannerAction.Select(it))
-                        if (!wide) onOpen()
-                    },
+    // The picker comes in over the planner, which stays as it is underneath: rebuilding the results
+    // for every pick shows as a stutter. It moves as a whole picture, so no frame lays anything out.
+    val picker = remember { MutableTransitionState(false) }
+    picker.targetState = search != null
+    var shown by remember { mutableStateOf(search) }
+    if (search != null) shown = search
+    val covered = picker.isIdle && picker.currentState
+    Box(Modifier.fillMaxSize()) {
+        PlannerScreen(
+            state,
+            wide = wide,
+            onAction = viewModel::act,
+            onOpen = {
+                viewModel.act(PlannerAction.Select(it))
+                if (!wide) onOpen()
+            },
+            modifier =
+                Modifier
+                    .graphicsLayer { alpha = if (covered) 0f else 1f }
+                    .then(if (covered) Modifier.clearAndSetSemantics {} else Modifier),
+        )
+        AnimatedVisibility(
+            picker,
+            enter = fadeIn(tween(PICKER_MS)) + scaleIn(tween(PICKER_MS), PICKER_SCALE, PICKER_ORIGIN),
+            exit = fadeOut(tween(PICKER_MS)) + scaleOut(tween(PICKER_MS), PICKER_SCALE, PICKER_ORIGIN),
+        ) {
+            shown?.let {
+                PlaceSearchScreen(
+                    it,
+                    onType = { text -> viewModel.act(PlannerAction.Type(text)) },
+                    onChoose = { place -> viewModel.act(PlannerAction.Choose(place)) },
+                    onForget = { place -> viewModel.act(PlannerAction.ForgetPlace(place)) },
+                    onClose = { viewModel.act(PlannerAction.ClosePlaceSearch) },
+                    onLocationAnswer = { viewModel.act(PlannerAction.CheckLocation) },
                 )
             }
         }
     }
 }
 
+private const val PICKER_MS = 220
+private const val PICKER_SCALE = 0.94f
+
+/** The picker grows out of the top of the screen, where the search form is. */
+private val PICKER_ORIGIN = TransformOrigin(0.5f, 0.2f)
+
 private enum class Sheet { Time, Options }
+
+/** Line names kept measured for the results list. */
+private const val MEASURED_NAMES = 64
 
 /** How soon after a search its results may still animate in. */
 private val ARRIVAL: Duration = Duration.ofSeconds(1)
@@ -207,13 +216,20 @@ private fun ResultsList(
 ) {
     val loaded = state.results as? Results.Loaded
     // The detail pane of a wide screen has its own size, and is open anyway.
-    if (loaded != null && !wide) PreloadRouteMaps(remember(loaded.itineraries) { loaded.itineraries.map { it.legs } })
+    val list = rememberLazyListState()
+    // Lines repeat from one result to the next, so the rows share their measurements.
+    val measurer = rememberTextMeasurer(cacheSize = MEASURED_NAMES)
+    if (loaded != null && !wide) PreloadResultMaps(loaded.itineraries, list, paused = state.placeSearch != null)
     PullToRefreshBox(
         isRefreshing = loaded?.refreshing == true,
         onRefresh = { onAction(PlannerAction.RefreshResults) },
         modifier = modifier,
     ) {
-        LazyColumn(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)) {
+        LazyColumn(
+            Modifier.fillMaxSize(),
+            state = list,
+            verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
+        ) {
             item(key = "form") {
                 SearchForm(
                     state.query,
@@ -294,6 +310,7 @@ private fun ResultsList(
                                     results.itineraries.size,
                                     // Only beside the list is the open journey still in view to point at.
                                     selected = wide && itinerary.key == state.open?.itinerary?.key,
+                                    measurer = measurer,
                                     onClick = { onOpen(itinerary) },
                                 )
                             }

@@ -29,17 +29,24 @@ fun StaggeredEntry(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
-    val shown = remember { Animatable(if (enabled) 0f else 1f) }
+    // Rows scrolling into view land here with nothing to animate, and they must stay cheap.
+    val shown = remember { if (enabled) Animatable(0f) else null }
     val spec = MaterialTheme.motionScheme.defaultSpatialSpec<Float>()
     val rise = with(LocalDensity.current) { ObehyTheme.spacing.xl.toPx() }
-    LaunchedEffect(Unit) {
-        delay(order.coerceAtMost(MAX_STEPS) * STEP_MS)
-        shown.animateTo(1f, spec)
+    if (shown != null) {
+        LaunchedEffect(Unit) {
+            delay(order.coerceAtMost(MAX_STEPS) * STEP_MS)
+            shown.animateTo(1f, spec)
+        }
     }
     Box(
-        modifier.graphicsLayer {
-            alpha = shown.value.coerceIn(0f, 1f)
-            translationY = (1 - shown.value) * rise
+        if (shown == null) {
+            modifier
+        } else {
+            modifier.graphicsLayer {
+                alpha = shown.value.coerceIn(0f, 1f)
+                translationY = (1 - shown.value) * rise
+            }
         },
     ) { content() }
 }

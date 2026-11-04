@@ -28,6 +28,13 @@ android {
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
+        // A release build anyone can install: debug builds run Compose too slowly to judge smoothness.
+        create("profile") {
+            initWith(getByName("release"))
+            signingConfig = signingConfigs.getByName("debug")
+            matchingFallbacks += "release"
+            isProfileable = true
+        }
     }
 }
 

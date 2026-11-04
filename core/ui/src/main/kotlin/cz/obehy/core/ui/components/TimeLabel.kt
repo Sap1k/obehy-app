@@ -39,12 +39,32 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.time.temporal.ChronoUnit
+import java.util.Locale
+
+/** A clock format, kept because a list of results asks for it many times a row. */
+private class ClockFormat(
+    val locale: Locale,
+    val zone: ZoneId,
+) {
+    val formatter: DateTimeFormatter =
+        DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale).withZone(zone)
+}
+
+@Volatile
+private var clockFormat: ClockFormat? = null
 
 /** The time in the phone's zone and clock style (14:31, or 2:31 PM). */
-fun Instant.clock(): String =
-    DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withZone(ZoneId.systemDefault()).format(this)
+fun Instant.clock(): String {
+    val locale = Locale.getDefault(Locale.Category.FORMAT)
+    val zone = ZoneId.systemDefault()
+    val format =
+        clockFormat?.takeIf { it.locale == locale && it.zone == zone }
+            ?: ClockFormat(locale, zone).also { clockFormat = it }
+    return format.formatter.format(this)
+}
 
-private val TimePoint.moved: Boolean get() = realtime && expected.clock() != scheduled.clock()
+private val TimePoint.moved: Boolean
+    get() = realtime && expected.truncatedTo(ChronoUnit.MINUTES) != scheduled.truncatedTo(ChronoUnit.MINUTES)
 
 /**
  * A time in a line of text (a result's "14:31 → 17:12"), telling live times from timetable times

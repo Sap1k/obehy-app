@@ -116,6 +116,7 @@ class PlannerViewModelTest {
                 JourneyRepository(motis, dispatcher),
                 location,
                 SearchHistoryRepository(store, settings),
+                dispatcher,
             )
         viewModel.now = { clock }
         backgroundScope.launch(dispatcher) { viewModel.state.collect {} }

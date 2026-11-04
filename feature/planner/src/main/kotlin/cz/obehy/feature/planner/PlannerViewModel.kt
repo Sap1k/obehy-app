@@ -18,6 +18,7 @@ import cz.obehy.core.model.PlaceKind
 import cz.obehy.core.model.SearchOptions
 import cz.obehy.core.model.Suggestion
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,10 +35,12 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
 import javax.inject.Inject
+import javax.inject.Named
 
 /** Which place of the search is being picked. */
 sealed interface PlaceTarget {
@@ -205,6 +208,7 @@ class PlannerViewModel
         private val journeys: JourneyRepository,
         private val location: LocationRepository,
         private val history: SearchHistoryRepository,
+        @param:Named("computation") private val computation: CoroutineDispatcher,
     ) : ViewModel() {
         private val local = MutableStateFlow(PlannerState())
         private var searchJob: Job? = null
@@ -221,7 +225,9 @@ class PlannerViewModel
 
         private val suggestions =
             combine(history.searches, moment) { searches, _ ->
-                JourneySuggester.suggestions(searches, now().atZone(ZoneId.systemDefault()), location.lastKnown())
+                val fix = location.lastKnown()
+                val at = now().atZone(ZoneId.systemDefault())
+                withContext(computation) { JourneySuggester.suggestions(searches, at, fix) }
             }.onStart { emit(emptyList()) }
 
         val state: StateFlow<PlannerState> =
@@ -441,19 +447,20 @@ class PlannerViewModel
         private fun loadRecents(target: PlaceTarget) {
             viewModelScope.launch {
                 val query = local.value.query
+                val searches = history.searches.first()
+                val fix = location.lastKnown()
+                val at = now().atZone(ZoneId.systemDefault())
+                val other =
+                    when (target) {
+                        PlaceTarget.From -> query.to
+                        PlaceTarget.To -> query.from
+                        is PlaceTarget.Via -> null
+                    }
+                val end = if (target == PlaceTarget.From) JourneyEnd.From else JourneyEnd.To
                 val recents =
-                    JourneySuggester.places(
-                        history.searches.first(),
-                        now().atZone(ZoneId.systemDefault()),
-                        location.lastKnown(),
-                        if (target == PlaceTarget.From) JourneyEnd.From else JourneyEnd.To,
-                        when (target) {
-                            PlaceTarget.From -> query.to
-                            PlaceTarget.To -> query.from
-                            is PlaceTarget.Via -> null
-                        },
-                        target.stopsOnly,
-                    )
+                    withContext(computation) {
+                        JourneySuggester.places(searches, at, fix, end, other, target.stopsOnly)
+                    }
                 local.update { state ->
                     val search = state.placeSearch?.takeIf { it.target == target } ?: return@update state
                     state.copy(placeSearch = search.copy(recents = recents))

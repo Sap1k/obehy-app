@@ -2,7 +2,9 @@ package cz.obehy.core.map
 
 import android.content.Context
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -61,6 +64,7 @@ import org.maplibre.compose.overlay.AttributionLinks
 import org.maplibre.compose.overlay.attributions
 import org.maplibre.compose.style.BaseStyle
 import org.maplibre.spatialk.geojson.Position
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.PI
 import kotlin.math.atan
 import kotlin.math.ln
@@ -87,17 +91,23 @@ fun RouteMap(
     val loading = MaterialTheme.colorScheme.surfaceContainer
     val shape = remember(legs) { legs.map { it.shape() } }
     // Keyed on the text too: fresh times bring new legs, but the same map, which needn't reload.
-    val json = remember(legs, look) { journeyStyle(context, look, legs) }
-    val style = remember(json) { BaseStyle.Json(json) }
+    val prepared = remember(legs, look) { preparedStyle(look, legs) }
+    val json by produceState(prepared, legs, look) { value = routeStyle(context, look, legs) }
+    val style = remember(json) { json?.let { BaseStyle.Json(it) } }
     BoxWithConstraints(modifier) {
+        val ready = json
+        if (ready == null || style == null) {
+            Box(Modifier.fillMaxSize().background(loading))
+            return@BoxWithConstraints
+        }
         val creditsModifier =
             Modifier
                 .align(Alignment.BottomEnd)
                 .then(if (fullscreen) Modifier.navigationBarsPadding() else Modifier)
                 .padding(ObehyTheme.spacing.s)
         val still =
-            remember(json, maxWidth, maxHeight, interactive) {
-                if (interactive) null else stillMap(json, DpSize(maxWidth, maxHeight))
+            remember(ready, maxWidth, maxHeight, interactive) {
+                if (interactive) null else stillMap(ready, DpSize(maxWidth, maxHeight))
             }
         if (still != null) {
             Image(still.image, contentDescription = null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
@@ -200,13 +210,15 @@ internal fun journeyStyle(
     val walk = look.walk
     val asset = if (look.dark) "map-style-dark.json" else "map-style-light.json"
     val base =
-        JsonParser
-            .parseToJsonElement(
-                context.assets
-                    .open(asset)
-                    .bufferedReader()
-                    .use { it.readText() },
-            ).jsonObject
+        baseStyles.getOrPut(asset) {
+            JsonParser
+                .parseToJsonElement(
+                    context.assets
+                        .open(asset)
+                        .bufferedReader()
+                        .use { it.readText() },
+                ).jsonObject
+        }
     val land =
         base
             .getValue("layers")
@@ -287,6 +299,9 @@ internal fun journeyStyle(
         }
     return JsonObject(base + mapOf("sources" to sources, "layers" to layers)).toString()
 }
+
+/** The base styles, read once. */
+private val baseStyles = ConcurrentHashMap<String, JsonObject>()
 
 /** This casing layer, coloured per path by its `casing` property. */
 private fun JsonElement.withCasingColour(): JsonObject {

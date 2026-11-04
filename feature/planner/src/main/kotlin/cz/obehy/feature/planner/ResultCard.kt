@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.text.TextMeasurer
 import cz.obehy.core.model.Itinerary
 import cz.obehy.core.ui.ObehyTheme
 import cz.obehy.core.ui.components.DelayLabel
@@ -41,6 +42,7 @@ internal fun ResultCard(
     index: Int,
     count: Int,
     selected: Boolean,
+    measurer: TextMeasurer,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -80,7 +82,7 @@ internal fun ResultCard(
                 )
                 TimeLabel(itinerary.end)
             }
-            JourneyBar(itinerary.legs)
+            JourneyBar(itinerary.legs, measurer = measurer)
             Row(
                 horizontalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.s),
                 verticalAlignment = Alignment.CenterVertically,

@@ -19,8 +19,8 @@ app ──► feature:* ──► core:data ──► core:network ──► cor
 - `core:ui`: **the design system**: theme, tokens, shared components. The only place styling is defined.
 - `core:map`: the MapLibre map (`RouteMap`). Its base style is the web's (`repo/web/src/features/map/style.ts`),
   exported to `core/map/src/main/assets` by `node core/map/tools/export-style.mjs <web folder>`; rerun it
-  when the web style changes, never edit the JSON by hand. `PreloadRouteMaps` draws the first results' header
-  maps off screen, so a journey opens with its map in place; a header without one loads a live `RouteMap`.
+  when the web style changes, never edit the JSON by hand. `PreloadRouteMaps` draws the header maps of the results
+  around what's on screen, off screen, so a journey opens with its map in place; a header without one loads a live `RouteMap`.
 - `feature:*`: one user-facing area each (screens, view models, its routes). **A feature never depends on
   another feature** (the build fails if it does). Shared code goes down into a core module; moving between
   features is navigation, wired in `app`.
@@ -99,6 +99,10 @@ Check UI changes on the phone (connected over wireless adb), not an emulator:
 ```bash
 adb install -r app/build/outputs/apk/debug/app-debug.apk
 ```
+
+Judge smoothness on the `profile` build (`./gradlew :app:assembleProfile`, then
+`app/build/outputs/apk/profile/app-profile.apk`): a release build signed with the debug key. Debug
+builds run Compose far too slowly to tell.
 
 ## Never
 
