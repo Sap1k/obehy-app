@@ -82,7 +82,12 @@
     </plurals>
     <string name="walk">%s chůze</string>
     <string name="spare">%s rezerva</string>
-    <string name="stay_seated">Zůstaňte sedět, pokračuje jako %s.</string>
+    <string name="same_train">Stejný vlak pokračuje jako</string>
+    <string name="same_subway">Stejné metro pokračuje jako</string>
+    <string name="same_tram">Stejná tramvaj pokračuje jako</string>
+    <string name="same_bus">Stejný autobus pokračuje jako</string>
+    <string name="same_boat">Stejná loď pokračuje jako</string>
+    <string name="same_service">Stejný spoj pokračuje jako</string>
     <string name="pick_journey">Vyberte spojení a zobrazí se tady.</string>
     <string name="new_search">Nové hledání</string>
     <string name="updated">Aktualizováno %s</string>

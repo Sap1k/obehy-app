@@ -1,5 +1,6 @@
 package cz.obehy.feature.planner
 
+import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.expandVertically
@@ -42,6 +43,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import cz.obehy.core.model.Itinerary
 import cz.obehy.core.model.Leg
+import cz.obehy.core.model.Mode
 import cz.obehy.core.model.StopCall
 import cz.obehy.core.model.TimePoint
 import cz.obehy.core.ui.ObehyTheme
@@ -56,6 +58,7 @@ import cz.obehy.core.ui.components.TimeColumn
 import cz.obehy.core.ui.components.rememberTimeColumnWidth
 import cz.obehy.core.ui.components.routeLineColor
 import cz.obehy.core.ui.components.walkStroke
+import cz.obehy.core.ui.icon
 import java.time.Duration
 
 /**
@@ -95,7 +98,7 @@ internal fun ItineraryTimeline(
 
                 is Leg.Transit -> {
                     val ride = RouteStroke(routeLineColor(leg.color))
-                    // When the vehicle just goes on as this ride, the previous ride's last stop already says so.
+                    // When the vehicle just goes on as this ride, the previous ride's last stop is this one's first.
                     if (!leg.staySeated) {
                         StopRow(
                             leg.from.name,
@@ -113,7 +116,11 @@ internal fun ItineraryTimeline(
                         leg.to.name,
                         leg.end,
                         leg.to,
-                        if (next == null) RouteMark.End else RouteMark.Stop,
+                        when {
+                            next == null -> RouteMark.End
+                            continues != null -> RouteMark.Through
+                            else -> RouteMark.Stop
+                        },
                         above = ride,
                         below =
                             continues?.let {
@@ -122,7 +129,6 @@ internal fun ItineraryTimeline(
                                 )
                             } ?: walk.takeIf { next is Leg.Walk },
                         width = width,
-                        note = continues?.let { stringResource(R.string.stay_seated, it.name) },
                     )
                 }
             }
@@ -188,31 +194,26 @@ private fun StopRow(
     below: RouteStroke?,
     width: Dp,
     modifier: Modifier = Modifier,
-    note: String? = null,
 ) {
     val style = MaterialTheme.typography.titleMediumEmphasized
     val gap = ObehyTheme.spacing.xs
     RouteRow(mark, modifier, above = above, below = below, markAt = firstLine(style), leading = {
         TimeColumn(time, width, Modifier.padding(top = gap))
     }) {
-        Column(Modifier.weight(1f).padding(start = ObehyTheme.spacing.m, top = gap, bottom = gap)) {
+        Row(
+            Modifier.weight(1f).padding(start = ObehyTheme.spacing.m, top = gap, bottom = gap),
+            horizontalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.s),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             Row(
+                Modifier.weight(1f),
                 horizontalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.s),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Row(
-                    Modifier.weight(1f),
-                    horizontalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.s),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(name, Modifier.weight(1f, fill = false), style = style)
-                    call?.track?.let { PlatformLabel(it, call.trackChanged) }
-                }
-                TimeBasis(time)
+                Text(name, Modifier.weight(1f, fill = false), style = style)
+                call?.track?.let { PlatformLabel(it, call.trackChanged) }
             }
-            note?.let {
-                Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
+            TimeBasis(time)
         }
     }
 }
@@ -243,33 +244,37 @@ private fun RideRow(
                     bottom = ObehyTheme.spacing.xs,
                 ).clip(MaterialTheme.shapes.large)
                 .background(MaterialTheme.colorScheme.surfaceContainer)
-                .then(if (stops.isNotEmpty()) Modifier.clickable(onClickLabel = toggle) { open = !open } else Modifier)
-                .padding(horizontal = ObehyTheme.spacing.m, vertical = ObehyTheme.spacing.s),
-            verticalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.xs),
+                .then(if (stops.isNotEmpty()) Modifier.clickable(onClickLabel = toggle) { open = !open } else Modifier),
         ) {
-            Row(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
+            if (ride.staySeated) SameVehicle(ride.mode)
+            Column(
+                Modifier.padding(horizontal = ObehyTheme.spacing.m, vertical = ObehyTheme.spacing.s),
+                verticalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.xs),
             ) {
-                LineBadge(ride)
-                if (ride.accessible == true) LowFloorIcon()
-            }
-            // On its own line, so a long train name can never squeeze it.
-            ride.headsign?.let { Headsign(it) }
-            if (stops.isNotEmpty()) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        pluralStringResource(R.plurals.stops_between, stops.size, stops.size),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    Icon(
-                        Icons.Rounded.ExpandMore,
-                        contentDescription = null,
-                        modifier = Modifier.size(ObehyTheme.sizes.iconSmall).rotate(chevron),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    LineBadge(ride)
+                    if (ride.accessible == true) LowFloorIcon()
+                }
+                // On its own line, so a long train name can never squeeze it.
+                ride.headsign?.let { Headsign(it) }
+                if (stops.isNotEmpty()) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            pluralStringResource(R.plurals.stops_between, stops.size, stops.size),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Icon(
+                            Icons.Rounded.ExpandMore,
+                            contentDescription = null,
+                            modifier = Modifier.size(ObehyTheme.sizes.iconSmall).rotate(chevron),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                 }
             }
         }
@@ -282,6 +287,60 @@ private fun RideRow(
         Column { ride.intermediateStops.forEach { PassedStop(it, stroke, width) } }
     }
 }
+
+/** The top of a ride that needs no change. It runs on into the line's badge right below it. */
+@Composable
+private fun SameVehicle(
+    mode: Mode,
+    modifier: Modifier = Modifier,
+) {
+    val color = MaterialTheme.colorScheme.onSecondaryContainer
+    Row(
+        modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.secondaryContainer)
+            .padding(horizontal = ObehyTheme.spacing.m, vertical = ObehyTheme.spacing.xs),
+        horizontalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.xs),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            mode.icon,
+            contentDescription = null,
+            modifier = Modifier.size(ObehyTheme.sizes.iconSmall),
+            tint = color,
+        )
+        Text(stringResource(mode.sameVehicle), style = MaterialTheme.typography.labelLarge, color = color)
+    }
+}
+
+@get:StringRes
+private val Mode.sameVehicle: Int
+    get() =
+        when (this) {
+            Mode.Subway -> {
+                R.string.same_subway
+            }
+
+            Mode.Tram -> {
+                R.string.same_tram
+            }
+
+            Mode.RegionalRail, Mode.SuburbanRail, Mode.LongDistanceRail, Mode.HighSpeedRail, Mode.NightRail -> {
+                R.string.same_train
+            }
+
+            Mode.Bus, Mode.Coach -> {
+                R.string.same_bus
+            }
+
+            Mode.Ferry -> {
+                R.string.same_boat
+            }
+
+            Mode.Walk, Mode.Funicular, Mode.AerialLift, Mode.Other -> {
+                R.string.same_service
+            }
+        }
 
 @Composable
 private fun PassedStop(

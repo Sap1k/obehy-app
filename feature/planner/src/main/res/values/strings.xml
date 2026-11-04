@@ -78,7 +78,12 @@
     </plurals>
     <string name="walk">%s walk</string>
     <string name="spare">%s to spare</string>
-    <string name="stay_seated">Stay on board: it goes on as %s.</string>
+    <string name="same_train">Same train, continuing as</string>
+    <string name="same_subway">Same metro, continuing as</string>
+    <string name="same_tram">Same tram, continuing as</string>
+    <string name="same_bus">Same bus, continuing as</string>
+    <string name="same_boat">Same boat, continuing as</string>
+    <string name="same_service">Same service, continuing as</string>
     <string name="pick_journey">Pick a connection to see it here.</string>
     <string name="new_search">New search</string>
     <string name="updated">Updated %s</string>

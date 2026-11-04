@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
@@ -31,6 +32,9 @@ enum class RouteMark {
 
     /** A stop the search must go through: a diamond. */
     Via,
+
+    /** Where the vehicle goes on as another line, so you stay on board: a ring in both colours. */
+    Through,
 
     /** Where the journey ends: a filled dot. */
     End,
@@ -74,6 +78,7 @@ fun RouteRow(
     val sizes = ObehyTheme.sizes
     val surface = MaterialTheme.colorScheme.surface
     val edge = MaterialTheme.colorScheme.outline
+    val secondColor = if (mark == RouteMark.Through) below?.color ?: markColor else markColor
     Row(
         modifier.height(IntrinsicSize.Min),
         verticalAlignment = if (markAt == null) Alignment.CenterVertically else Alignment.Top,
@@ -114,9 +119,10 @@ fun RouteRow(
                         Offset(x, y),
                         (if (mark == RouteMark.Pass) sizes.routePassMarker else sizes.routeMarker).toPx() / 2,
                         markColor,
+                        secondColor,
                         surface,
                         edge.takeIf {
-                            markColor.blendsInto(surface)
+                            markColor.blendsInto(surface) || secondColor.blendsInto(surface)
                         },
                     )
                 },
@@ -148,6 +154,7 @@ private fun DrawScope.marker(
     centre: Offset,
     radius: Float,
     color: Color,
+    secondColor: Color,
     surface: Color,
     edge: Color?,
 ) {
@@ -162,6 +169,19 @@ private fun DrawScope.marker(
             drawCircle(surface, radius, centre)
             drawCircle(color, radius - ring / 2, centre, style = Stroke(ring))
             // A ring that would vanish needs its edge on the inside too.
+            if (edge != null) {
+                val width = 1.dp.toPx()
+                drawCircle(edge, radius - ring - width / 2, centre, style = Stroke(width))
+            }
+        }
+
+        RouteMark.Through -> {
+            drawCircle(surface, radius, centre)
+            val middle = radius - ring / 2
+            val corner = Offset(centre.x - middle, centre.y - middle)
+            val box = Size(middle * 2, middle * 2)
+            drawArc(color, 180f, 180f, useCenter = false, topLeft = corner, size = box, style = Stroke(ring))
+            drawArc(secondColor, 0f, 180f, useCenter = false, topLeft = corner, size = box, style = Stroke(ring))
             if (edge != null) {
                 val width = 1.dp.toPx()
                 drawCircle(edge, radius - ring - width / 2, centre, style = Stroke(width))
