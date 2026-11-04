@@ -4,9 +4,11 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.emptyPreferences
 import cz.obehy.core.data.JourneyRepository
+import cz.obehy.core.data.LocationRepository
 import cz.obehy.core.data.PlaceRepository
 import cz.obehy.core.data.SettingsRepository
 import cz.obehy.core.model.JourneyQuery
+import cz.obehy.core.model.LatLon
 import cz.obehy.core.model.Place
 import cz.obehy.core.model.PlaceKind
 import cz.obehy.core.model.SearchOptions
@@ -36,6 +38,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -50,6 +53,7 @@ class PlannerViewModelTest {
     /** Refreshes answer with the ride stripped of its trip, as MOTIS sometimes does. */
     private var stripped = false
     private var clock = Instant.parse("2026-11-03T08:00:00Z")
+    private val location = FakeLocation()
 
     @Before
     fun setUp() = Dispatchers.setMain(dispatcher)
@@ -71,6 +75,10 @@ class PlannerViewModelTest {
                                 respond("{}", HttpStatusCode.ServiceUnavailable)
                             }
 
+                            request.url.encodedPath.endsWith("map/stops") -> {
+                                respond(MAP_STOPS, HttpStatusCode.OK, json)
+                            }
+
                             request.url.encodedPath.endsWith("refresh-itinerary") -> {
                                 val tripId = request.url.parameters["itineraryId"]!!
                                 respond(
@@ -90,7 +98,7 @@ class PlannerViewModelTest {
             )
         val motis = MotisApi(apiClient(engine, MotisJson, "test")) { "https://motis.test/" }
         val settings = SettingsRepository(MemoryStore())
-        val viewModel = PlannerViewModel(settings, PlaceRepository(motis), JourneyRepository(motis))
+        val viewModel = PlannerViewModel(settings, PlaceRepository(motis), JourneyRepository(motis), location)
         viewModel.now = { clock }
         backgroundScope.launch(dispatcher) { viewModel.state.collect {} }
         return viewModel to settings
@@ -108,6 +116,134 @@ class PlannerViewModelTest {
         act(PlannerAction.Pick(PlaceTarget.To))
         act(PlannerAction.Choose(stop("D")))
     }
+
+    private fun allowLocation(fix: LatLon? = HERE) {
+        location.fix = fix
+        location.allowed.value = true
+    }
+
+    @Test
+    fun `with the location allowed a search starts from my location, and a new search does too`() =
+        runTest(dispatcher) {
+            allowLocation()
+            val (vm, _) = viewModel()
+            advanceUntilIdle()
+            assertEquals(
+                PlaceKind.MyLocation,
+                vm.state.value.query.from
+                    ?.kind,
+            )
+            assertFalse(vm.state.value.canReset)
+
+            vm.act(PlannerAction.Pick(PlaceTarget.From))
+            vm.act(PlannerAction.Choose(stop("A")))
+            advanceUntilIdle()
+            assertTrue(vm.state.value.canReset)
+
+            vm.act(PlannerAction.Reset)
+            advanceUntilIdle()
+            assertEquals(
+                PlaceKind.MyLocation,
+                vm.state.value.query.from
+                    ?.kind,
+            )
+        }
+
+    @Test
+    fun `without the location nothing is filled in`() =
+        runTest(dispatcher) {
+            val (vm, _) = viewModel()
+            advanceUntilIdle()
+
+            assertEquals(null, vm.state.value.query.from)
+        }
+
+    @Test
+    fun `my location swapped to the destination is not filled in again as the start`() =
+        runTest(dispatcher) {
+            allowLocation()
+            val (vm, _) = viewModel()
+            advanceUntilIdle()
+
+            vm.act(PlannerAction.Swap)
+            vm.act(PlannerAction.Reset)
+            vm.act(PlannerAction.Swap)
+            location.allowed.value = false
+            location.allowed.value = true
+            advanceUntilIdle()
+
+            assertEquals(null, vm.state.value.query.from)
+            assertEquals(
+                PlaceKind.MyLocation,
+                vm.state.value.query.to
+                    ?.kind,
+            )
+        }
+
+    @Test
+    fun `a search from my location sends a fresh fix, and later pages keep that start`() =
+        runTest(dispatcher) {
+            allowLocation()
+            val (vm, _) = viewModel()
+            advanceUntilIdle()
+            vm.act(PlannerAction.Pick(PlaceTarget.To))
+            vm.act(PlannerAction.Choose(stop("D")))
+
+            vm.act(PlannerAction.Search)
+            advanceUntilIdle()
+            location.fix = LatLon(1.0, 2.0)
+            vm.act(PlannerAction.Later)
+            advanceUntilIdle()
+
+            val sent = requests.filter { it.url.parameters["fromPlace"] != null }
+            assertEquals(listOf("50.08,14.43", "50.08,14.43"), sent.map { it.url.parameters["fromPlace"] })
+        }
+
+    @Test
+    fun `no fix says so instead of searching`() =
+        runTest(dispatcher) {
+            allowLocation(fix = null)
+            val (vm, _) = viewModel()
+            advanceUntilIdle()
+            vm.act(PlannerAction.Pick(PlaceTarget.To))
+            vm.act(PlannerAction.Choose(stop("D")))
+
+            vm.act(PlannerAction.Search)
+            advanceUntilIdle()
+
+            assertEquals(Results.NoLocation, vm.state.value.results)
+            assertTrue(requests.isEmpty())
+        }
+
+    @Test
+    fun `the picker shows nearby stops, or asks for what is missing`() =
+        runTest(dispatcher) {
+            val (vm, _) = viewModel()
+            vm.act(PlannerAction.Pick(PlaceTarget.From))
+            advanceUntilIdle()
+            assertEquals(
+                NearbyStatus.NeedsPermission,
+                vm.state.value.placeSearch
+                    ?.nearbyStatus,
+            )
+
+            allowLocation()
+            vm.act(PlannerAction.CheckLocation)
+            advanceUntilIdle()
+            val search = vm.state.value.placeSearch
+            assertEquals(NearbyStatus.Ready, search?.nearbyStatus)
+            assertEquals(listOf("Muzeum"), search?.nearby?.map { it.place.name })
+
+            vm.act(PlannerAction.ClosePlaceSearch)
+            location.enabled = false
+            vm.act(PlannerAction.Pick(PlaceTarget.From))
+            advanceUntilIdle()
+            assertEquals(
+                NearbyStatus.Off,
+                vm.state.value.placeSearch
+                    ?.nearbyStatus,
+            )
+        }
 
     @Test
     fun `swapping reverses the route without searching before the first search`() =
@@ -309,6 +445,23 @@ class PlannerViewModelTest {
 }
 
 /** DataStore in memory: writes land before the test's clock moves on. */
+private val HERE = LatLon(50.08, 14.43)
+
+private const val MAP_STOPS =
+    """[{"name":"Muzeum","stopId":"cz-PID_U400Z1P","lat":50.0795,"lon":14.4305,"modes":["SUBWAY"]}]"""
+
+private class FakeLocation : LocationRepository {
+    var fix: LatLon? = null
+    override val allowed = MutableStateFlow(false)
+    override var enabled = true
+
+    override fun recheck() = Unit
+
+    override fun lastKnown(): LatLon? = fix
+
+    override suspend fun current(): LatLon? = fix
+}
+
 private class MemoryStore : DataStore<Preferences> {
     private val state = MutableStateFlow(emptyPreferences())
     override val data: StateFlow<Preferences> = state

@@ -33,6 +33,17 @@ class MotisApi(
                 bias?.let { parameter("placeBias", it) }
             }.body()
 
+    /** Every stop and platform in the box from [min] to [max], both `lat,lon`. */
+    suspend fun mapStops(
+        min: String,
+        max: String,
+    ): List<MotisStop> =
+        client
+            .get("${baseUrl()}api/v1/map/stops") {
+                parameter("min", min)
+                parameter("max", max)
+            }.body()
+
     /** Itineraries for [request]. */
     suspend fun plan(request: MotisPlanRequest): MotisPlan =
         client

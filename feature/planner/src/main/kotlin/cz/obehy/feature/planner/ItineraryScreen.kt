@@ -86,7 +86,7 @@ internal fun ItineraryScreen(
             refreshing = open.refreshing,
             onRefresh = onRefresh,
         ) {
-            ItineraryTimeline(itinerary, query.from?.name, query.to?.name)
+            ItineraryTimeline(itinerary, query.from?.label(), query.to?.label())
         }
     }
 }

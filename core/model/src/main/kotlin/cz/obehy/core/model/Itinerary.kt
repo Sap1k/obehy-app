@@ -2,6 +2,9 @@ package cz.obehy.core.model
 
 import java.time.Duration
 import java.time.Instant
+import kotlin.math.cos
+import kotlin.math.round
+import kotlin.math.sqrt
 
 /** A planned time and, once realtime data says otherwise, the expected one. */
 data class TimePoint(
@@ -17,7 +20,21 @@ data class TimePoint(
 data class LatLon(
     val lat: Double,
     val lon: Double,
-)
+) {
+    /** The straight-line distance to [other]; accurate enough at the scale of a town. */
+    fun metresTo(other: LatLon): Double {
+        val dLat = (lat - other.lat) * METRES_PER_DEGREE
+        val dLon = (lon - other.lon) * METRES_PER_DEGREE * cos(Math.toRadians((lat + other.lat) / 2))
+        return sqrt(dLat * dLat + dLon * dLon)
+    }
+
+    /** About 100 m coarser: all a list of stops or a ranking needs to send to a server. */
+    fun rounded(): LatLon = LatLon(round(lat * 1_000) / 1_000, round(lon * 1_000) / 1_000)
+
+    companion object {
+        const val METRES_PER_DEGREE = 111_000.0
+    }
+}
 
 /** A stop on a journey and its times there. */
 data class StopCall(

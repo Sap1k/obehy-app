@@ -1,0 +1,619 @@
+[
+{
+"name": "Praha hl.n.",
+"stopId": "sk-zsr_5457076",
+"lat": 50.083873999999994,
+"lon": 14.435948,
+"modes": [
+"LONG_DISTANCE",
+"NIGHT_RAIL",
+"REGIONAL_RAIL"
+]
+},
+{
+"name": "Praha hlavní nádraží",
+"stopId": "pl-Polish-Trains_129059_FALLBACK",
+"parentId": "pl-Polish-Trains_129059",
+"lat": 50.083023,
+"lon": 14.436302999999999,
+"modes": [
+"LONG_DISTANCE"
+]
+},
+{
+"name": "Praha hl.n.",
+"stopId": "at-Railway-Current-Reference-Data-2026_cz:0:5457076:0:1",
+"lat": 50.083479999999994,
+"lon": 14.435882000000001,
+"modes": [
+"HIGHSPEED_RAIL",
+"LONG_DISTANCE",
+"NIGHT_RAIL",
+"REGIONAL_RAIL"
+]
+},
+{
+"name": "Praha, hlavni nadrazi",
+"stopId": "de-DELFI_cz:55100:20100:7:30",
+"lat": 50.083164,
+"lon": 14.437409,
+"modes": [
+"REGIONAL_RAIL"
+]
+},
+{
+"name": "Praha hl.n.",
+"stopId": "de-DELFI_000005400014",
+"lat": 50.083059999999996,
+"lon": 14.436039000000001,
+"modes": [
+"HIGHSPEED_RAIL",
+"LONG_DISTANCE",
+"REGIONAL_RAIL"
+]
+},
+{
+"name": "Praha hl.n.",
+"stopId": "eu-european-sleeper_5457076",
+"lat": 50.082962,
+"lon": 14.436094,
+"modes": [
+"NIGHT_RAIL"
+]
+},
+{
+"name": "Prague (Main Railway Station)",
+"stopId": "eu-flixbus_9b6adf5b-3ecb-11ea-8017-02437075395e",
+"lat": 50.083583999999995,
+"lon": 14.435296000000001,
+"modes": [
+"COACH"
+]
+},
+{
+"name": "Prague (Main Railway Station)",
+"stopId": "eu-flixbus_9b6adf77-3ecb-11ea-8017-02437075395e",
+"lat": 50.083157,
+"lon": 14.434290999999998,
+"modes": [
+"COACH"
+]
+},
+{
+"name": "Hlavní nádraží",
+"stopId": "cz-PID_U142Z403",
+"lat": 50.08112,
+"lon": 14.43388,
+"modes": [
+"BUS"
+]
+},
+{
+"name": "Hlavní nádraží",
+"stopId": "cz-PID_U142Z3P",
+"lat": 50.08112,
+"lon": 14.43388,
+"modes": [
+"BUS"
+]
+},
+{
+"name": "Hlavní nádraží",
+"stopId": "cz-PID_U142Z102P",
+"parentId": "cz-PID_U142S1",
+"lat": 50.083515000000006,
+"lon": 14.434089,
+"modes": [
+"SUBWAY"
+]
+},
+{
+"name": "Hlavní nádraží",
+"stopId": "cz-PID_U142Z101P",
+"parentId": "cz-PID_U142S1",
+"lat": 50.083496,
+"lon": 14.434156,
+"modes": [
+"SUBWAY"
+]
+},
+{
+"name": "Na Smetance",
+"stopId": "cz-PID_U427Z2P",
+"lat": 50.08005,
+"lon": 14.438116999999998,
+"modes": [
+"BUS"
+]
+},
+{
+"name": "Muzeum",
+"stopId": "cz-PID_U400Z121P",
+"parentId": "cz-PID_U400S1",
+"lat": 50.080193,
+"lon": 14.431194999999999,
+"modes": [
+"SUBWAY"
+]
+},
+{
+"name": "Hlavní nádraží",
+"stopId": "cz-PID_U142Z2P",
+"lat": 50.085693,
+"lon": 14.435927999999999,
+"modes": [
+"TRAM"
+]
+},
+{
+"name": "Hlavní nádraží",
+"stopId": "cz-PID_U142Z461",
+"lat": 50.08485999999999,
+"lon": 14.433754,
+"modes": [
+"BUS"
+]
+},
+{
+"name": "Hlavní nádraží",
+"stopId": "cz-PID_U142Z10P",
+"lat": 50.084489999999995,
+"lon": 14.433417,
+"modes": [
+"BUS"
+]
+},
+{
+"name": "Hlavní nádraží",
+"stopId": "cz-PID_U142Z15P",
+"lat": 50.084346999999994,
+"lon": 14.433299,
+"modes": [
+"BUS"
+]
+},
+{
+"name": "Hlavní nádraží",
+"stopId": "cz-PID_U142Z54P",
+"lat": 50.08373,
+"lon": 14.432604000000001,
+"modes": [
+"BUS"
+]
+},
+{
+"name": "Muzeum",
+"stopId": "cz-PID_U400Z122P",
+"parentId": "cz-PID_U400S1",
+"lat": 50.08029,
+"lon": 14.43098,
+"modes": [
+"SUBWAY"
+]
+},
+{
+"name": "Muzeum",
+"stopId": "cz-PID_U400Z3P",
+"lat": 50.080032,
+"lon": 14.430883,
+"modes": [
+"BUS"
+]
+},
+{
+"name": "Jindřišská",
+"stopId": "cz-PID_U203Z1P",
+"lat": 50.085083,
+"lon": 14.430157999999999,
+"modes": [
+"TRAM"
+]
+},
+{
+"name": "Jindřišská",
+"stopId": "cz-PID_U203Z2P",
+"lat": 50.08532,
+"lon": 14.430784000000001,
+"modes": [
+"TRAM"
+]
+},
+{
+"name": "Praha hlavní nádraží",
+"stopId": "cz-PID_U142Z301",
+"parentId": "cz-PID_U142S2",
+"lat": 50.083096,
+"lon": 14.436194,
+"modes": [
+"REGIONAL_RAIL"
+]
+},
+{
+"name": "Praha hlavní nádraží",
+"stopId": "cz-CZPTT_czptt:stop:CZ:57076:platform:BUS",
+"parentId": "cz-CZPTT_czptt:stop:CZ:57076",
+"lat": 50.08309,
+"lon": 14.435977999999999,
+"modes": [
+"BUS"
+]
+},
+{
+"name": "Praha hlavní nádraží",
+"stopId": "cz-CZPTT_czptt:stop:CZ:57076:platform:9b",
+"parentId": "cz-CZPTT_czptt:stop:CZ:57076",
+"lat": 50.08309,
+"lon": 14.435977999999999,
+"modes": [
+"LONG_DISTANCE",
+"REGIONAL_RAIL"
+]
+},
+{
+"name": "Praha hlavní nádraží",
+"stopId": "cz-CZPTT_czptt:stop:CZ:57076:platform:9",
+"parentId": "cz-CZPTT_czptt:stop:CZ:57076",
+"lat": 50.08309,
+"lon": 14.435977999999999,
+"modes": [
+"LONG_DISTANCE",
+"REGIONAL_RAIL"
+]
+},
+{
+"name": "Praha hlavní nádraží",
+"stopId": "cz-CZPTT_czptt:stop:CZ:57076:platform:8b",
+"parentId": "cz-CZPTT_czptt:stop:CZ:57076",
+"lat": 50.08309,
+"lon": 14.435977999999999,
+"modes": [
+"LONG_DISTANCE",
+"NIGHT_RAIL",
+"REGIONAL_RAIL"
+]
+},
+{
+"name": "Praha hlavní nádraží",
+"stopId": "cz-CZPTT_czptt:stop:CZ:57076:platform:8",
+"parentId": "cz-CZPTT_czptt:stop:CZ:57076",
+"lat": 50.08309,
+"lon": 14.435977999999999,
+"modes": [
+"LONG_DISTANCE",
+"REGIONAL_RAIL"
+]
+},
+{
+"name": "Praha hlavní nádraží",
+"stopId": "cz-CZPTT_czptt:stop:CZ:57076:platform:7b",
+"parentId": "cz-CZPTT_czptt:stop:CZ:57076",
+"lat": 50.08309,
+"lon": 14.435977999999999,
+"modes": [
+"REGIONAL_RAIL"
+]
+},
+{
+"name": "Praha hlavní nádraží",
+"stopId": "cz-CZPTT_czptt:stop:CZ:57076:platform:7",
+"parentId": "cz-CZPTT_czptt:stop:CZ:57076",
+"lat": 50.08309,
+"lon": 14.435977999999999,
+"modes": [
+"LONG_DISTANCE",
+"NIGHT_RAIL",
+"REGIONAL_RAIL"
+]
+},
+{
+"name": "Praha hlavní nádraží",
+"stopId": "cz-CZPTT_czptt:stop:CZ:57076:platform:32b",
+"parentId": "cz-CZPTT_czptt:stop:CZ:57076",
+"lat": 50.08309,
+"lon": 14.435977999999999,
+"modes": [
+"NIGHT_RAIL",
+"REGIONAL_RAIL"
+]
+},
+{
+"name": "Praha hlavní nádraží",
+"stopId": "cz-CZPTT_czptt:stop:CZ:57076:platform:22b",
+"parentId": "cz-CZPTT_czptt:stop:CZ:57076",
+"lat": 50.08309,
+"lon": 14.435977999999999,
+"modes": [
+"LONG_DISTANCE",
+"REGIONAL_RAIL"
+]
+},
+{
+"name": "Praha hlavní nádraží",
+"stopId": "cz-CZPTT_czptt:stop:CZ:57076:platform:22",
+"parentId": "cz-CZPTT_czptt:stop:CZ:57076",
+"lat": 50.08309,
+"lon": 14.435977999999999,
+"modes": [
+"LONG_DISTANCE",
+"REGIONAL_RAIL"
+]
+},
+{
+"name": "Praha hlavní nádraží",
+"stopId": "cz-CZPTT_czptt:stop:CZ:57076:platform:20b",
+"parentId": "cz-CZPTT_czptt:stop:CZ:57076",
+"lat": 50.08309,
+"lon": 14.435977999999999,
+"modes": [
+"LONG_DISTANCE",
+"REGIONAL_RAIL"
+]
+},
+{
+"name": "Praha hlavní nádraží",
+"stopId": "cz-CZPTT_czptt:stop:CZ:57076:platform:20",
+"parentId": "cz-CZPTT_czptt:stop:CZ:57076",
+"lat": 50.08309,
+"lon": 14.435977999999999,
+"modes": [
+"LONG_DISTANCE",
+"REGIONAL_RAIL"
+]
+},
+{
+"name": "Praha hlavní nádraží",
+"stopId": "cz-CZPTT_czptt:stop:CZ:57076:platform:2",
+"parentId": "cz-CZPTT_czptt:stop:CZ:57076",
+"lat": 50.08309,
+"lon": 14.435977999999999,
+"modes": [
+"LONG_DISTANCE",
+"REGIONAL_RAIL"
+]
+},
+{
+"name": "Praha hlavní nádraží",
+"stopId": "cz-CZPTT_czptt:stop:CZ:57076:platform:1b",
+"parentId": "cz-CZPTT_czptt:stop:CZ:57076",
+"lat": 50.08309,
+"lon": 14.435977999999999,
+"modes": [
+"LONG_DISTANCE",
+"REGIONAL_RAIL"
+]
+},
+{
+"name": "Praha hlavní nádraží",
+"stopId": "cz-CZPTT_czptt:stop:CZ:57076:platform:14b",
+"parentId": "cz-CZPTT_czptt:stop:CZ:57076",
+"lat": 50.08309,
+"lon": 14.435977999999999,
+"modes": [
+"LONG_DISTANCE",
+"NIGHT_RAIL",
+"REGIONAL_RAIL"
+]
+},
+{
+"name": "Praha hlavní nádraží",
+"stopId": "cz-CZPTT_czptt:stop:CZ:57076:platform:14",
+"parentId": "cz-CZPTT_czptt:stop:CZ:57076",
+"lat": 50.08309,
+"lon": 14.435977999999999,
+"modes": [
+"LONG_DISTANCE",
+"REGIONAL_RAIL"
+]
+},
+{
+"name": "Praha hlavní nádraží",
+"stopId": "cz-CZPTT_czptt:stop:CZ:57076:platform:13b",
+"parentId": "cz-CZPTT_czptt:stop:CZ:57076",
+"lat": 50.08309,
+"lon": 14.435977999999999,
+"modes": [
+"LONG_DISTANCE"
+]
+},
+{
+"name": "Praha hlavní nádraží",
+"stopId": "cz-CZPTT_czptt:stop:CZ:57076:platform:13a",
+"parentId": "cz-CZPTT_czptt:stop:CZ:57076",
+"lat": 50.08309,
+"lon": 14.435977999999999,
+"modes": [
+"LONG_DISTANCE",
+"REGIONAL_RAIL"
+]
+},
+{
+"name": "Praha hlavní nádraží",
+"stopId": "cz-CZPTT_czptt:stop:CZ:57076:platform:11a",
+"parentId": "cz-CZPTT_czptt:stop:CZ:57076",
+"lat": 50.08309,
+"lon": 14.435977999999999,
+"modes": [
+"REGIONAL_RAIL"
+]
+},
+{
+"name": "Praha hlavní nádraží",
+"stopId": "cz-CZPTT_czptt:stop:CZ:57076:platform:1",
+"parentId": "cz-CZPTT_czptt:stop:CZ:57076",
+"lat": 50.08309,
+"lon": 14.435977999999999,
+"modes": [
+"LONG_DISTANCE",
+"REGIONAL_RAIL"
+]
+},
+{
+"name": "Praha hlavní nádraží",
+"stopId": "cz-CZPTT_czptt:stop:CZ:57076:platform:24",
+"parentId": "cz-CZPTT_czptt:stop:CZ:57076",
+"lat": 50.08309,
+"lon": 14.435977999999999,
+"modes": [
+"LONG_DISTANCE",
+"NIGHT_RAIL",
+"REGIONAL_RAIL"
+]
+},
+{
+"name": "Praha hlavní nádraží",
+"stopId": "cz-CZPTT_czptt:stop:CZ:57076:platform:24b",
+"parentId": "cz-CZPTT_czptt:stop:CZ:57076",
+"lat": 50.08309,
+"lon": 14.435977999999999,
+"modes": [
+"LONG_DISTANCE",
+"NIGHT_RAIL",
+"REGIONAL_RAIL"
+]
+},
+{
+"name": "Praha hlavní nádraží",
+"stopId": "cz-CZPTT_czptt:stop:CZ:57076:platform:26",
+"parentId": "cz-CZPTT_czptt:stop:CZ:57076",
+"lat": 50.08309,
+"lon": 14.435977999999999,
+"modes": [
+"LONG_DISTANCE",
+"REGIONAL_RAIL"
+]
+},
+{
+"name": "Praha hlavní nádraží",
+"stopId": "cz-CZPTT_czptt:stop:CZ:57076:platform:26b",
+"parentId": "cz-CZPTT_czptt:stop:CZ:57076",
+"lat": 50.08309,
+"lon": 14.435977999999999,
+"modes": [
+"LONG_DISTANCE",
+"REGIONAL_RAIL"
+]
+},
+{
+"name": "Praha hlavní nádraží",
+"stopId": "cz-CZPTT_czptt:stop:CZ:57076:platform:28",
+"parentId": "cz-CZPTT_czptt:stop:CZ:57076",
+"lat": 50.08309,
+"lon": 14.435977999999999,
+"modes": [
+"REGIONAL_RAIL"
+]
+},
+{
+"name": "Praha hlavní nádraží",
+"stopId": "cz-CZPTT_czptt:stop:CZ:57076:platform:28b",
+"parentId": "cz-CZPTT_czptt:stop:CZ:57076",
+"lat": 50.08309,
+"lon": 14.435977999999999,
+"modes": [
+"LONG_DISTANCE",
+"REGIONAL_RAIL"
+]
+},
+{
+"name": "Praha hlavní nádraží",
+"stopId": "cz-CZPTT_czptt:stop:CZ:57076:platform:2b",
+"parentId": "cz-CZPTT_czptt:stop:CZ:57076",
+"lat": 50.08309,
+"lon": 14.435977999999999,
+"modes": [
+"LONG_DISTANCE",
+"REGIONAL_RAIL"
+]
+},
+{
+"name": "Praha hlavní nádraží",
+"stopId": "cz-CZPTT_czptt:stop:CZ:57076:platform:30",
+"parentId": "cz-CZPTT_czptt:stop:CZ:57076",
+"lat": 50.08309,
+"lon": 14.435977999999999,
+"modes": [
+"REGIONAL_RAIL"
+]
+},
+{
+"name": "Praha hlavní nádraží",
+"stopId": "cz-CZPTT_czptt:stop:CZ:57076:platform:30b",
+"parentId": "cz-CZPTT_czptt:stop:CZ:57076",
+"lat": 50.08309,
+"lon": 14.435977999999999,
+"modes": [
+"REGIONAL_RAIL"
+]
+},
+{
+"name": "Praha hlavní nádraží",
+"stopId": "cz-CZPTT_czptt:stop:CZ:57076:platform:32",
+"parentId": "cz-CZPTT_czptt:stop:CZ:57076",
+"lat": 50.08309,
+"lon": 14.435977999999999,
+"modes": [
+"REGIONAL_RAIL"
+]
+},
+{
+"name": "Praha,Hlavní nádraží",
+"stopId": "cz-JDF-merged_jdf:stop:30105:unspecified",
+"parentId": "cz-JDF-merged_jdf:stop:30105",
+"lat": 50.083884999999995,
+"lon": 14.434444000000001,
+"modes": [
+"COACH",
+"BUS"
+]
+},
+{
+"name": "Praha,Hlavní nádraží",
+"stopId": "cz-JDF-merged_jdf:stop:30105:est:3",
+"parentId": "cz-JDF-merged_jdf:stop:30105",
+"lat": 50.083479999999994,
+"lon": 14.435239000000001,
+"modes": [
+"BUS"
+]
+},
+{
+"name": "Praha hl.n.",
+"stopId": "cz-IDZK_58029",
+"lat": 50.083076,
+"lon": 14.435898,
+"modes": [
+"REGIONAL_RAIL"
+]
+},
+{
+"name": "Praha hl. n.",
+"stopId": "ch-opentransportdataswiss27_5457076",
+"parentId": "ch-opentransportdataswiss27_Parent5457076",
+"lat": 50.083059999999996,
+"lon": 14.436044,
+"modes": [
+"LONG_DISTANCE"
+]
+},
+{
+"name": "Praha hl. n.",
+"stopId": "ch-opentransportdataswiss26_5457076",
+"parentId": "ch-opentransportdataswiss26_Parent5457076",
+"lat": 50.083059999999996,
+"lon": 14.436044,
+"modes": [
+"LONG_DISTANCE"
+]
+},
+{
+"name": "Praha hl. n.",
+"stopId": "hu-mav_1:005457076_0",
+"parentId": "hu-mav_1:005457076",
+"lat": 50.08139,
+"lon": 14.435277999999998,
+"modes": [
+"LONG_DISTANCE",
+"NIGHT_RAIL"
+]
+}
+]

@@ -33,6 +33,15 @@ fun MotisMatch.toPlace(): Place =
         modes = modes.mapTo(mutableSetOf()) { motisMode(it) },
     )
 
+/** This stop as a place to route from, under [routingId] rather than its own platform's ID. */
+fun MotisStop.toPlace(
+    routingId: String,
+    modes: Set<Mode>,
+): Place = Place(routingId, name, null, PlaceKind.Stop, lat, lon, modes)
+
+/** The modes MOTIS lists for this stop. */
+fun MotisStop.domainModes(): Set<Mode> = modes.mapTo(mutableSetOf()) { motisMode(it) }
+
 /** The MOTIS request for [query] (which must be complete) with [options]. */
 fun motisPlanRequest(
     query: JourneyQuery,

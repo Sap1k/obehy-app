@@ -225,7 +225,7 @@ private fun PlaceField(
                 )
                 // The name slides in the way the places trade when they are swapped.
                 AnimatedContent(
-                    place?.name,
+                    place?.label(),
                     transitionSpec = {
                         val height = { full: Int -> if (arrivesFromBelow) full else -full }
                         val leaving = { full: Int -> -height(full) }

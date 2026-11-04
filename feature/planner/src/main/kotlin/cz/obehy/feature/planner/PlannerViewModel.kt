@@ -3,11 +3,15 @@ package cz.obehy.feature.planner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cz.obehy.core.data.JourneyRepository
+import cz.obehy.core.data.LocationRepository
 import cz.obehy.core.data.PlaceRepository
 import cz.obehy.core.data.SettingsRepository
 import cz.obehy.core.model.Itinerary
 import cz.obehy.core.model.JourneyQuery
+import cz.obehy.core.model.LatLon
+import cz.obehy.core.model.NearbyStop
 import cz.obehy.core.model.Place
+import cz.obehy.core.model.PlaceKind
 import cz.obehy.core.model.SearchOptions
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
@@ -41,6 +45,9 @@ sealed interface PlaceTarget {
     val stopsOnly: Boolean get() = this is Via
 }
 
+/** Whether nearby stops can be shown, and if not, what would make them appear. */
+enum class NearbyStatus { Unknown, Loading, Ready, NeedsPermission, Off }
+
 /** The place search while a place is being picked. */
 data class PlaceSearch(
     val target: PlaceTarget,
@@ -48,6 +55,9 @@ data class PlaceSearch(
     val results: List<Place> = emptyList(),
     val loading: Boolean = false,
     val failed: Boolean = false,
+    /** Shown while nothing has been typed. */
+    val nearby: List<NearbyStop> = emptyList(),
+    val nearbyStatus: NearbyStatus = NearbyStatus.Unknown,
 )
 
 /** The journeys found for the current search. */
@@ -57,6 +67,9 @@ sealed interface Results {
     data object Loading : Results
 
     data object Failed : Results
+
+    /** The search starts or ends at "My location", and the phone can't tell where that is. */
+    data object NoLocation : Results
 
     data class Loaded(
         val itineraries: List<Itinerary>,
@@ -89,7 +102,11 @@ data class PlannerState(
     val open: OpenJourney? = null,
 ) {
     /** Whether there is anything to clear with a new search. */
-    val canReset: Boolean get() = query != JourneyQuery() || results != Results.Idle
+    val canReset: Boolean
+        get() {
+            val typed = query.copy(from = query.from?.takeUnless { it.kind == PlaceKind.MyLocation })
+            return typed != JourneyQuery() || results != Results.Idle
+        }
 }
 
 /** Everything the user can do on the planner. */
@@ -105,6 +122,9 @@ sealed interface PlannerAction {
     data class Choose(
         val place: Place,
     ) : PlannerAction
+
+    /** The app came back, or the permission was answered: the location's status may have changed. */
+    data object CheckLocation : PlannerAction
 
     data object ClosePlaceSearch : PlannerAction
 
@@ -153,10 +173,12 @@ class PlannerViewModel
         private val settings: SettingsRepository,
         private val places: PlaceRepository,
         private val journeys: JourneyRepository,
+        private val location: LocationRepository,
     ) : ViewModel() {
         private val local = MutableStateFlow(PlannerState())
         private var searchJob: Job? = null
         private var refreshJob: Job? = null
+        private var nearbyJob: Job? = null
 
         /** The clock; tests set their own. */
         internal var now: () -> Instant = Instant::now
@@ -166,6 +188,7 @@ class PlannerViewModel
                 .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PlannerState())
 
         init {
+            viewModelScope.launch { location.allowed.collect { startFromHere() } }
             viewModelScope.launch {
                 local
                     .map { state -> state.placeSearch?.let { it.target to it.text } }
@@ -174,7 +197,7 @@ class PlannerViewModel
                     .collectLatest { typed ->
                         val (target, text) = typed ?: return@collectLatest
                         if (text.trim().length < MIN_PLACE_TEXT) return@collectLatest
-                        val found = places.search(text, target.stopsOnly)
+                        val found = places.search(text, target.stopsOnly, location.lastKnown())
                         local.update {
                             val search = it.placeSearch
                             if (search?.text != text) {
@@ -198,6 +221,7 @@ class PlannerViewModel
             when (action) {
                 is PlannerAction.Pick -> {
                     local.update { it.copy(placeSearch = PlaceSearch(action.target)) }
+                    loadNearby()
                 }
 
                 is PlannerAction.Type -> {
@@ -220,7 +244,14 @@ class PlannerViewModel
                     choose(action.place)
                 }
 
+                PlannerAction.CheckLocation -> {
+                    location.recheck()
+                    val status = local.value.placeSearch?.nearbyStatus
+                    if (status != null && status != NearbyStatus.Ready && status != NearbyStatus.Loading) loadNearby()
+                }
+
                 PlannerAction.ClosePlaceSearch -> {
+                    nearbyJob?.cancel()
                     local.update { it.copy(placeSearch = null) }
                 }
 
@@ -272,7 +303,49 @@ class PlannerViewModel
                     searchJob?.cancel()
                     refreshJob?.cancel()
                     local.update { PlannerState() }
+                    startFromHere()
                 }
+            }
+        }
+
+        /** A search with no start begins here, once the user has let the app know where that is. */
+        private fun startFromHere() {
+            if (!location.allowed.value) return
+            local.update { state ->
+                val query = state.query
+                if (query.from == null && query.to?.kind != PlaceKind.MyLocation) {
+                    state.copy(query = query.copy(from = Place.myLocation()))
+                } else {
+                    state
+                }
+            }
+        }
+
+        /** The stops around the phone, for the picker before anything is typed. */
+        private fun loadNearby() {
+            nearbyJob?.cancel()
+            val status =
+                when {
+                    !location.allowed.value -> NearbyStatus.NeedsPermission
+                    !location.enabled -> NearbyStatus.Off
+                    else -> NearbyStatus.Loading
+                }
+            updateNearby(status)
+            if (status != NearbyStatus.Loading) return
+            nearbyJob =
+                viewModelScope.launch {
+                    val fix = location.current()
+                    val stops = fix?.let { places.nearby(it).getOrNull() }
+                    updateNearby(if (stops != null) NearbyStatus.Ready else NearbyStatus.Unknown, stops.orEmpty())
+                }
+        }
+
+        private fun updateNearby(
+            status: NearbyStatus,
+            stops: List<NearbyStop> = emptyList(),
+        ) {
+            local.update { state ->
+                state.copy(placeSearch = state.placeSearch?.copy(nearbyStatus = status, nearby = stops))
             }
         }
 
@@ -332,6 +405,7 @@ class PlannerViewModel
 
         private fun choose(place: Place) {
             val target = local.value.placeSearch?.target ?: return
+            nearbyJob?.cancel()
             local.update { it.copy(placeSearch = null) }
             changeQuery { query ->
                 when (target) {
@@ -370,7 +444,13 @@ class PlannerViewModel
             local.update { it.copy(results = Results.Loading, open = null) }
             searchJob =
                 viewModelScope.launch {
-                    val page = journeys.search(query, settings.searchOptions.first())
+                    val located = locate(query)
+                    if (located == null) {
+                        local.update { it.copy(results = Results.NoLocation) }
+                        return@launch
+                    }
+                    local.update { it.copy(query = located) }
+                    val page = journeys.search(located, settings.searchOptions.first())
                     val at = now()
                     local.update { state ->
                         state.copy(
@@ -383,6 +463,22 @@ class PlannerViewModel
                     }
                 }
         }
+
+        /** [query] with "My location" put on the map; null when the phone can't tell where it is. */
+        private suspend fun locate(query: JourneyQuery): JourneyQuery? {
+            if (query.from?.kind != PlaceKind.MyLocation && query.to?.kind != PlaceKind.MyLocation) return query
+            val fix = location.current() ?: return null
+            return query.copy(from = query.from?.located(fix), to = query.to?.located(fix))
+        }
+
+        private fun Place.located(fix: LatLon): Place =
+            if (kind ==
+                PlaceKind.MyLocation
+            ) {
+                Place.myLocation(fix)
+            } else {
+                this
+            }
 
         private fun loadMore(earlier: Boolean) {
             val shown = local.value.results as? Results.Loaded ?: return

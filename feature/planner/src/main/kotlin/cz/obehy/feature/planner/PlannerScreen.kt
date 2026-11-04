@@ -33,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cz.obehy.core.map.PreloadRouteMaps
 import cz.obehy.core.map.RouteMap
@@ -57,12 +58,17 @@ internal fun PlannerDestination(
     val wide = isWideWindow()
     val search = state.placeSearch
     BackHandler(enabled = search != null) { viewModel.act(PlannerAction.ClosePlaceSearch) }
+    LifecycleResumeEffect(viewModel) {
+        viewModel.act(PlannerAction.CheckLocation)
+        onPauseOrDispose {}
+    }
     if (search != null) {
         PlaceSearchScreen(
             search,
             onType = { viewModel.act(PlannerAction.Type(it)) },
             onChoose = { viewModel.act(PlannerAction.Choose(it)) },
             onClose = { viewModel.act(PlannerAction.ClosePlaceSearch) },
+            onLocationAnswer = { viewModel.act(PlannerAction.CheckLocation) },
         )
     } else {
         PlannerScreen(
@@ -188,6 +194,10 @@ private fun ResultsList(
                     item(key = "failed") { Note(R.string.results_error) { onAction(PlannerAction.Search) } }
                 }
 
+                Results.NoLocation -> {
+                    item(key = "no-location") { Note(R.string.results_no_location) { onAction(PlannerAction.Search) } }
+                }
+
                 is Results.Loaded -> {
                     if (results.itineraries.isEmpty()) {
                         item(key = "none") { Note(R.string.results_none) }
@@ -303,6 +313,6 @@ private fun DetailPane(
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        ItineraryTimeline(open.itinerary, query.from?.name, query.to?.name)
+        ItineraryTimeline(open.itinerary, query.from?.label(), query.to?.label())
     }
 }

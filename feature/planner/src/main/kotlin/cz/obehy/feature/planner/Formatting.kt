@@ -4,6 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import cz.obehy.core.model.JourneyQuery
+import cz.obehy.core.model.Place
+import cz.obehy.core.model.PlaceKind
 import cz.obehy.core.ui.components.clock
 import java.time.Duration
 import java.time.Instant
@@ -28,6 +30,19 @@ internal fun transfersText(transfers: Int): String =
     when (transfers) {
         0 -> stringResource(R.string.direct)
         else -> pluralStringResource(R.plurals.transfers, transfers, transfers)
+    }
+
+/** What a place is called on screen. */
+@Composable
+internal fun Place.label(): String = if (kind == PlaceKind.MyLocation) stringResource(R.string.my_location) else name
+
+/** "120 m", or "1.4 km" further out. */
+@Composable
+internal fun distanceText(metres: Int): String =
+    if (metres < 1_000) {
+        stringResource(R.string.distance_metres, metres / 10 * 10)
+    } else {
+        stringResource(R.string.distance_kilometres, metres / 1_000.0)
     }
 
 /** "Leave now", "Leave 14:30", "Arrive by Wed 5 Nov 8:00". */

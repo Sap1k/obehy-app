@@ -1,7 +1,7 @@
 package cz.obehy.core.model
 
 /** What a found place is: a stop routes by its ID, anything else by its coordinates. */
-enum class PlaceKind { Stop, Address, Poi }
+enum class PlaceKind { Stop, Address, Poi, MyLocation }
 
 /** A place to travel from, to or through, as the place search found it. */
 data class Place(
@@ -17,4 +17,21 @@ data class Place(
 ) {
     /** How a journey search names this place: the stop's ID, otherwise `lat,lon`. */
     val routingRef: String get() = if (kind == PlaceKind.Stop) id else "$lat,$lon"
+
+    val position: LatLon get() = LatLon(lat, lon)
+
+    companion object {
+        /**
+         * Wherever the phone is. Its coordinates are unknown (NaN) until a search asks for a fix
+         * and fills them in, and the name comes from the screen showing it.
+         */
+        fun myLocation(fix: LatLon? = null): Place =
+            Place("my-location", "", null, PlaceKind.MyLocation, fix?.lat ?: Double.NaN, fix?.lon ?: Double.NaN)
+    }
 }
+
+/** A stop near the user, [metres] away in a straight line. */
+data class NearbyStop(
+    val place: Place,
+    val metres: Int,
+)

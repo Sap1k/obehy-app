@@ -57,7 +57,17 @@
     <string name="later">Pozdější</string>
     <string name="results_none">Žádné spojení jsme nenašli. Zkuste jiný čas nebo méně omezení.</string>
     <string name="results_error">Spojení se nepodařilo najít. Zkontrolujte připojení a zkuste to znovu.</string>
+    <string name="results_no_location">Nedaří se zjistit, kde jste. Zkontrolujte, že je poloha zapnutá, nebo vyberte místo.</string>
     <string name="retry">Zkusit znovu</string>
+    <string name="my_location">Moje poloha</string>
+    <string name="near_you">Ve vašem okolí</string>
+    <string name="near_you_ask">Zobrazit zastávky v okolí</string>
+    <string name="near_you_ask_body">Uvidíte nejbližší zastávky a jak daleko jsou.</string>
+    <string name="near_you_blocked_body">Poloha je pro Oběhy zablokovaná. Povolte ji v nastavení aplikace.</string>
+    <string name="near_you_off">Zapnout polohu</string>
+    <string name="near_you_off_body">Poloha v telefonu je vypnutá.</string>
+    <string name="distance_metres">%d m</string>
+    <string name="distance_kilometres">%.1f km</string>
 
     <string name="towards">směr %s</string>
     <plurals name="stops_between">

@@ -1,0 +1,252 @@
+[
+{
+"name": "Červené Pečky,Bohouňovice I",
+"stopId": "jdf_jdf:stop:31992:est:1",
+"parentId": "jdf_jdf:stop:31992",
+"lat": 49.975716076991105,
+"lon": 15.180843,
+"modes": [
+"BUS"
+]
+},
+{
+"name": "Červené Pečky,Dobešovice",
+"stopId": "jdf_overlay:pid-gtfs:post:0bd9270c958a47cf",
+"parentId": "jdf_jdf:stop:564",
+"lat": 49.983008999999996,
+"lon": 15.198812999999998,
+"modes": [
+"BUS"
+]
+},
+{
+"name": "Červené Pečky,Bohouňovice I",
+"stopId": "jdf_jdf:stop:31992:est:2",
+"parentId": "jdf_jdf:stop:31992",
+"lat": 49.975647076991194,
+"lon": 15.1811008,
+"modes": [
+"BUS"
+]
+},
+{
+"name": "Červené Pečky,Bohouňovice I",
+"stopId": "jdf_overlay:pid-gtfs:post:ab9a28ff75cf374d",
+"parentId": "jdf_jdf:stop:31992",
+"lat": 49.975646999999995,
+"lon": 15.181100999999998,
+"modes": [
+"BUS"
+]
+},
+{
+"name": "Červené Pečky,Dobešovice",
+"stopId": "jdf_jdf:stop:564:est:1",
+"parentId": "jdf_jdf:stop:564",
+"lat": 49.98306667698229,
+"lon": 15.198862099999998,
+"modes": [
+"BUS"
+]
+},
+{
+"name": "Červené Pečky,Bohouňovice I",
+"stopId": "jdf_overlay:pid-gtfs:post:09d2a5f356115cfd",
+"parentId": "jdf_jdf:stop:31992",
+"lat": 49.975716000000006,
+"lon": 15.180843,
+"modes": [
+"BUS"
+]
+},
+{
+"name": "Červené Pečky,Dobešovice",
+"stopId": "jdf_overlay:pid-gtfs:post:8078c06b05192624",
+"parentId": "jdf_jdf:stop:564",
+"lat": 49.98306699999999,
+"lon": 15.198861999999998,
+"modes": [
+"BUS"
+]
+},
+{
+"name": "Pašinka",
+"stopId": "jdf_jdf:stop:32772:est:1",
+"parentId": "jdf_jdf:stop:32772",
+"lat": 49.9963900769662,
+"lon": 15.186209999999999,
+"modes": [
+"BUS"
+]
+},
+{
+"name": "Pašinka",
+"stopId": "jdf_overlay:pid-gtfs:post:aacb5e09a5137173",
+"parentId": "jdf_jdf:stop:32772",
+"lat": 49.996391,
+"lon": 15.186209999999999,
+"modes": [
+"BUS"
+]
+},
+{
+"name": "Ratboř",
+"stopId": "jdf_jdf:stop:8137:est:2",
+"parentId": "jdf_jdf:stop:8137",
+"lat": 49.978010076988305,
+"lon": 15.1593447,
+"modes": [
+"BUS"
+]
+},
+{
+"name": "Pašinka",
+"stopId": "jdf_overlay:pid-gtfs:post:bec9346419599d4b",
+"parentId": "jdf_jdf:stop:32772",
+"lat": 49.996433,
+"lon": 15.186397,
+"modes": [
+"BUS"
+]
+},
+{
+"name": "Kbel,Kbílek",
+"stopId": "jdf_overlay:pid-gtfs:post:069ee25302b21d4e",
+"parentId": "jdf_jdf:stop:26430",
+"lat": 49.984916999999996,
+"lon": 15.1512,
+"modes": [
+"BUS"
+]
+},
+{
+"name": "Pašinka",
+"stopId": "jdf_jdf:stop:32772:est:2",
+"parentId": "jdf_jdf:stop:32772",
+"lat": 49.9964330769661,
+"lon": 15.186397,
+"modes": [
+"BUS"
+]
+},
+{
+"name": "Kbel,Kbílek",
+"stopId": "jdf_jdf:stop:26430:est:1",
+"parentId": "jdf_jdf:stop:26430",
+"lat": 49.984920076979996,
+"lon": 15.1512,
+"modes": [
+"BUS"
+]
+},
+{
+"name": "Ratboř,žel.st.",
+"stopId": "jdf_overlay:pid-gtfs:post:c08b2f4ac4afcf84",
+"parentId": "jdf_jdf:stop:19218",
+"lat": 49.98214,
+"lon": 15.162012,
+"modes": [
+"BUS"
+]
+},
+{
+"name": "Ratboř,žel.st.",
+"stopId": "jdf_jdf:stop:19218:est:1",
+"parentId": "jdf_jdf:stop:19218",
+"lat": 49.9826200769828,
+"lon": 15.162270999999999,
+"modes": [
+"BUS"
+]
+},
+{
+"name": "Kbel,Kbílek",
+"stopId": "jdf_overlay:pid-gtfs:post:4e77dd130babec88",
+"parentId": "jdf_jdf:stop:26430",
+"lat": 49.985229,
+"lon": 15.151046000000001,
+"modes": [
+"BUS"
+]
+},
+{
+"name": "Ratboř,žel.st.",
+"stopId": "jdf_overlay:pid-gtfs:post:55efc96f69a9155c",
+"parentId": "jdf_jdf:stop:19218",
+"lat": 49.98262,
+"lon": 15.162270999999999,
+"modes": [
+"BUS"
+]
+},
+{
+"name": "Kbel,Kbílek",
+"stopId": "jdf_jdf:stop:26430:est:2",
+"parentId": "jdf_jdf:stop:26430",
+"lat": 49.985253776979604,
+"lon": 15.151057999999999,
+"modes": [
+"BUS"
+]
+},
+{
+"name": "Ratboř",
+"stopId": "jdf_overlay:pid-gtfs:post:f683dca6387b7eee",
+"parentId": "jdf_jdf:stop:8137",
+"lat": 49.978008,
+"lon": 15.159345,
+"modes": [
+"BUS"
+]
+},
+{
+"name": "Ratboř",
+"stopId": "czptt_czptt:stop:CZ:56476:platform:1",
+"parentId": "czptt_czptt:stop:CZ:56476",
+"lat": 49.981491999999996,
+"lon": 15.160285,
+"modes": [
+"REGIONAL_RAIL"
+]
+},
+{
+"name": "Ratboř,žel.st.",
+"stopId": "jdf_jdf:stop:19218:est:2",
+"parentId": "jdf_jdf:stop:19218",
+"lat": 49.9821400769834,
+"lon": 15.162012,
+"modes": [
+"BUS"
+]
+},
+{
+"name": "Ratboř",
+"stopId": "jdf_overlay:pid-gtfs:post:142e62ffbc3a8c61",
+"parentId": "jdf_jdf:stop:8137",
+"lat": 49.977923999999994,
+"lon": 15.159539000000002,
+"modes": [
+"BUS"
+]
+},
+{
+"name": "Ratboř",
+"stopId": "czptt_czptt:stop:CZ:56476:platform:2",
+"parentId": "czptt_czptt:stop:CZ:56476",
+"lat": 49.981491999999996,
+"lon": 15.160285,
+"modes": [
+"REGIONAL_RAIL"
+]
+},
+{
+"name": "Ratboř",
+"stopId": "jdf_jdf:stop:8137:est:1",
+"parentId": "jdf_jdf:stop:8137",
+"lat": 49.977924076988394,
+"lon": 15.159540000000002,
+"modes": [
+"BUS"
+]
+}
+]

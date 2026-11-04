@@ -5,6 +5,8 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
+import cz.obehy.core.data.AndroidLocationRepository
+import cz.obehy.core.data.LocationRepository
 import cz.obehy.core.data.SettingsRepository
 import cz.obehy.core.model.RoutingProvider
 import cz.obehy.core.network.MotisJson
@@ -12,6 +14,7 @@ import cz.obehy.core.network.ObehyJson
 import cz.obehy.core.network.apiClient
 import cz.obehy.core.network.motis.MotisApi
 import cz.obehy.core.network.obehy.ObehyApi
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -46,4 +49,11 @@ object DataModule {
     fun obehyApi(
         @Named("userAgent") userAgent: String,
     ): ObehyApi = ObehyApi(apiClient(OkHttp.create(), ObehyJson, userAgent))
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+internal interface LocationModule {
+    @Binds
+    fun location(repository: AndroidLocationRepository): LocationRepository
 }

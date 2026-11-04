@@ -42,6 +42,15 @@
     <string name="place_clear">Clear</string>
     <string name="place_none">Nothing found. Try writing it differently.</string>
     <string name="place_error">The search didn\'t work. Check your connection.</string>
+    <string name="my_location">My location</string>
+    <string name="near_you">Near you</string>
+    <string name="near_you_ask">Show stops near you</string>
+    <string name="near_you_ask_body">See the closest stops and how far away they are.</string>
+    <string name="near_you_blocked_body">Location is blocked for Oběhy. Allow it in the app\'s settings.</string>
+    <string name="near_you_off">Turn on location</string>
+    <string name="near_you_off_body">Your phone\'s location is off.</string>
+    <string name="distance_metres">%d m</string>
+    <string name="distance_kilometres">%.1f km</string>
 
     <string name="times">%1$s → %2$s</string>
     <string name="duration_hours">%1$d h %2$d min</string>
@@ -55,6 +64,7 @@
     <string name="later">Later</string>
     <string name="results_none">No connections found. Try another time or fewer limits.</string>
     <string name="results_error">We couldn\'t find connections. Check your connection and try again.</string>
+    <string name="results_no_location">We can\'t tell where you are. Check that location is on, or pick a place instead.</string>
     <string name="retry">Try again</string>
 
     <string name="towards">towards %s</string>

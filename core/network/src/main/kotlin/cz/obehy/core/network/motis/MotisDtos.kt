@@ -2,7 +2,7 @@ package cz.obehy.core.network.motis
 
 import kotlinx.serialization.Serializable
 
-// The parts of the MOTIS API (v6 plan, v1 geocode) the app reads. Times are ISO 8601 UTC.
+// The parts of the MOTIS API (v6 plan, v1 geocode and map) the app reads. Times are ISO 8601 UTC.
 
 @Serializable
 data class MotisMatch(
@@ -18,6 +18,17 @@ data class MotisMatch(
     val houseNumber: String? = null,
     /** From the country down to the district; the last is the most specific. */
     val areas: List<MotisArea> = emptyList(),
+    val modes: List<String> = emptyList(),
+)
+
+/** A stop or platform on the map. Platforms often, but not always, name their station as [parentId]. */
+@Serializable
+data class MotisStop(
+    val name: String,
+    val stopId: String? = null,
+    val parentId: String? = null,
+    val lat: Double,
+    val lon: Double,
     val modes: List<String> = emptyList(),
 )
 
