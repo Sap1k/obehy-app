@@ -11,10 +11,10 @@ import cz.obehy.core.data.HISTORY_DATABASE
 import cz.obehy.core.data.HistoryDatabase
 import cz.obehy.core.data.JourneySearchDao
 import cz.obehy.core.data.LocationRepository
+import cz.obehy.core.data.MotisServerChecker
 import cz.obehy.core.data.RoomSearchHistoryStore
 import cz.obehy.core.data.SearchHistoryStore
 import cz.obehy.core.data.SettingsRepository
-import cz.obehy.core.model.RoutingProvider
 import cz.obehy.core.network.MotisJson
 import cz.obehy.core.network.ObehyJson
 import cz.obehy.core.network.apiClient
@@ -61,10 +61,18 @@ object DataModule {
     fun motisApi(
         settings: SettingsRepository,
         @Named("userAgent") userAgent: String,
-    ): MotisApi =
-        MotisApi(apiClient(OkHttp.create(), MotisJson, userAgent)) {
-            (settings.current().routingProvider ?: RoutingProvider.Transitous).baseUrl
-        }
+    ): MotisApi = MotisApi(apiClient(OkHttp.create(), MotisJson, userAgent)) { settings.current().motisUrl }
+
+    /** Talks to the server being checked, not to the one in the settings. */
+    @Provides
+    @Singleton
+    fun motisServerChecker(
+        @Named("userAgent") userAgent: String,
+        @Named("computation") computation: CoroutineDispatcher,
+    ): MotisServerChecker {
+        val client = apiClient(OkHttp.create(), MotisJson, userAgent)
+        return MotisServerChecker(computation) { url -> MotisApi(client) { url } }
+    }
 
     @Provides
     @Singleton

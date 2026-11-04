@@ -238,8 +238,8 @@ class PlannerViewModel
         init {
             viewModelScope.launch { location.allowed.collect { startFromHere() } }
             viewModelScope.launch {
-                // Stop IDs mean nothing to another provider.
-                settings.settings.map { it.routingProvider }.distinctUntilChanged().drop(1).collect {
+                // Stop IDs mean nothing to another server.
+                settings.settings.map { it.routingServer }.distinctUntilChanged().drop(1).collect {
                     preloadJob?.cancel()
                     preloaded = null
                 }

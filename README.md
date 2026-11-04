@@ -13,7 +13,7 @@ delays, vehicles, compositions, alerts). See [PLAN.md](PLAN.md) for the architec
 | `core:network` | Ktor clients and DTOs for MOTIS and the Oběhy API (JVM, unit-tested with recorded answers) |
 | `core:data` | Repositories, DataStore settings, Hilt bindings |
 | `core:ui` | The design system: Material 3 Expressive theme in the Oběhy brand, spacing/size tokens, `ObehyScreen`, shared components |
-| `feature:onboarding` | First-start choice of mode and routing provider; Settings |
+| `feature:onboarding` | First-start choice of mode; Settings |
 | `feature:planner` | Journey search (placeholder) |
 | `feature:trip` | Trip detail (placeholder) |
 | `core:map` | The MapLibre route map, drawn in the web app's map style |

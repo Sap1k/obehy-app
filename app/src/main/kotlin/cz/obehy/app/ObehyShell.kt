@@ -58,12 +58,12 @@ private data class TopLevel(
     val icon: ImageVector,
 )
 
-/** The top-level destinations per mode: the live map only in Enhanced mode. */
+/** The top-level destinations per mode: the live map comes from Oběhy. */
 private fun destinations(mode: AppMode): List<TopLevel> =
     buildList {
         add(TopLevel(PlannerRoute, PlannerRoute::class, R.string.nav_journeys, Icons.Outlined.Directions))
         add(TopLevel(DeparturesRoute, DeparturesRoute::class, R.string.nav_departures, Icons.Outlined.DepartureBoard))
-        if (mode == AppMode.Enhanced) {
+        if (mode.usesObehy) {
             add(TopLevel(MapRoute, MapRoute::class, R.string.nav_map, Icons.Outlined.Map))
         }
         add(TopLevel(SettingsRoute, SettingsRoute::class, R.string.nav_settings, Icons.Outlined.Settings))

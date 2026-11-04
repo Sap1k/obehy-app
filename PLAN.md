@@ -6,8 +6,8 @@ Oběhy (`sap1k/obehy`) is a Czech realtime backend (FastAPI `/api/v1`, per-feed 
 React + MapLibre web app. The native app (`sap1k/obehy-app`, an empty repo on branch
 `claude/awesome-allen-3hjyfu`) was planned as a post-1.0 project and is now moving forward. The goal
 is one Android app that combines international journey planning (MOTIS/Transitous) with Oběhy's
-Czech realtime, vehicle and operational data. It has two UI modes, **Enhanced Oběhy** and
-**Transitous client**, built on the same data layer.
+Czech realtime, vehicle and operational data. It has three modes, **Oběhy**, **Transitous + Oběhy**
+and **Transitous only**, built on the same data layer.
 
 **MOTIS figures out how to get you there. Oběhy tells you everything it knows about the vehicles
 getting you there.**
@@ -37,9 +37,10 @@ visible features and defaults. Repositories, models and the enrichment pipeline 
 
 ## Decisions (this session)
 
-- **Routing provider is chosen at first startup** (onboarding): Transitous or motis.obehy.cz,
-  changeable in Settings. Onboarding also asks for the mode (Enhanced / Transitous). Both choices
-  go to DataStore.
+- **Onboarding asks for one of three modes**, changeable in Settings and kept in DataStore: Oběhy
+  (motis.obehy.cz with Oběhy data), Transitous + Oběhy, and Transitous only, which never contacts
+  Oběhy and can point at any MOTIS server. Servers don't publish their OpenAPI, so a wizard tries
+  the endpoints the app uses before a server can be picked; modes stay locked until it's reset.
 - **Enrichment uses a new batch endpoint in obehy.** The backend owns MOTIS-ID parsing and
   the dataset-tag → namespace mapping, which keeps the "IDs are opaque, resolve through
   source_key" rule server-side.
@@ -104,12 +105,12 @@ Refresh/replanning uses MOTIS (re-plan / `trip` endpoint) and never runs in-hous
 ### App (`sap1k/obehy-app`)
 
 1. Gradle scaffold, version catalog, modules, Hilt, CI workflow, `values/` + `values-cs/` strings.
-2. Onboarding: mode + routing provider. Settings screen to change both.
+2. Onboarding: the mode. Settings screen to change it.
 3. Place search (MOTIS geocode), journey search form, results list, itinerary detail
    (phone: stacked; tablet: `ListDetailPaneScaffold` results | itinerary + map).
 4. Enrichment merge plus leg UI (realtime estimate, vehicle chip, platform, "detail unavailable").
 5. Trip detail: Czech legs → `GET /api/v1/trips/{trip_id}/{date}`, foreign → MOTIS `trip`.
-   The mode decides how much is shown (composition/circulation only in Enhanced).
+   The mode decides how much is shown (composition/circulation only in the modes with Oběhy).
 6. Itinerary map with MapLibre (leg polylines from MOTIS `legGeometry`).
 
 ## Shipped since milestone 1
@@ -122,8 +123,8 @@ Refresh/replanning uses MOTIS (re-plan / `trip` endpoint) and never runs in-hous
 ## Later milestones
 
 - **M2 Boards:** MOTIS `stoptimes` (both modes, enriched via the same endpoint), plus the
-  Oběhy `/stop-places/{id}/departures` board in Enhanced mode. Grouped nearby boards come later.
-- **M3 Live map (Enhanced):** `/api/v1/vehicles` viewport polling, vehicle detail, composition.
+  Oběhy `/stop-places/{id}/departures` board in the modes with Oběhy. Grouped nearby boards come later.
+- **M3 Live map (modes with Oběhy):** `/api/v1/vehicles` viewport polling, vehicle detail, composition.
 - **M4:** saved journeys with MOTIS refresh, disruption notifications, Play release.
 
 ## Verified against live services (2026-11-02)

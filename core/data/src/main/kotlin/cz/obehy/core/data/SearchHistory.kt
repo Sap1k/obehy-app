@@ -1,7 +1,6 @@
 package cz.obehy.core.data
 
 import cz.obehy.core.model.Place
-import cz.obehy.core.model.RoutingProvider
 import cz.obehy.core.model.Suggestion
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -44,8 +43,8 @@ interface SearchHistoryStore {
 }
 
 /**
- * The journeys searched for, on this phone only. Switching provider shows that provider's
- * history; switching back brings the first one back.
+ * The journeys searched for, on this phone only. Switching server shows that server's history;
+ * switching back brings the first one back.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 @Singleton
@@ -57,9 +56,9 @@ class SearchHistoryRepository
     ) {
         val searches: Flow<List<PastSearch>> =
             settings.settings
-                .map { it.routingProvider ?: RoutingProvider.Transitous }
+                .map { it.routingServer }
                 .distinctUntilChanged()
-                .flatMapLatest { store.searches(it.name) }
+                .flatMapLatest { store.searches(it) }
 
         /** Remembers a search that found journeys; changing an option and searching again doesn't count twice. */
         suspend fun record(
@@ -69,8 +68,7 @@ class SearchHistoryRepository
         ) {
             val latest = searches.first().firstOrNull { it.from.id == from.id && it.to.id == to.id }
             if (latest != null && Duration.between(latest.at, at) < SAME_SEARCH) return
-            val provider = settings.current().routingProvider ?: RoutingProvider.Transitous
-            store.add(provider.name, PastSearch(0, at, from, to))
+            store.add(settings.current().routingServer, PastSearch(0, at, from, to))
             store.trim(at - KEPT_FOR, KEPT_SEARCHES)
         }
 

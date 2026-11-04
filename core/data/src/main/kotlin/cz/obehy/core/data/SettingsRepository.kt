@@ -8,7 +8,6 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import cz.obehy.core.model.AppMode
 import cz.obehy.core.model.AppSettings
-import cz.obehy.core.model.RoutingProvider
 import cz.obehy.core.model.SearchOptions
 import cz.obehy.core.model.ThemeMode
 import cz.obehy.core.model.TransportType
@@ -18,7 +17,7 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
-/** The user's mode, routing provider and search options (by enum name) and whether onboarding is done. */
+/** The user's mode and search options (by enum name), their own server, and whether onboarding is done. */
 @Singleton
 class SettingsRepository
     @Inject
@@ -28,11 +27,8 @@ class SettingsRepository
         val settings: Flow<AppSettings> =
             store.data.map { prefs ->
                 AppSettings(
-                    mode = prefs[MODE]?.let { name -> AppMode.entries.firstOrNull { it.name == name } },
-                    routingProvider =
-                        prefs[PROVIDER]?.let { name ->
-                            RoutingProvider.entries.firstOrNull { it.name == name }
-                        },
+                    mode = AppMode.entries.firstOrNull { it.name == prefs[MODE] } ?: prefs.modeFromBefore(),
+                    customMotisUrl = prefs[MOTIS_URL],
                     onboardingFinished = prefs[ONBOARDED] ?: false,
                     theme = ThemeMode.entries.firstOrNull { it.name == prefs[THEME] } ?: ThemeMode.System,
                 )
@@ -44,8 +40,9 @@ class SettingsRepository
             store.edit { it[MODE] = mode.name }
         }
 
-        suspend fun setRoutingProvider(provider: RoutingProvider) {
-            store.edit { it[PROVIDER] = provider.name }
+        /** A [url] that has passed [MotisServerChecker], or null to go back to Transitous. */
+        suspend fun setCustomMotisUrl(url: String?) {
+            store.edit { if (url != null) it[MOTIS_URL] = url else it.remove(MOTIS_URL) }
         }
 
         suspend fun setTheme(theme: ThemeMode) {
@@ -80,9 +77,19 @@ class SettingsRepository
             }
         }
 
+        /** The mode was once two choices: how much to show, and which server to ask. */
+        private fun Preferences.modeFromBefore(): AppMode? =
+            when {
+                this[OLD_PROVIDER] == "Obehy" -> AppMode.Obehy
+                this[MODE] == "Enhanced" -> AppMode.TransitousEnriched
+                this[MODE] == "Transitous" -> AppMode.MotisOnly
+                else -> null
+            }
+
         private companion object {
             val MODE = stringPreferencesKey("mode")
-            val PROVIDER = stringPreferencesKey("routing_provider")
+            val OLD_PROVIDER = stringPreferencesKey("routing_provider")
+            val MOTIS_URL = stringPreferencesKey("custom_motis_url")
             val ONBOARDED = booleanPreferencesKey("onboarding_finished")
             val THEME = stringPreferencesKey("theme")
             val LOW_FLOOR = booleanPreferencesKey("search_low_floor")

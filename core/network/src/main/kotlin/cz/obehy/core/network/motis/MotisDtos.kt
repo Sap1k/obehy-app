@@ -38,6 +38,19 @@ data class MotisArea(
     val adminLevel: Double? = null,
 )
 
+/** The middle of the server's coverage. */
+@Serializable
+data class MotisInitial(
+    val lat: Double,
+    val lon: Double,
+    val serverConfig: MotisServerConfig,
+)
+
+@Serializable
+data class MotisServerConfig(
+    val motisVersion: String,
+)
+
 @Serializable
 data class MotisPlan(
     val itineraries: List<MotisItinerary> = emptyList(),

@@ -1,18 +1,8 @@
 package cz.obehy.core.model
 
-/**
- * How much of Oběhy the app shows. Both modes plan journeys, show departures and enrich Czech
- * legs; Enhanced adds the live map and the operational detail (compositions, oběhy).
- */
-enum class AppMode {
-    /** Everything Oběhy knows: for people travelling in Czechia. */
-    Enhanced,
+import java.net.URI
 
-    /** A streamlined international journey planner. */
-    Transitous,
-}
-
-/** The MOTIS instance journeys are planned with. */
+/** The MOTIS instances the app knows; [name] also tells their search histories apart. */
 enum class RoutingProvider(
     val baseUrl: String,
 ) {
@@ -21,6 +11,22 @@ enum class RoutingProvider(
 
     /** Oběhy's own instance: Czech data only, the freshest Oběhy feeds. */
     Obehy("https://motis.obehy.cz/"),
+}
+
+/** Who plans the journeys, and whether Oběhy adds what it knows to them. */
+enum class AppMode(
+    val provider: RoutingProvider,
+    /** Oběhy's live map and its detail on Czech trips. */
+    val usesObehy: Boolean,
+) {
+    /** Oběhy for both: Czechia only, with the freshest timetables. */
+    Obehy(RoutingProvider.Obehy, usesObehy = true),
+
+    /** Transitous plans all over Europe and Oběhy fills in the Czech trips. */
+    TransitousEnriched(RoutingProvider.Transitous, usesObehy = true),
+
+    /** Nothing but a MOTIS server: Transitous, or the user's own ([AppSettings.customMotisUrl]). */
+    MotisOnly(RoutingProvider.Transitous, usesObehy = false),
 }
 
 /** Whether the app is light or dark. */
@@ -32,14 +38,35 @@ enum class ThemeMode {
 }
 
 /**
- * The user's choices. Onboarding saves each as it is picked and sets [onboardingFinished] only
+ * The user's choices. Onboarding saves the mode as it is picked and sets [onboardingFinished] only
  * when the user confirms, so the app stays in onboarding until then.
  */
 data class AppSettings(
     val mode: AppMode? = null,
-    val routingProvider: RoutingProvider? = null,
+    /** The user's own server. Kept when leaving [AppMode.MotisOnly], but used only there. */
+    val customMotisUrl: String? = null,
     val onboardingFinished: Boolean = false,
     val theme: ThemeMode = ThemeMode.System,
 ) {
-    val isOnboarded: Boolean get() = onboardingFinished && mode != null && routingProvider != null
+    val isOnboarded: Boolean get() = onboardingFinished && mode != null
+
+    private val provider get() = mode?.provider ?: RoutingProvider.Transitous
+    private val customServer get() = customMotisUrl.takeIf { mode == AppMode.MotisOnly }
+
+    /** Where journeys are planned. */
+    val motisUrl: String get() = customServer ?: provider.baseUrl
+
+    /** Which server this is: stop IDs and search history belong to one server. */
+    val routingServer: String get() = customServer ?: provider.name
+}
+
+/**
+ * [text] as a server address that request paths can be added to, or null if it can't be one.
+ * Without a scheme, it's taken to be https.
+ */
+fun motisUrlOf(text: String): String? {
+    val url = text.trim().let { if ("://" in it) it else "https://$it" }
+    val uri = runCatching { URI(url) }.getOrNull() ?: return null
+    val isWebAddress = uri.scheme?.lowercase() in setOf("http", "https") && uri.host != null
+    return if (isWebAddress && uri.query == null && uri.fragment == null) url.trimEnd('/') + "/" else null
 }

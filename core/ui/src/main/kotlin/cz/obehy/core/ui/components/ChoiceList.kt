@@ -21,6 +21,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.graphicsLayer
@@ -44,7 +45,8 @@ data class ChoiceItem<T>(
 /**
  * Pick one of a few options, each with an icon and a sentence of explanation: a segmented list
  * whose picked item turns Lime (the brand's selected state), its icon badge morphing from a circle
- * into a cookie. Nothing in an item moves or reflows when it is picked.
+ * into a cookie. Nothing in an item moves or reflows when it is picked. While not [enabled], the
+ * choice stays visible but can't be changed.
  */
 @Composable
 fun <T> ChoiceList(
@@ -52,13 +54,16 @@ fun <T> ChoiceList(
     selected: T?,
     onSelect: (T) -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
+    val iconAlpha = if (enabled) 1f else DISABLED_ICON_ALPHA
     Column(modifier.selectableGroup(), verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)) {
         items.forEachIndexed { index, item ->
             val isSelected = item.value == selected
             SegmentedListItem(
                 selected = isSelected,
                 onClick = { onSelect(item.value) },
+                enabled = enabled,
                 shapes = ListItemDefaults.segmentedShapes(index, items.size),
                 modifier = Modifier.semantics { role = Role.RadioButton },
                 colors =
@@ -71,8 +76,8 @@ fun <T> ChoiceList(
                         selectedLeadingContentColor = MaterialTheme.colorScheme.primaryContainer,
                         selectedTrailingContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     ),
-                leadingContent = { ChoiceBadge(item.icon, isSelected) },
-                trailingContent = { SelectedCheck(isSelected) },
+                leadingContent = { ChoiceBadge(item.icon, isSelected, Modifier.alpha(iconAlpha)) },
+                trailingContent = { SelectedCheck(isSelected, Modifier.alpha(iconAlpha)) },
                 overlineContent = item.overline?.let { { Text(it) } },
                 supportingContent = { Text(item.description) },
             ) {
@@ -81,6 +86,8 @@ fun <T> ChoiceList(
         }
     }
 }
+
+private const val DISABLED_ICON_ALPHA = 0.38f
 
 @Composable
 private fun ChoiceBadge(

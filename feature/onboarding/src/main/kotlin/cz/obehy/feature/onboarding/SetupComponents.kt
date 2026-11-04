@@ -5,7 +5,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.BrightnessAuto
 import androidx.compose.material.icons.rounded.DarkMode
 import androidx.compose.material.icons.rounded.LightMode
-import androidx.compose.material.icons.rounded.Map
 import androidx.compose.material.icons.rounded.Public
 import androidx.compose.material.icons.rounded.Route
 import androidx.compose.runtime.Composable
@@ -13,7 +12,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import cz.obehy.core.model.AppMode
-import cz.obehy.core.model.RoutingProvider
 import cz.obehy.core.model.ThemeMode
 import cz.obehy.core.ui.components.ChoiceItem
 import cz.obehy.core.ui.R as UiR
@@ -29,30 +27,20 @@ internal data class Choice<T>(
 
 internal val modeChoices =
     listOf(
-        Choice(AppMode.Enhanced, R.string.mode_enhanced, R.string.mode_enhanced_description, { Icons.Rounded.Map }),
         Choice(
-            AppMode.Transitous,
-            R.string.mode_transitous,
-            R.string.mode_transitous_description,
-            { Icons.Rounded.Route },
+            AppMode.Obehy,
+            R.string.mode_obehy,
+            R.string.mode_obehy_description,
+            { ImageVector.vectorResource(UiR.drawable.obehy_symbol) },
         ),
-    )
-
-internal val providerChoices =
-    listOf(
         Choice(
-            RoutingProvider.Transitous,
-            R.string.provider_transitous,
-            R.string.provider_transitous_description,
+            AppMode.TransitousEnriched,
+            R.string.mode_enriched,
+            R.string.mode_enriched_description,
             { Icons.Rounded.Public },
             recommended = true,
         ),
-        Choice(
-            RoutingProvider.Obehy,
-            R.string.provider_obehy,
-            R.string.provider_obehy_description,
-            { ImageVector.vectorResource(UiR.drawable.obehy_symbol) },
-        ),
+        Choice(AppMode.MotisOnly, R.string.mode_motis, R.string.mode_motis_description, { Icons.Rounded.Route }),
     )
 
 internal val themeChoices =
@@ -72,6 +60,6 @@ internal fun <T> List<Choice<T>>.toItems(): List<ChoiceItem<T>> =
             title = stringResource(choice.title),
             description = stringResource(choice.description),
             icon = choice.icon(),
-            overline = if (choice.recommended) stringResource(R.string.provider_recommended) else null,
+            overline = if (choice.recommended) stringResource(R.string.mode_recommended) else null,
         )
     }

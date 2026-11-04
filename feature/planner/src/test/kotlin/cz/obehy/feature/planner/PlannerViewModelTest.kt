@@ -10,11 +10,11 @@ import cz.obehy.core.data.PlaceRepository
 import cz.obehy.core.data.SearchHistoryRepository
 import cz.obehy.core.data.SearchHistoryStore
 import cz.obehy.core.data.SettingsRepository
+import cz.obehy.core.model.AppMode
 import cz.obehy.core.model.JourneyQuery
 import cz.obehy.core.model.LatLon
 import cz.obehy.core.model.Place
 import cz.obehy.core.model.PlaceKind
-import cz.obehy.core.model.RoutingProvider
 import cz.obehy.core.model.SearchOptions
 import cz.obehy.core.model.Suggestion
 import cz.obehy.core.model.TransportType
@@ -346,13 +346,13 @@ class PlannerViewModelTest {
         runTest(dispatcher) {
             allowLocation()
             val (vm, settings) = viewModel()
-            settings.setRoutingProvider(RoutingProvider.Transitous)
+            settings.setMode(AppMode.TransitousEnriched)
             advanceUntilIdle()
             vm.act(PlannerAction.CheckLocation)
             advanceUntilIdle()
             val fetched = stopRequests()
 
-            settings.setRoutingProvider(RoutingProvider.Obehy)
+            settings.setMode(AppMode.Obehy)
             advanceUntilIdle()
             vm.act(PlannerAction.Pick(PlaceTarget.From))
             advanceUntilIdle()

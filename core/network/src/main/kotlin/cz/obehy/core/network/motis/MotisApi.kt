@@ -8,8 +8,8 @@ import io.ktor.client.request.parameter
 import java.time.Instant
 
 /**
- * A MOTIS instance: Transitous or motis.obehy.cz. [baseUrl] is read for every request, so a
- * change of provider in the settings applies to the next search.
+ * A MOTIS instance: Transitous, motis.obehy.cz or the user's own. [baseUrl] is read for every
+ * request, so a change in the settings applies to the next search.
  */
 class MotisApi(
     private val client: HttpClient,
@@ -43,6 +43,9 @@ class MotisApi(
                 parameter("min", min)
                 parameter("max", max)
             }.body()
+
+    /** Where the server's coverage is, and what it is. */
+    suspend fun initial(): MotisInitial = client.get("${baseUrl()}api/v1/map/initial").body()
 
     /** Itineraries for [request]. */
     suspend fun plan(request: MotisPlanRequest): MotisPlan =

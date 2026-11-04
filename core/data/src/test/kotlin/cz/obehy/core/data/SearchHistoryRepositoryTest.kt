@@ -3,9 +3,9 @@ package cz.obehy.core.data
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.emptyPreferences
+import cz.obehy.core.model.AppMode
 import cz.obehy.core.model.Place
 import cz.obehy.core.model.PlaceKind
-import cz.obehy.core.model.RoutingProvider
 import cz.obehy.core.model.Suggestion
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -47,15 +47,28 @@ class SearchHistoryRepositoryTest {
         }
 
     @Test
-    fun `each provider has its own history, and it comes back`() =
+    fun `each server has its own history, and it comes back`() =
         runTest {
-            settings.setRoutingProvider(RoutingProvider.Transitous)
+            settings.setMode(AppMode.TransitousEnriched)
             history.record(a, b, at)
 
-            settings.setRoutingProvider(RoutingProvider.entries.first { it != RoutingProvider.Transitous })
+            settings.setMode(AppMode.Obehy)
             assertEquals(emptyList<PastSearch>(), history.searches.first())
 
-            settings.setRoutingProvider(RoutingProvider.Transitous)
+            settings.setMode(AppMode.TransitousEnriched)
+            assertEquals(1, history.searches.first().size)
+        }
+
+    @Test
+    fun `your own server has its own history`() =
+        runTest {
+            settings.setMode(AppMode.MotisOnly)
+            history.record(a, b, at)
+
+            settings.setCustomMotisUrl("https://motis.example.org/")
+            assertEquals(emptyList<PastSearch>(), history.searches.first())
+
+            settings.setCustomMotisUrl(null)
             assertEquals(1, history.searches.first().size)
         }
 
@@ -127,7 +140,7 @@ private class FakeStore : SearchHistoryStore {
     }
 }
 
-private class MemoryPreferences : DataStore<Preferences> {
+internal class MemoryPreferences : DataStore<Preferences> {
     private val state = MutableStateFlow(emptyPreferences())
     override val data: StateFlow<Preferences> = state
 

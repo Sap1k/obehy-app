@@ -6,7 +6,6 @@ import cz.obehy.core.data.SearchHistoryRepository
 import cz.obehy.core.data.SettingsRepository
 import cz.obehy.core.model.AppMode
 import cz.obehy.core.model.AppSettings
-import cz.obehy.core.model.RoutingProvider
 import cz.obehy.core.model.ThemeMode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -15,7 +14,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-/** The mode and routing provider: chosen at first start, changed in the settings. */
+/** The mode, chosen at first start, and what the settings change. */
 @HiltViewModel
 class SetupViewModel
     @Inject
@@ -28,10 +27,6 @@ class SetupViewModel
 
         fun choose(mode: AppMode) {
             viewModelScope.launch { settings.setMode(mode) }
-        }
-
-        fun choose(provider: RoutingProvider) {
-            viewModelScope.launch { settings.setRoutingProvider(provider) }
         }
 
         fun choose(theme: ThemeMode) {

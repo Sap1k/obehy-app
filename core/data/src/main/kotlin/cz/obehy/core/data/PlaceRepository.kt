@@ -57,21 +57,9 @@ class PlaceRepository
             at: LatLon,
             metres: Double,
         ): List<NearbyStop> {
-            val centre = at.rounded()
-            val dLat = metres / LatLon.METRES_PER_DEGREE
-            val dLon = dLat / cos(Math.toRadians(centre.lat))
-            val stops =
-                motis.mapStops(
-                    corner(centre.lat - dLat, centre.lon - dLon),
-                    corner(centre.lat + dLat, centre.lon + dLon),
-                )
-            return groupNearbyStops(stops, at).take(MAX_NEARBY)
+            val (min, max) = boxAround(at.rounded(), metres)
+            return groupNearbyStops(motis.mapStops(min, max), at).take(MAX_NEARBY)
         }
-
-        private fun corner(
-            lat: Double,
-            lon: Double,
-        ) = String.format(Locale.ROOT, "%.5f,%.5f", lat, lon)
 
         private companion object {
             /** Without a location, rank Czech matches first. */
@@ -82,6 +70,21 @@ class PlaceRepository
             const val MAX_NEARBY = 6
         }
     }
+
+/** The corners, as `lat,lon`, of the box reaching [metres] from [centre] each way. */
+internal fun boxAround(
+    centre: LatLon,
+    metres: Double,
+): Pair<String, String> {
+    val dLat = metres / LatLon.METRES_PER_DEGREE
+    val dLon = dLat / cos(Math.toRadians(centre.lat))
+    return corner(centre.lat - dLat, centre.lon - dLon) to corner(centre.lat + dLat, centre.lon + dLon)
+}
+
+private fun corner(
+    lat: Double,
+    lon: Double,
+) = String.format(Locale.ROOT, "%.5f,%.5f", lat, lon)
 
 /** The language MOTIS names places in: Czech on a Czech phone, English otherwise. */
 internal fun appLanguage(): String = if (Locale.getDefault().language == "cs") "cs" else "en"

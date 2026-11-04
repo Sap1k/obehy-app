@@ -7,7 +7,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
@@ -43,7 +42,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -70,11 +68,11 @@ import cz.obehy.core.ui.ObehyTheme
 import cz.obehy.core.ui.components.ChoiceList
 import cz.obehy.core.ui.R as UiR
 
-private enum class Step { Welcome, Mode, Provider }
+private enum class Step { Welcome, Mode }
 
 /**
- * First start: a welcome, then the mode, then the routing provider. Each choice is saved as soon
- * as it is picked; the last button finishes onboarding and the app switches to its main screens.
+ * First start: a welcome, then the mode. The mode is saved as soon as it is picked; the last button
+ * finishes onboarding and the app switches to its main screens.
  */
 @Composable
 fun OnboardingScreen(
@@ -94,7 +92,7 @@ fun OnboardingScreen(
                 canContinue = step.isAnswered(settings),
                 onBack = { step = Step.entries[step.ordinal - 1] },
                 onNext = {
-                    if (step == Step.Provider) viewModel.finishOnboarding() else step = Step.entries[step.ordinal + 1]
+                    if (step == Step.Mode) viewModel.finishOnboarding() else step = Step.entries[step.ordinal + 1]
                 },
             )
         },
@@ -116,18 +114,8 @@ fun OnboardingScreen(
                 }
 
                 Step.Mode -> {
-                    ChoiceStep(number = 1, title = R.string.mode_title, subtitle = R.string.mode_subtitle) {
+                    ChoiceStep(title = R.string.mode_title, subtitle = R.string.mode_subtitle) {
                         ChoiceList(modeChoices.toItems(), settings.mode, viewModel::choose)
-                    }
-                }
-
-                Step.Provider -> {
-                    ChoiceStep(
-                        number = 2,
-                        title = R.string.provider_title,
-                        subtitle = R.string.provider_subtitle,
-                    ) {
-                        ChoiceList(providerChoices.toItems(), settings.routingProvider, viewModel::choose)
                     }
                 }
             }
@@ -139,7 +127,6 @@ private fun Step.isAnswered(settings: AppSettings) =
     when (this) {
         Step.Welcome -> true
         Step.Mode -> settings.mode != null
-        Step.Provider -> settings.routingProvider != null
     }
 
 /** The brand moment: the route loop on a slowly turning Lime cookie, the wordmark and the promise. */
@@ -195,13 +182,11 @@ private fun WelcomeStep(modifier: Modifier = Modifier) {
 
 @Composable
 private fun ChoiceStep(
-    number: Int,
     @StringRes title: Int,
     @StringRes subtitle: Int,
     modifier: Modifier = Modifier,
     choices: @Composable () -> Unit,
 ) {
-    val progress by animateFloatAsState(number / 2f, MaterialTheme.motionScheme.slowEffectsSpec(), label = "progress")
     Column(
         modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = ObehyTheme.spacing.xl),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -211,14 +196,6 @@ private fun ChoiceStep(
                 .widthIn(max = ObehyTheme.sizes.readableWidth)
                 .padding(top = ObehyTheme.spacing.l, bottom = ObehyTheme.spacing.xl),
         ) {
-            LinearWavyProgressIndicator(progress = { progress }, modifier = Modifier.fillMaxWidth())
-            Spacer(Modifier.height(ObehyTheme.spacing.xxl))
-            Text(
-                stringResource(R.string.onboarding_step, number, 2),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary,
-            )
-            Spacer(Modifier.height(ObehyTheme.spacing.s))
             Text(stringResource(title), style = MaterialTheme.typography.headlineMediumEmphasized)
             Spacer(Modifier.height(ObehyTheme.spacing.s))
             Text(
@@ -282,8 +259,7 @@ private fun BottomActions(
             val label =
                 when (step) {
                     Step.Welcome -> R.string.onboarding_start
-                    Step.Mode -> R.string.onboarding_next
-                    Step.Provider -> R.string.onboarding_finish
+                    Step.Mode -> R.string.onboarding_finish
                 }
             Text(stringResource(label), style = ButtonDefaults.textStyleFor(height))
         }
