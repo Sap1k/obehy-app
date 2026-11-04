@@ -1,4 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="trip_title">Spoj</string>
+    <string name="trip_failed">Spoj se nepodařilo načíst.</string>
+    <string name="trip_retry">Zkusit znovu</string>
+    <string name="trip_cancelled">Tento spoj je zrušený</string>
+    <string name="trip_schedule">Jízdní řád</string>
+    <string name="trip_vehicle">Vozidlo</string>
+    <string name="trip_train_order">Řazení vlaku</string>
+    <string name="trip_direction">Směr jízdy</string>
+    <string name="trip_finding_order">Zjišťujeme řazení vlaku…</string>
+    <string name="trip_checking">%s · ověřujeme…</string>
+    <string name="trip_span">%1$s – %2$s</string>
+    <string name="trip_notes">Poznámky</string>
+    <string name="trip_more_notes">Další poznámky (%d)</string>
+    <string name="trip_fewer_notes">Méně poznámek</string>
+    <string name="trip_connections">Návaznosti</string>
+    <string name="trip_waits_for">Čeká na %s</string>
+    <string name="trip_connects_to">Návaznost na %s</string>
+    <string name="trip_connection_any">spoj</string>
+    <string name="trip_wait_minutes">nejvýše %d min</string>
+    <string name="stop_cancelled">Zrušeno</string>
+    <string name="stop_on_request">Na znamení</string>
+    <string name="stop_exit_only">Jen pro výstup</string>
+    <string name="stop_boarding_only">Jen pro nástup</string>
+    <string name="trip_links">Více o spoji</string>
+    <string name="trip_link_tickets">Koupit jízdenku</string>
+    <string name="trip_link_line">Stránka linky</string>
+    <string name="trip_link_operator">Web dopravce</string>
+    <string name="trip_bikes">Přepravuje kola</string>
+    <string name="trip_reservation">Místenku si můžete zakoupit</string>
+    <string name="trip_reservation_required">Potřebujete místenku</string>
+    <string name="vehicle_low_floor">Nízkopodlažní</string>
+    <string name="vehicle_air_conditioning">Klimatizace</string>
+    <string name="unit_through_coach">Přímý vůz do %s</string>
+    <string name="unit_leaves_at">Od vlaku se odpojí v %s</string>
+    <string name="unit_continues_as">Dál jede jako %s</string>
+    <string name="unit_only_between">Jen v úseku %1$s – %2$s</string>
 </resources>

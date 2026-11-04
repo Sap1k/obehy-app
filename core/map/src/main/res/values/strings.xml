@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="map_credits">Map credits</string>
+    <string name="map_vehicle">Where the vehicle is now</string>
+    <string name="map_vehicle_estimated">Where the vehicle should be now, going by its times</string>
 </resources>

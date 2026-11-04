@@ -9,6 +9,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigation
+import cz.obehy.core.model.Leg
 import cz.obehy.core.ui.AnimatedDestination
 import kotlinx.serialization.Serializable
 
@@ -30,13 +31,21 @@ data object JourneyMapRoute
 /**
  * Journey search, results, a journey's detail and its map (PLAN.md, milestone 1). The screens
  * share one view model, scoped to the planner graph, so the detail shows the journey picked.
+ * [onOpenTrip] leaves the planner for one ride's whole trip.
  */
-fun NavGraphBuilder.plannerScreen(nav: NavController) {
+fun NavGraphBuilder.plannerScreen(
+    nav: NavController,
+    onOpenTrip: (Leg.Transit) -> Unit,
+) {
     navigation<PlannerRoute>(startDestination = SearchRoute) {
         composable<SearchRoute> { entry ->
             val graph = remember(entry) { nav.getBackStackEntry<PlannerRoute>() }
             AnimatedDestination(this) {
-                PlannerDestination(hiltViewModel(graph), onOpen = { nav.navigate(ItineraryRoute) })
+                PlannerDestination(
+                    hiltViewModel(graph),
+                    onOpen = { nav.navigate(ItineraryRoute) },
+                    onOpenTrip = onOpenTrip,
+                )
             }
         }
         composable<ItineraryRoute> { entry ->
@@ -45,9 +54,12 @@ fun NavGraphBuilder.plannerScreen(nav: NavController) {
             AnimatedDestination(this) {
                 ItineraryDestination(
                     hiltViewModel(graph),
-                    mapOpen = top?.destination?.hasRoute<JourneyMapRoute>() == true,
+                    // The map or a trip growing over the journey, which then stays as it is under them.
+                    covered =
+                        top?.destination?.let { it.hasRoute<ItineraryRoute>() || it.hasRoute<SearchRoute>() } == false,
                     onBack = { nav.popBackStack() },
                     onMap = { nav.navigate(JourneyMapRoute) },
+                    onOpenTrip = onOpenTrip,
                 )
             }
         }

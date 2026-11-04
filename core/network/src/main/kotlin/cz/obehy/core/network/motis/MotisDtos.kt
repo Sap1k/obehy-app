@@ -94,6 +94,13 @@ data class MotisLeg(
     val distance: Double? = null,
     /** `ACCESSIBLE`, `NOT_ACCESSIBLE` or `UNKNOWN`. */
     val wheelchairAccessible: String? = null,
+    val bikesAllowed: Boolean? = null,
+    val agencyUrl: String? = null,
+    val agencyFareUrl: String? = null,
+    val routeUrl: String? = null,
+    /** `NONE`, or how a seat is booked (`COMPULSORY`, …). */
+    val reservation: String? = null,
+    val alerts: List<MotisAlert> = emptyList(),
     val interlineWithPreviousLeg: Boolean = false,
     val intermediateStops: List<MotisPlace> = emptyList(),
     val legGeometry: MotisGeometry? = null,
@@ -113,6 +120,20 @@ data class MotisPlace(
     val scheduledArrival: String? = null,
     val scheduledDeparture: String? = null,
     val cancelled: Boolean = false,
+    /** Where a time comes from: `NO_RT_DATA`, `PREDICTED`, `PROPAGATED`, … */
+    val arrivalTimestampReason: String? = null,
+    val departureTimestampReason: String? = null,
+    /** `NORMAL` or `NOT_ALLOWED`. */
+    val pickupType: String? = null,
+    val dropoffType: String? = null,
+)
+
+@Serializable
+data class MotisAlert(
+    val headerText: String? = null,
+    val descriptionText: String? = null,
+    /** GTFS-RT's: `INFO`, `WARNING`, `SEVERE`. */
+    val severityLevel: String? = null,
 )
 
 /** An encoded polyline with [precision] decimal places. */

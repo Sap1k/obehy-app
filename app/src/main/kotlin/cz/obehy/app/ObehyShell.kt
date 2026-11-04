@@ -23,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -41,6 +42,8 @@ import cz.obehy.feature.onboarding.settingsScreen
 import cz.obehy.feature.planner.JourneyMapRoute
 import cz.obehy.feature.planner.PlannerRoute
 import cz.obehy.feature.planner.plannerScreen
+import cz.obehy.feature.trip.TripRoute
+import cz.obehy.feature.trip.navigateToTrip
 import cz.obehy.feature.trip.tripScreen
 import kotlinx.serialization.Serializable
 import kotlin.reflect.KClass
@@ -69,6 +72,10 @@ private fun destinations(mode: AppMode): List<TopLevel> =
         add(TopLevel(SettingsRoute, SettingsRoute::class, R.string.nav_settings, Icons.Outlined.Settings))
     }
 
+/** A screen that grows out of something on the one before, which stays put under it. */
+private val NavDestination.morphsIn: Boolean
+    get() = hasRoute(JourneyMapRoute::class) || hasRoute(TripRoute::class)
+
 /**
  * The app's frame in Material 3 Expressive: the short bottom bar on phones, the wide navigation
  * rail on tablets and other wide windows (NavigationSuiteScaffold picks by window size).
@@ -91,7 +98,10 @@ fun ObehyShell(
         navigationItems = {
             destinations(mode).forEach { top ->
                 NavigationSuiteItem(
-                    selected = current?.hierarchy?.any { it.hasRoute(top.routeClass) } == true,
+                    // A trip is opened from a journey, so the journeys tab stays lit under it.
+                    selected =
+                        current?.hierarchy?.any { it.hasRoute(top.routeClass) } == true ||
+                            (top.routeClass == PlannerRoute::class && current?.hasRoute(TripRoute::class) == true),
                     onClick = {
                         nav.navigate(top.route) {
                             popUpTo(nav.graph.findStartDestination().id) { saveState = true }
@@ -115,18 +125,17 @@ fun ObehyShell(
                 nav,
                 startDestination = PlannerRoute,
                 enterTransition = {
-                    if (targetState.destination.hasRoute(
-                            JourneyMapRoute::class,
-                        )
-                    ) {
+                    if (targetState.destination.hasRoute(JourneyMapRoute::class)) {
                         EnterTransition.None
+                    } else if (targetState.destination.hasRoute(TripRoute::class)) {
+                        fadeIn(tween(BACK_MS, easing = BackEasing))
                     } else {
                         fadeIn
                     }
                 },
                 // The journey stays behind its map as it grows to fill the screen.
                 exitTransition = {
-                    if (targetState.destination.hasRoute(JourneyMapRoute::class)) {
+                    if (targetState.destination.morphsIn) {
                         HoldDuringMorph
                     } else {
                         fadeOut
@@ -137,8 +146,10 @@ fun ObehyShell(
                 predictivePopEnterTransition = { EnterTransition.None },
                 predictivePopExitTransition = { fadeOut(tween(BACK_MS, easing = BackEasing)) },
             ) {
-                plannerScreen(nav)
-                tripScreen()
+                plannerScreen(nav) { ride ->
+                    ride.tripId?.let { nav.navigateToTrip(TripRoute(it, ride.name, ride.from.stopId, ride.to.stopId)) }
+                }
+                tripScreen(nav)
                 settingsScreen()
                 composable<DeparturesRoute> { ComingSoon(stringResource(R.string.nav_departures)) }
                 composable<MapRoute> { ComingSoon(stringResource(R.string.nav_map)) }

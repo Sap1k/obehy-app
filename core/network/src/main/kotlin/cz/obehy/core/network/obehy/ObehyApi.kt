@@ -2,10 +2,13 @@ package cz.obehy.core.network.obehy
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.get
+import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
+import io.ktor.http.encodeURLPathPart
 
 /** The Oběhy API (`/api/v1`). */
 class ObehyApi(
@@ -24,6 +27,32 @@ class ObehyApi(
                 setBody(EnrichRequest(legs))
             }.body()
     }
+
+    /** A trip on a service date, whole, with its calls, notes and what's live on it. */
+    suspend fun trip(
+        tripId: String,
+        serviceDate: String,
+    ): ObehyTrip = client.get(tripUrl(tripId, serviceDate)).body()
+
+    /**
+     * A train's composition from the stop [from] (default: its next stop). The API asks its source
+     * lazily, so the first answer is usually `pending`, with when to ask again.
+     */
+    suspend fun composition(
+        tripId: String,
+        serviceDate: String,
+        from: String? = null,
+    ): ObehyComposition =
+        client
+            .get("${tripUrl(tripId, serviceDate)}/composition") {
+                from?.let { parameter("from", it) }
+            }.body()
+
+    /** A trip ID's `%` is part of the ID: it goes out encoded again, or the ID names another trip. */
+    private fun tripUrl(
+        tripId: String,
+        serviceDate: String,
+    ) = "${baseUrl}trips/${tripId.encodeURLPathPart()}/$serviceDate"
 
     companion object {
         const val DEFAULT_BASE_URL = "https://obehy.cz/api/v1/"

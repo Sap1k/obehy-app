@@ -15,7 +15,9 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpSize
 import cz.obehy.core.model.Leg
-import cz.obehy.core.ui.ObehyTheme
+import cz.obehy.core.model.RouteSurroundings
+import cz.obehy.core.ui.heroFullHeight
+import cz.obehy.core.ui.heroStripHeight
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -82,9 +84,10 @@ internal suspend fun routeStyle(
     context: Context,
     look: MapLook,
     legs: List<Leg>,
+    around: RouteSurroundings? = null,
 ): String =
     preparedStyle(look, legs)
-        ?: withContext(Dispatchers.Default) { journeyStyle(context, look, legs) }
+        ?: withContext(Dispatchers.Default) { journeyStyle(context, look, legs, around) }
             .also { styles.put(StyleKey(look, legs), it) }
 
 /** The map already drawn for this [style] at this [size], if there is one. */
@@ -103,29 +106,42 @@ internal fun stillMap(
  * Draws nothing itself; a journey not ready yet simply loads its map on opening.
  */
 @Composable
-fun PreloadRouteMaps(wanted: () -> List<List<Leg>>) {
+fun PreloadRouteMaps(
+    around: (List<Leg>) -> RouteSurroundings? = { null },
+    wanted: () -> List<List<Leg>>,
+) {
     val journeys by rememberUpdatedState(wanted)
+    val surroundings by rememberUpdatedState(around)
     val context = LocalContext.current
     val density by rememberUpdatedState(LocalDensity.current)
     val look = mapLook()
     val window = LocalWindowInfo.current.containerSize
-    val height = ObehyTheme.sizes.heroMap
-    LaunchedEffect(look, window, height) {
-        val size = with(density) { DpSize(window.width.toDp(), height) }
+    val height = heroFullHeight()
+    val strip = heroStripHeight()
+    LaunchedEffect(look, window, height, strip) {
+        val width = with(density) { window.width.toDp() }
+        val fits = IdentityHashMap<List<Leg>, ShrinkFit>()
+
+        fun fitOf(legs: List<Leg>) =
+            fits.getOrPut(legs) {
+                shrinkFit(legs.flatMap { it.shape() } + surroundings(legs)?.path.orEmpty(), width, height, strip)
+            }
         val failed = Collections.newSetFromMap(IdentityHashMap<List<Leg>, Boolean>())
 
-        fun isDrawn(legs: List<Leg>) = preparedStyle(look, legs)?.let { stills[StillKey(it, size)] } != null
+        fun isDrawn(legs: List<Leg>) = preparedStyle(look, legs)?.let { stills[StillKey(it, fitOf(legs).size)] } != null
 
         while (true) {
             val legs = snapshotFlow { journeys().firstOrNull { it !in failed && !isDrawn(it) } }.filterNotNull().first()
             delay(PAUSE_MS)
             if (journeys().none { it === legs }) continue
-            val style = routeStyle(context, look, legs)
+            val rest = surroundings(legs)
+            val style = routeStyle(context, look, legs, rest)
+            val size = fitOf(legs).size
             val key = StillKey(style, size)
             if (stills[key] != null) continue
             val camera =
                 withContext(Dispatchers.Default) {
-                    frame(legs.flatMap { it.shape() }, size.width.value, size.height.value)
+                    frame(legs.flatMap { it.shape() } + rest?.path.orEmpty(), width.value, height.value)
                 }
             val still = capture(style, size, camera, density)
             if (still != null) {

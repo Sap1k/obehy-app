@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="map_credits">Zdroje mapy</string>
+    <string name="map_vehicle">Kde je vozidlo teď</string>
+    <string name="map_vehicle_estimated">Kde by vozidlo teď mělo být podle časů</string>
 </resources>

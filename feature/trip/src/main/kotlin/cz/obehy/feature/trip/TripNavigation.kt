@@ -1,29 +1,27 @@
 package cz.obehy.feature.trip
 
-import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import androidx.navigation.toRoute
-import cz.obehy.core.ui.ComingSoon
+import cz.obehy.core.ui.AnimatedDestination
 import kotlinx.serialization.Serializable
 
 /**
- * A trip's detail: an Oběhy trip (`/api/v1/trips/{tripId}/{serviceDate}`) when the leg resolved,
- * else the MOTIS trip ([motisTripId], `/api/v5/trip`).
+ * A trip's detail, opened from a ride on a journey: [motisTripId] and the MOTIS stops it's ridden
+ * between. [title] names the line until the trip arrives.
  */
 @Serializable
 data class TripRoute(
-    val tripId: String? = null,
-    val serviceDate: String? = null,
-    val motisTripId: String? = null,
+    val motisTripId: String,
+    val title: String,
+    val fromStopId: String? = null,
+    val toStopId: String? = null,
 )
 
 fun NavController.navigateToTrip(route: TripRoute) = navigate(route)
 
-fun NavGraphBuilder.tripScreen() {
-    composable<TripRoute> { entry ->
-        val route = entry.toRoute<TripRoute>()
-        ComingSoon(route.tripId ?: route.motisTripId ?: stringResource(R.string.trip_title))
+fun NavGraphBuilder.tripScreen(nav: NavController) {
+    composable<TripRoute> {
+        AnimatedDestination(this) { TripDestination(onBack = { nav.popBackStack() }) }
     }
 }

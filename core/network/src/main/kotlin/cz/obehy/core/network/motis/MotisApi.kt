@@ -81,6 +81,21 @@ class MotisApi(
                 routing(routing)
             }.body()
 
+    /**
+     * The trip [tripId], whole. A vehicle going on as another line comes back as a leg for each of
+     * its lines, so pick the one asked for.
+     */
+    suspend fun trip(
+        tripId: String,
+        language: String? = null,
+    ): MotisItinerary =
+        client
+            .get("${baseUrl()}api/v6/trip") {
+                parameter("tripId", tripId)
+                parameter("joinInterlinedLegs", false)
+                language?.let { parameter("language", it) }
+            }.body()
+
     /** Every train keeps its own number; rides come with their path for the map, walks only when routed. */
     private fun HttpRequestBuilder.routing(routing: MotisRouting) {
         with(routing) {

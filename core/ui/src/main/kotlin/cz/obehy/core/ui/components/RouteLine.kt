@@ -57,6 +57,10 @@ data class RouteStroke(
 @Composable
 fun walkStroke(): RouteStroke = RouteStroke(MaterialTheme.colorScheme.outline, dotted = true)
 
+/** The route line's colour for the part of a trip the journey doesn't ride on. */
+@Composable
+fun quietStroke(): RouteStroke = RouteStroke(MaterialTheme.colorScheme.outline)
+
 /**
  * One row along a route line, shared by the search form (from, via, to) and a journey's detail
  * (stops, rides, walks), so both draw the same line. The line comes in [above] the [mark] and

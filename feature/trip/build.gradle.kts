@@ -5,3 +5,7 @@ plugins {
 android {
     namespace = "cz.obehy.feature.trip"
 }
+
+dependencies {
+    implementation(project(":core:map"))
+}

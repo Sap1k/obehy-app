@@ -2,12 +2,15 @@ package cz.obehy.core.ui
 
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.BoundsTransform
+import androidx.compose.animation.EnterExitState
 import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -15,7 +18,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.State
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 
 // Container transforms between screens: a thing on one screen (a result card) grows into the
@@ -37,6 +43,9 @@ fun SharedMotion(
         CompositionLocalProvider(LocalSharedTransitionScope provides this) { content() }
     }
 }
+
+/** The [SharedBounds] key of a ride on a journey and the trip's content it grows into. */
+fun rideMorphKey(motisTripId: String): String = "ride:$motisTripId"
 
 /** How long a shared element takes to morph, and a screen to leave with it. */
 const val BACK_MS: Int = 350
@@ -60,11 +69,23 @@ fun AnimatedDestination(
     CompositionLocalProvider(LocalNavAnimatedScope provides scope) { content() }
 }
 
+/** How far this destination has come in, from 0 to 1, following the back gesture too; 1 outside navigation. */
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+fun rememberEntrance(): State<Float> {
+    val animated = LocalNavAnimatedScope.current ?: return remember { mutableFloatStateOf(1f) }
+    return animated.transition.animateFloat(
+        transitionSpec = { tween(BACK_MS, easing = BackEasing) },
+        label = "entrance",
+    ) { if (it == EnterExitState.Visible) 1f else 0f }
+}
+
 /**
  * [content] as the same thing as every other [SharedBounds] with this [key] on another screen:
  * moving between the screens morphs one into the other. With [holdOnExit] it stays as it is when
- * it leaves instead of fading, for something else growing over it. Without [SharedMotion] around,
- * it is a plain box.
+ * it leaves instead of fading, for something else growing over it. With [inPlace] it morphs among
+ * its screen's other content, behind whatever lies on top of it there, rather than above everything.
+ * Without [SharedMotion] around, it is a plain box.
  */
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -72,6 +93,7 @@ fun SharedBounds(
     key: Any,
     modifier: Modifier = Modifier,
     holdOnExit: Boolean = false,
+    inPlace: Boolean = false,
     content: @Composable () -> Unit,
 ) {
     val shared = LocalSharedTransitionScope.current
@@ -93,6 +115,7 @@ fun SharedBounds(
                         } else {
                             fadeOut(tween(BACK_MS, easing = BackEasing))
                         },
+                    renderInOverlayDuringTransition = !inPlace,
                     clipInOverlayDuringTransition = OverlayClip(MaterialTheme.shapes.large),
                 )
             }

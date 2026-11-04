@@ -57,6 +57,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cz.obehy.core.map.RouteMap
 import cz.obehy.core.model.Itinerary
 import cz.obehy.core.model.JourneyQuery
+import cz.obehy.core.model.Leg
 import cz.obehy.core.model.Suggestion
 import cz.obehy.core.ui.ContentWidth
 import cz.obehy.core.ui.ObehyScreen
@@ -72,6 +73,7 @@ import java.time.Instant
 internal fun PlannerDestination(
     viewModel: PlannerViewModel,
     onOpen: () -> Unit,
+    onOpenTrip: (Leg.Transit) -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val wide = isWideWindow()
@@ -99,6 +101,7 @@ internal fun PlannerDestination(
                 viewModel.act(PlannerAction.Select(it))
                 if (!wide) onOpen()
             },
+            onOpenTrip = onOpenTrip,
             modifier =
                 Modifier
                     .graphicsLayer { alpha = if (covered) 0f else 1f }
@@ -147,6 +150,7 @@ internal fun PlannerScreen(
     wide: Boolean,
     onAction: (PlannerAction) -> Unit,
     onOpen: (Itinerary) -> Unit,
+    onOpenTrip: (Leg.Transit) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var sheet by rememberSaveable { mutableStateOf<Sheet?>(null) }
@@ -173,7 +177,7 @@ internal fun PlannerScreen(
         if (wide) {
             Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.xl)) {
                 results(Modifier.width(ObehyTheme.sizes.listPane))
-                DetailPane(state.open, state.query, Modifier.weight(1f))
+                DetailPane(state.open, state.query, onOpenTrip, Modifier.weight(1f))
             }
         } else {
             results(Modifier.fillMaxSize())
@@ -392,6 +396,7 @@ private fun Note(
 private fun DetailPane(
     open: OpenJourney?,
     query: JourneyQuery,
+    onOpenTrip: (Leg.Transit) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (open == null) {
@@ -410,6 +415,6 @@ private fun DetailPane(
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        ItineraryTimeline(open.itinerary, query.from?.label(), query.to?.label())
+        ItineraryTimeline(open.itinerary, query.from?.label(), query.to?.label(), onOpenTrip)
     }
 }

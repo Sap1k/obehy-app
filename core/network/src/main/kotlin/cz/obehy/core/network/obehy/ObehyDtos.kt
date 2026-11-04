@@ -120,6 +120,8 @@ data class TripVehicle(
     val longitude: Double? = null,
     val bearing: Double? = null,
     val traits: VehicleTraits = VehicleTraits(),
+    /** A vehicle a source names as such, not a run keyed by its trip or train number. */
+    val physical: Boolean = true,
 )
 
 @Serializable
@@ -137,6 +139,8 @@ data class TripCall(
     /** scheduled, predicted, actual, inferred, no_realtime or cancelled. */
     val status: String,
     val sourceClass: String? = null,
+    /** request_stop, on_request, conditional, exit_only, boarding_only, not_stopping, border_control_only. */
+    val flags: List<String> = emptyList(),
 )
 
 @Serializable
@@ -147,4 +151,104 @@ data class Alert(
     /** Per language: `cs`, `en`, … */
     val header: Map<String, String> = emptyMap(),
     val description: Map<String, String> = emptyMap(),
+)
+
+@Serializable
+data class ObehyTrip(
+    val tripId: String,
+    val serviceDate: String,
+    val realtime: TripRealtime? = null,
+    val vehicles: List<TripVehicle> = emptyList(),
+    val composition: Boolean = false,
+    val calls: List<TripCall> = emptyList(),
+    val features: List<Feature> = emptyList(),
+    val connections: List<Connection> = emptyList(),
+    val alerts: List<Alert> = emptyList(),
+)
+
+@Serializable
+data class Label(
+    val cs: String,
+    val en: String,
+)
+
+@Serializable
+data class SourceCode(
+    val system: String,
+    val code: String,
+)
+
+@Serializable
+data class Note(
+    val kind: String,
+    val code: String? = null,
+    val label: String? = null,
+    val text: String? = null,
+)
+
+@Serializable
+data class Feature(
+    val kinds: List<String> = emptyList(),
+    val icon: String,
+    val label: Label,
+    val scope: String,
+    val note: Note? = null,
+    val sourceCode: SourceCode? = null,
+)
+
+@Serializable
+data class Connection(
+    /** waits_for or connects_to. */
+    val direction: String,
+    val atSequence: Int? = null,
+    val waitMinutes: Int? = null,
+    val line: String? = null,
+    val destination: String? = null,
+    val note: String? = null,
+)
+
+@Serializable
+data class ObehyComposition(
+    /** fresh, stale, pending or not_available. */
+    val status: String,
+    val retryAfterS: Int? = null,
+    val units: List<ObehyCompositionUnit> = emptyList(),
+    val segments: List<ObehyCompositionSegment> = emptyList(),
+)
+
+@Serializable
+data class ObehyCompositionCall(
+    val sequence: Int,
+    val name: String,
+)
+
+@Serializable
+data class ObehyUnitFeature(
+    val feature: String,
+    val label: Label? = null,
+    val icon: String? = null,
+    val text: String? = null,
+)
+
+@Serializable
+data class ObehyCompositionUnit(
+    val label: Label? = null,
+    val source: String,
+    /** locomotive, coach or unit. */
+    val kind: String,
+    val vehicleType: String? = null,
+    val coachNumber: String? = null,
+    val classes: List<Int> = emptyList(),
+    val features: List<ObehyUnitFeature> = emptyList(),
+    val destination: String? = null,
+    val details: Map<String, String> = emptyMap(),
+    val fromCall: ObehyCompositionCall,
+    val toCall: ObehyCompositionCall,
+)
+
+@Serializable
+data class ObehyCompositionSegment(
+    val fromCall: ObehyCompositionCall,
+    val toCall: ObehyCompositionCall,
+    val units: List<Int>,
 )

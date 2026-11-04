@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -21,9 +22,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material.icons.automirrored.rounded.DirectionsWalk
 import androidx.compose.material.icons.rounded.ExpandMore
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.ToggleButton
+import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,14 +43,18 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import cz.obehy.core.model.Itinerary
 import cz.obehy.core.model.Leg
 import cz.obehy.core.model.Mode
 import cz.obehy.core.model.StopCall
 import cz.obehy.core.model.TimePoint
 import cz.obehy.core.ui.ObehyTheme
+import cz.obehy.core.ui.SharedBounds
 import cz.obehy.core.ui.components.LineBadge
 import cz.obehy.core.ui.components.LowFloorIcon
 import cz.obehy.core.ui.components.PlatformLabel
@@ -59,6 +67,7 @@ import cz.obehy.core.ui.components.rememberTimeColumnWidth
 import cz.obehy.core.ui.components.routeLineColor
 import cz.obehy.core.ui.components.walkStroke
 import cz.obehy.core.ui.icon
+import cz.obehy.core.ui.rideMorphKey
 import java.time.Duration
 
 /**
@@ -71,6 +80,7 @@ internal fun ItineraryTimeline(
     itinerary: Itinerary,
     fromName: String?,
     toName: String?,
+    onOpenTrip: (Leg.Transit) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val walk = walkStroke()
@@ -110,7 +120,7 @@ internal fun ItineraryTimeline(
                             width = width,
                         )
                     }
-                    RideRow(leg, ride, width)
+                    RideRow(leg, ride, width, onOpenTrip)
                     val continues = (next as? Leg.Transit)?.takeIf { it.staySeated }
                     StopRow(
                         leg.to.name,
@@ -205,15 +215,9 @@ private fun StopRow(
             horizontalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.s),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Row(
-                Modifier.weight(1f),
-                horizontalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.s),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(name, Modifier.weight(1f, fill = false), style = style)
-                call?.track?.let { PlatformLabel(it, call.trackChanged) }
-            }
+            Text(name, Modifier.weight(1f), style = style)
             TimeBasis(time)
+            call?.track?.let { PlatformLabel(it, call.trackChanged) }
         }
     }
 }
@@ -223,61 +227,25 @@ private fun RideRow(
     ride: Leg.Transit,
     stroke: RouteStroke,
     width: Dp,
+    onOpenTrip: (Leg.Transit) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var open by rememberSaveable(ride.tripId) { mutableStateOf(false) }
     val motion = MaterialTheme.motionScheme
-    val chevron by animateFloatAsState(if (open) 180f else 0f, motion.defaultSpatialSpec())
-    val stops = ride.intermediateStops
-    val toggle = stringResource(if (open) R.string.hide_stops else R.string.show_stops)
     RouteRow(RouteMark.None, modifier, above = stroke, below = stroke, leading = {
         val duration = ride.duration.spoken()
         DurationNote(duration, duration, width)
     }) {
-        // The whole ride is the toggle, which keeps it an easy target without adding height.
-        Column(
-            Modifier
-                .weight(1f)
-                .padding(
-                    start = ObehyTheme.spacing.m,
-                    top = ObehyTheme.spacing.xs,
-                    bottom = ObehyTheme.spacing.xs,
-                ).clip(MaterialTheme.shapes.large)
-                .background(MaterialTheme.colorScheme.surfaceContainer)
-                .then(if (stops.isNotEmpty()) Modifier.clickable(onClickLabel = toggle) { open = !open } else Modifier),
-        ) {
-            if (ride.staySeated) SameVehicle(ride.mode)
-            Column(
-                Modifier.padding(horizontal = ObehyTheme.spacing.m, vertical = ObehyTheme.spacing.s),
-                verticalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.xs),
-            ) {
-                Row(
-                    Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    LineBadge(ride)
-                    if (ride.accessible == true) LowFloorIcon()
-                }
-                // On its own line, so a long train name can never squeeze it.
-                ride.headsign?.let { Headsign(it) }
-                if (stops.isNotEmpty()) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            pluralStringResource(R.plurals.stops_between, stops.size, stops.size),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                        Icon(
-                            Icons.Rounded.ExpandMore,
-                            contentDescription = null,
-                            modifier = Modifier.size(ObehyTheme.sizes.iconSmall).rotate(chevron),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                }
-            }
-        }
+        // The whole ride opens the trip, growing into it; the stops have their own row to fold out on.
+        SharedBounds(
+            ride.tripId?.let(::rideMorphKey) ?: "ride",
+            Modifier.weight(1f).padding(
+                start = ObehyTheme.spacing.m,
+                top = ObehyTheme.spacing.xs,
+                bottom = ObehyTheme.spacing.xs,
+            ),
+            inPlace = true,
+        ) { RideCard(ride, open, onOpenTrip, onToggle = { open = !open }) }
     }
     AnimatedVisibility(
         visible = open,
@@ -285,6 +253,93 @@ private fun RideRow(
         exit = shrinkVertically(motion.defaultSpatialSpec()) + fadeOut(motion.defaultEffectsSpec()),
     ) {
         Column { ride.intermediateStops.forEach { PassedStop(it, stroke, width) } }
+    }
+}
+
+/** A ride: its line up top with the way to fold out its stops beside it, and where it's heading. */
+@Composable
+private fun RideCard(
+    ride: Leg.Transit,
+    open: Boolean,
+    onOpenTrip: (Leg.Transit) -> Unit,
+    onToggle: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val details = stringResource(R.string.open_trip)
+    Column(
+        modifier
+            .fillMaxWidth()
+            .clip(MaterialTheme.shapes.large)
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .then(
+                if (ride.tripId != null) Modifier.clickable(onClickLabel = details) { onOpenTrip(ride) } else Modifier,
+            ),
+    ) {
+        if (ride.staySeated) SameVehicle(ride.mode)
+        val stops = ride.intermediateStops.size
+        Column(
+            Modifier.padding(
+                start = ObehyTheme.spacing.m,
+                end = ObehyTheme.spacing.m,
+                top = ObehyTheme.spacing.s,
+                // The button's tap target already leaves room under it.
+                bottom = if (stops > 0) 0.dp else ObehyTheme.spacing.s,
+            ),
+            verticalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.xs),
+        ) {
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                LineBadge(ride, Modifier.weight(1f, fill = false))
+                if (ride.accessible == true) LowFloorIcon()
+            }
+            // On its own line, so a long train name can never squeeze it.
+            ride.headsign?.let { Headsign(it) }
+            if (stops > 0) StopsToggle(stops, open, onToggle)
+        }
+    }
+}
+
+/** How many stops a ride passes, as a tonal button that changes shape and flips its chevron when open. */
+@Composable
+private fun StopsToggle(
+    stops: Int,
+    open: Boolean,
+    onToggle: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val chevron by animateFloatAsState(if (open) 180f else 0f, MaterialTheme.motionScheme.defaultSpatialSpec())
+    val spoken = stringResource(if (open) R.string.hide_stops else R.string.show_stops)
+    val height = ButtonDefaults.ExtraSmallContainerHeight
+    ToggleButton(
+        checked = open,
+        onCheckedChange = { onToggle() },
+        modifier =
+            modifier
+                .heightIn(min = height)
+                .semantics { onClick(label = spoken, action = null) },
+        shapes = ToggleButtonDefaults.shapesFor(height),
+        colors =
+            ToggleButtonDefaults.colors(
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                checkedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                checkedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            ),
+        contentPadding = ButtonDefaults.contentPaddingFor(height),
+    ) {
+        Text(
+            pluralStringResource(R.plurals.stops_between, stops, stops),
+            style = MaterialTheme.typography.labelMedium,
+            maxLines = 1,
+        )
+        Icon(
+            Icons.Rounded.ExpandMore,
+            contentDescription = null,
+            modifier = Modifier.size(ObehyTheme.sizes.iconSmall).rotate(chevron),
+        )
     }
 }
 

@@ -78,6 +78,7 @@
     </plurals>
     <string name="walk">%s walk</string>
     <string name="spare">%s to spare</string>
+    <string name="open_trip">Open trip details</string>
     <string name="same_train">Same train, continuing as</string>
     <string name="same_subway">Same metro, continuing as</string>
     <string name="same_tram">Same tram, continuing as</string>

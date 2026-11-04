@@ -1,0 +1,720 @@
+{
+ "release_id": "20261104T030736Z-cc7b077ce778",
+ "generated_at": "2026-11-04T21:43:21.019572+01:00",
+ "trip_id": "czptt:trip:Pa%3A0054%3AKT----22530A%3A00%3A2026:1",
+ "service_date": "2026-11-04",
+ "journey": {
+  "namespace": "czptt:train_number",
+  "key": "577"
+ },
+ "line": {
+  "route_id": "czptt:route:line:3:1154:102",
+  "short_name": "Ex3",
+  "long_name": "Praha – Pardubice – Brno – Břeclav",
+  "mode": "rail",
+  "color": "b91c1c",
+  "text_color": "ffffff"
+ },
+ "agency": "České dráhy, a.s.",
+ "trip_short_name": "rj 577",
+ "headsign": "Břeclav",
+ "wheelchair_accessible": true,
+ "bikes_allowed": true,
+ "amenities": {
+  "wheelchair": "booking_required",
+  "bicycles": "reservation_required",
+  "reservation": null,
+  "refreshments": false,
+  "luggage": false,
+  "self_service_ticketing": false,
+  "on_request": false,
+  "conditional": false,
+  "integrated_transport": [],
+  "operates": []
+ },
+ "realtime": {
+  "lifecycle": "pre_trip",
+  "delay_s": null,
+  "off_route": false,
+  "stale": false,
+  "updated_at": "2026-11-04T20:30:24.945479+01:00",
+  "sources": []
+ },
+ "vehicles": [],
+ "run_parts": [
+  {
+   "trip_id": "czptt:trip:Pa%3A0054%3AKT----22530A%3A00%3A2026:1",
+   "run_part": 1
+  }
+ ],
+ "composition": true,
+ "calls": [
+  {
+   "sequence": 5,
+   "location_id": "czptt:stop:CZ:57076",
+   "name": "Praha hlavní nádraží",
+   "latitude": 50.08309,
+   "longitude": 14.435978,
+   "boarding": "regular",
+   "alighting": "regular",
+   "flags": [],
+   "platform": "26b",
+   "scheduled_arrival": "2026-11-04T21:49:00+01:00",
+   "scheduled_departure": "2026-11-04T21:58:00+01:00",
+   "estimated_arrival": null,
+   "estimated_departure": null,
+   "status": "scheduled",
+   "source_class": null
+  },
+  {
+   "sequence": 7,
+   "location_id": "czptt:stop:CZ:57176",
+   "name": "Praha-Libeň",
+   "latitude": 50.100637,
+   "longitude": 14.502328,
+   "boarding": "regular",
+   "alighting": "regular",
+   "flags": [],
+   "platform": "1",
+   "scheduled_arrival": "2026-11-04T22:04:00+01:00",
+   "scheduled_departure": "2026-11-04T22:06:00+01:00",
+   "estimated_arrival": null,
+   "estimated_departure": null,
+   "status": "scheduled",
+   "source_class": null
+  },
+  {
+   "sequence": 29,
+   "location_id": "czptt:stop:CZ:53414",
+   "name": "Kolín",
+   "latitude": 50.025832,
+   "longitude": 15.212705,
+   "boarding": "regular",
+   "alighting": "regular",
+   "flags": [],
+   "platform": "101",
+   "scheduled_arrival": "2026-11-04T22:36:00+01:00",
+   "scheduled_departure": "2026-11-04T22:38:00+01:00",
+   "estimated_arrival": null,
+   "estimated_departure": null,
+   "status": "scheduled",
+   "source_class": null
+  },
+  {
+   "sequence": 46,
+   "location_id": "czptt:stop:CZ:53613",
+   "name": "Pardubice hlavní nádraží",
+   "latitude": 50.031682,
+   "longitude": 15.756512,
+   "boarding": "regular",
+   "alighting": "regular",
+   "flags": [],
+   "platform": "1",
+   "scheduled_arrival": "2026-11-04T22:57:00+01:00",
+   "scheduled_departure": "2026-11-04T22:59:00+01:00",
+   "estimated_arrival": null,
+   "estimated_departure": null,
+   "status": "scheduled",
+   "source_class": null
+  },
+  {
+   "sequence": 56,
+   "location_id": "czptt:stop:CZ:53813",
+   "name": "Choceň",
+   "latitude": 49.993859,
+   "longitude": 16.223621,
+   "boarding": "regular",
+   "alighting": "regular",
+   "flags": [],
+   "platform": "1",
+   "scheduled_arrival": "2026-11-04T23:18:30+01:00",
+   "scheduled_departure": "2026-11-04T23:20:00+01:00",
+   "estimated_arrival": null,
+   "estimated_departure": null,
+   "status": "scheduled",
+   "source_class": null
+  },
+  {
+   "sequence": 60,
+   "location_id": "czptt:stop:CZ:53863",
+   "name": "Ústí nad Orlicí",
+   "latitude": 49.971251,
+   "longitude": 16.376854,
+   "boarding": "regular",
+   "alighting": "regular",
+   "flags": [],
+   "platform": "1",
+   "scheduled_arrival": "2026-11-04T23:30:30+01:00",
+   "scheduled_departure": "2026-11-04T23:32:00+01:00",
+   "estimated_arrival": null,
+   "estimated_departure": null,
+   "status": "scheduled",
+   "source_class": null
+  },
+  {
+   "sequence": 65,
+   "location_id": "czptt:stop:CZ:53913",
+   "name": "Česká Třebová",
+   "latitude": 49.896831,
+   "longitude": 16.447115,
+   "boarding": "regular",
+   "alighting": "regular",
+   "flags": [],
+   "platform": "1",
+   "scheduled_arrival": "2026-11-04T23:40:00+01:00",
+   "scheduled_departure": "2026-11-04T23:42:00+01:00",
+   "estimated_arrival": null,
+   "estimated_departure": null,
+   "status": "scheduled",
+   "source_class": null
+  },
+  {
+   "sequence": 95,
+   "location_id": "czptt:stop:CZ:33295",
+   "name": "Brno hlavní nádraží",
+   "latitude": 49.189992,
+   "longitude": 16.611046,
+   "boarding": "regular",
+   "alighting": "regular",
+   "flags": [],
+   "platform": "2",
+   "scheduled_arrival": "2026-11-05T00:41:00+01:00",
+   "scheduled_departure": "2026-11-05T00:46:00+01:00",
+   "estimated_arrival": null,
+   "estimated_departure": null,
+   "status": "scheduled",
+   "source_class": null
+  },
+  {
+   "sequence": 115,
+   "location_id": "czptt:stop:CZ:33425",
+   "name": "Břeclav",
+   "latitude": 48.754384,
+   "longitude": 16.893605,
+   "boarding": "regular",
+   "alighting": "regular",
+   "flags": [],
+   "platform": "1",
+   "scheduled_arrival": "2026-11-05T01:15:00+01:00",
+   "scheduled_departure": "2026-11-05T01:15:00+01:00",
+   "estimated_arrival": null,
+   "estimated_departure": null,
+   "status": "scheduled",
+   "source_class": null
+  }
+ ],
+ "features": [
+  {
+   "kinds": [
+    "bicycle_carry_on",
+    "bicycle_reservation_required",
+    "bicycle_transport"
+   ],
+   "group": "bicycles",
+   "icon": "bicycle_reservation",
+   "label": {
+    "cs": "přeprava spoluzavazadel s povinnou rezervací místa pro jízdní kolo a cestujícího, v některých vlacích pouze pro jízdní kolo",
+    "en": "Bicycles as accompanied luggage; Bicycle space reservation required; Carries bicycles"
+   },
+   "official": true,
+   "scope": "trip",
+   "from_sequence": null,
+   "to_sequence": null,
+   "system": null,
+   "note": {
+    "kind": "czptt_central_note",
+    "code": "29",
+    "label": "kolo rezervace nutná",
+    "text": "přeprava spoluzavazadel s povinnou rezervací místa pro jízdní kolo a cestujícího, v některých vlacích pouze pro jízdní kolo"
+   },
+   "source_code": {
+    "system": "czptt_note",
+    "code": "29",
+    "name": "kolo rezervace nutná",
+    "text": "přeprava spoluzavazadel s povinnou rezervací místa pro jízdní kolo a cestujícího, v některých vlacích pouze pro jízdní kolo"
+   }
+  },
+  {
+   "kinds": [
+    "wheelchair_accessible_vehicle",
+    "wheelchair_booking_required"
+   ],
+   "group": "accessibility",
+   "icon": "wheelchair_booking",
+   "label": {
+    "cs": "vůz vhodný pro přepravu cestujících na vozíku, je nutné objednání přepravy",
+    "en": "Wheelchair-accessible vehicle; Wheelchair space must be booked"
+   },
+   "official": true,
+   "scope": "trip",
+   "from_sequence": null,
+   "to_sequence": null,
+   "system": null,
+   "note": {
+    "kind": "czptt_central_note",
+    "code": "34",
+    "label": "invalida s plošinou",
+    "text": "vůz vhodný pro přepravu cestujících na vozíku, je nutné objednání přepravy"
+   },
+   "source_code": {
+    "system": "czptt_note",
+    "code": "34",
+    "name": "invalida – objednání",
+    "text": "vůz vhodný pro přepravu cestujících na vozíku, je nutné objednání přepravy"
+   }
+  },
+  {
+   "kinds": [
+    "note"
+   ],
+   "group": "note",
+   "icon": "note",
+   "label": {
+    "cs": "ve vlaku je řazen vůz s přípojkou 230 V",
+    "en": "Note"
+   },
+   "official": false,
+   "scope": "call_range",
+   "from_sequence": 1,
+   "to_sequence": 115,
+   "system": null,
+   "note": {
+    "kind": "czptt_central_note",
+    "code": "30",
+    "label": "zásuvka",
+    "text": "ve vlaku je řazen vůz s přípojkou 230 V"
+   },
+   "source_code": null
+  },
+  {
+   "kinds": [
+    "note"
+   ],
+   "group": "note",
+   "icon": "note",
+   "label": {
+    "cs": "přeprava spoluzavazadel s povinnou rezervací místa pro jízdní kolo a cestujícího, v některých vlacích pouze pro jízdní kolo",
+    "en": "Note"
+   },
+   "official": false,
+   "scope": "call_range",
+   "from_sequence": 1,
+   "to_sequence": 115,
+   "system": null,
+   "note": {
+    "kind": "czptt_central_note",
+    "code": "29",
+    "label": "kolo rezervace nutná",
+    "text": "přeprava spoluzavazadel s povinnou rezervací místa pro jízdní kolo a cestujícího, v některých vlacích pouze pro jízdní kolo"
+   },
+   "source_code": null
+  },
+  {
+   "kinds": [
+    "note"
+   ],
+   "group": "note",
+   "icon": "note",
+   "label": {
+    "cs": "tichý oddíl",
+    "en": "Note"
+   },
+   "official": false,
+   "scope": "call_range",
+   "from_sequence": 1,
+   "to_sequence": 115,
+   "system": null,
+   "note": {
+    "kind": "czptt_central_note",
+    "code": "39",
+    "label": "tichý oddíl",
+    "text": "tichý oddíl"
+   },
+   "source_code": null
+  },
+  {
+   "kinds": [
+    "note"
+   ],
+   "group": "note",
+   "icon": "note",
+   "label": {
+    "cs": "vůz vhodný pro přepravu cestujících na vozíku, je nutné objednání přepravy",
+    "en": "Note"
+   },
+   "official": false,
+   "scope": "call_range",
+   "from_sequence": 1,
+   "to_sequence": 115,
+   "system": null,
+   "note": {
+    "kind": "czptt_central_note",
+    "code": "34",
+    "label": "invalida s plošinou",
+    "text": "vůz vhodný pro přepravu cestujících na vozíku, je nutné objednání přepravy"
+   },
+   "source_code": null
+  },
+  {
+   "kinds": [
+    "note"
+   ],
+   "group": "note",
+   "icon": "note",
+   "label": {
+    "cs": "dětské kino",
+    "en": "Note"
+   },
+   "official": false,
+   "scope": "call_range",
+   "from_sequence": 1,
+   "to_sequence": 115,
+   "system": null,
+   "note": {
+    "kind": "czptt_central_note",
+    "code": "42",
+    "label": "kino",
+    "text": "dětské kino"
+   },
+   "source_code": null
+  },
+  {
+   "kinds": [
+    "note"
+   ],
+   "group": "note",
+   "icon": "note",
+   "label": {
+    "cs": "restaurační vůz",
+    "en": "Note"
+   },
+   "official": false,
+   "scope": "call_range",
+   "from_sequence": 1,
+   "to_sequence": 115,
+   "system": null,
+   "note": {
+    "kind": "czptt_central_note",
+    "code": "18",
+    "label": "hospoda",
+    "text": "restaurační vůz"
+   },
+   "source_code": null
+  },
+  {
+   "kinds": [
+    "note"
+   ],
+   "group": "note",
+   "icon": "note",
+   "label": {
+    "cs": "do označených vozů možno zakoupit místenku",
+    "en": "Note"
+   },
+   "official": false,
+   "scope": "call_range",
+   "from_sequence": 1,
+   "to_sequence": 115,
+   "system": null,
+   "note": {
+    "kind": "czptt_central_note",
+    "code": "19",
+    "label": "místenka",
+    "text": "do označených vozů možno zakoupit místenku"
+   },
+   "source_code": null
+  },
+  {
+   "kinds": [
+    "note"
+   ],
+   "group": "note",
+   "icon": "note",
+   "label": {
+    "cs": "vůz nebo oddíly vyhrazené pro cestující s dětmi do 10 let",
+    "en": "Note"
+   },
+   "official": false,
+   "scope": "call_range",
+   "from_sequence": 1,
+   "to_sequence": 115,
+   "system": null,
+   "note": {
+    "kind": "czptt_central_note",
+    "code": "33",
+    "label": "dítě",
+    "text": "vůz nebo oddíly vyhrazené pro cestující s dětmi do 10 let"
+   },
+   "source_code": null
+  },
+  {
+   "kinds": [
+    "note"
+   ],
+   "group": "note",
+   "icon": "note",
+   "label": {
+    "cs": "lehátkový vůz",
+    "en": "Note"
+   },
+   "official": false,
+   "scope": "call_range",
+   "from_sequence": 1,
+   "to_sequence": 115,
+   "system": null,
+   "note": {
+    "kind": "czptt_central_note",
+    "code": "14",
+    "label": "lehátko",
+    "text": "lehátkový vůz"
+   },
+   "source_code": null
+  },
+  {
+   "kinds": [
+    "note"
+   ],
+   "group": "note",
+   "icon": "note",
+   "label": {
+    "cs": "palubní portál",
+    "en": "Note"
+   },
+   "official": false,
+   "scope": "call_range",
+   "from_sequence": 1,
+   "to_sequence": 115,
+   "system": null,
+   "note": {
+    "kind": "czptt_central_note",
+    "code": "41",
+    "label": "palubní portál ČD",
+    "text": "palubní portál"
+   },
+   "source_code": null
+  },
+  {
+   "kinds": [
+    "note"
+   ],
+   "group": "note",
+   "icon": "note",
+   "label": {
+    "cs": "lůžkový vůz",
+    "en": "Note"
+   },
+   "official": false,
+   "scope": "call_range",
+   "from_sequence": 1,
+   "to_sequence": 115,
+   "system": null,
+   "note": {
+    "kind": "czptt_central_note",
+    "code": "13",
+    "label": "lůžko",
+    "text": "lůžkový vůz"
+   },
+   "source_code": null
+  },
+  {
+   "kinds": [
+    "note"
+   ],
+   "group": "note",
+   "icon": "note",
+   "label": {
+    "cs": "ve vlaku je řazen vůz s bezdrátovým připojením k internetu",
+    "en": "Note"
+   },
+   "official": false,
+   "scope": "call_range",
+   "from_sequence": 1,
+   "to_sequence": 115,
+   "system": null,
+   "note": {
+    "kind": "czptt_central_note",
+    "code": "40",
+    "label": "WiFi",
+    "text": "ve vlaku je řazen vůz s bezdrátovým připojením k internetu"
+   },
+   "source_code": null
+  },
+  {
+   "kinds": [
+    "note"
+   ],
+   "group": "note",
+   "icon": "note",
+   "label": {
+    "cs": "přímý vůz",
+    "en": "Note"
+   },
+   "official": false,
+   "scope": "call_range",
+   "from_sequence": 1,
+   "to_sequence": 115,
+   "system": null,
+   "note": {
+    "kind": "czptt_central_note",
+    "code": "15",
+    "label": "vagon",
+    "text": "přímý vůz"
+   },
+   "source_code": null
+  },
+  {
+   "kinds": [
+    "note"
+   ],
+   "group": "note",
+   "icon": "note",
+   "label": {
+    "cs": "CZ58376||CZ33425||v oddílech 1. vozové třídy Business povinná rezervace místa|2|3|1|0|",
+    "en": "Note"
+   },
+   "official": false,
+   "scope": "call_range",
+   "from_sequence": 1,
+   "to_sequence": 115,
+   "system": null,
+   "note": {
+    "kind": "czptt_local_note",
+    "code": null,
+    "label": "v oddílech 1. vozové třídy Business povinná rezervace místa",
+    "text": "CZ58376||CZ33425||v oddílech 1. vozové třídy Business povinná rezervace místa|2|3|1|0|"
+   },
+   "source_code": null
+  },
+  {
+   "kinds": [
+    "note"
+   ],
+   "group": "note",
+   "icon": "note",
+   "label": {
+    "cs": "vlak zařazený v integrovaném dopravním systému",
+    "en": "Note"
+   },
+   "official": false,
+   "scope": "call_range",
+   "from_sequence": 29,
+   "to_sequence": 65,
+   "system": null,
+   "note": {
+    "kind": "czptt_central_note",
+    "code": "44",
+    "label": "IDS",
+    "text": "vlak zařazený v integrovaném dopravním systému"
+   },
+   "source_code": null
+  }
+ ],
+ "notes": [
+  {
+   "kind": "czptt_central_note",
+   "code": "29",
+   "label": "kolo rezervace nutná",
+   "text": "přeprava spoluzavazadel s povinnou rezervací místa pro jízdní kolo a cestujícího, v některých vlacích pouze pro jízdní kolo"
+  },
+  {
+   "kind": "czptt_central_note",
+   "code": "34",
+   "label": "invalida s plošinou",
+   "text": "vůz vhodný pro přepravu cestujících na vozíku, je nutné objednání přepravy"
+  },
+  {
+   "kind": "czptt_central_note",
+   "code": "30",
+   "label": "zásuvka",
+   "text": "ve vlaku je řazen vůz s přípojkou 230 V"
+  },
+  {
+   "kind": "czptt_central_note",
+   "code": "29",
+   "label": "kolo rezervace nutná",
+   "text": "přeprava spoluzavazadel s povinnou rezervací místa pro jízdní kolo a cestujícího, v některých vlacích pouze pro jízdní kolo"
+  },
+  {
+   "kind": "czptt_central_note",
+   "code": "39",
+   "label": "tichý oddíl",
+   "text": "tichý oddíl"
+  },
+  {
+   "kind": "czptt_central_note",
+   "code": "34",
+   "label": "invalida s plošinou",
+   "text": "vůz vhodný pro přepravu cestujících na vozíku, je nutné objednání přepravy"
+  },
+  {
+   "kind": "czptt_central_note",
+   "code": "42",
+   "label": "kino",
+   "text": "dětské kino"
+  },
+  {
+   "kind": "czptt_central_note",
+   "code": "18",
+   "label": "hospoda",
+   "text": "restaurační vůz"
+  },
+  {
+   "kind": "czptt_central_note",
+   "code": "19",
+   "label": "místenka",
+   "text": "do označených vozů možno zakoupit místenku"
+  },
+  {
+   "kind": "czptt_central_note",
+   "code": "33",
+   "label": "dítě",
+   "text": "vůz nebo oddíly vyhrazené pro cestující s dětmi do 10 let"
+  },
+  {
+   "kind": "czptt_central_note",
+   "code": "14",
+   "label": "lehátko",
+   "text": "lehátkový vůz"
+  },
+  {
+   "kind": "czptt_central_note",
+   "code": "41",
+   "label": "palubní portál ČD",
+   "text": "palubní portál"
+  },
+  {
+   "kind": "czptt_central_note",
+   "code": "13",
+   "label": "lůžko",
+   "text": "lůžkový vůz"
+  },
+  {
+   "kind": "czptt_central_note",
+   "code": "40",
+   "label": "WiFi",
+   "text": "ve vlaku je řazen vůz s bezdrátovým připojením k internetu"
+  },
+  {
+   "kind": "czptt_central_note",
+   "code": "15",
+   "label": "vagon",
+   "text": "přímý vůz"
+  },
+  {
+   "kind": "czptt_local_note",
+   "code": null,
+   "label": "v oddílech 1. vozové třídy Business povinná rezervace místa",
+   "text": "CZ58376||CZ33425||v oddílech 1. vozové třídy Business povinná rezervace místa|2|3|1|0|"
+  },
+  {
+   "kind": "czptt_central_note",
+   "code": "44",
+   "label": "IDS",
+   "text": "vlak zařazený v integrovaném dopravním systému"
+  }
+ ],
+ "connections": [],
+ "links": [],
+ "alerts": [],
+ "shape": null
+}

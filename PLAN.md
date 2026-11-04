@@ -120,6 +120,10 @@ Refresh/replanning uses MOTIS (re-plan / `trip` endpoint) and never runs in-hous
 - **Search history:** Room, on the phone only, per provider, excluded from backups. `JourneySuggester`
   ranks past searches by recency, time of day, kind of day and where the phone is, and offers the way back.
 
+- **Trip detail:** tapping a ride opens its whole trip: MOTIS `trip` for the schedule and path in every mode, and
+  in the modes with Oběhy, `journeys/enrich` then `/trips/{id}/{date}` and `/composition` for live stops, notes,
+  vehicle and train order. Circulation and delay history are still to come.
+
 ## Later milestones
 
 - **M2 Boards:** MOTIS `stoptimes` (both modes, enriched via the same endpoint), plus the

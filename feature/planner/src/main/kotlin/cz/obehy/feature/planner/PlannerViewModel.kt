@@ -9,14 +9,17 @@ import cz.obehy.core.data.LocationRepository
 import cz.obehy.core.data.PlaceRepository
 import cz.obehy.core.data.SearchHistoryRepository
 import cz.obehy.core.data.SettingsRepository
+import cz.obehy.core.data.TripRepository
 import cz.obehy.core.model.Itinerary
 import cz.obehy.core.model.JourneyQuery
 import cz.obehy.core.model.LatLon
+import cz.obehy.core.model.Leg
 import cz.obehy.core.model.NearbyStop
 import cz.obehy.core.model.Place
 import cz.obehy.core.model.PlaceKind
 import cz.obehy.core.model.SearchOptions
 import cz.obehy.core.model.Suggestion
+import cz.obehy.core.model.TripMap
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.FlowPreview
@@ -118,6 +121,8 @@ data class PlannerState(
     val placeSearch: PlaceSearch? = null,
     /** The journey open in the detail (beside the results on wide screens). */
     val open: OpenJourney? = null,
+    /** The maps of the trips ridden on the [open] journey, fetched ahead. */
+    val tripMaps: List<TripMap> = emptyList(),
     /** Journeys to offer before a search. */
     val suggestions: List<Suggestion> = emptyList(),
 ) {
@@ -206,6 +211,7 @@ class PlannerViewModel
         private val settings: SettingsRepository,
         private val places: PlaceRepository,
         private val journeys: JourneyRepository,
+        private val trips: TripRepository,
         private val location: LocationRepository,
         private val history: SearchHistoryRepository,
         @param:Named("computation") private val computation: CoroutineDispatcher,
@@ -216,6 +222,7 @@ class PlannerViewModel
         private var nearbyJob: Job? = null
         private var preloadJob: Job? = null
         private var preloaded: PreloadedStops? = null
+        private var tripsJob: Job? = null
 
         /** The clock; tests set their own. */
         internal var now: () -> Instant = Instant::now
@@ -364,7 +371,8 @@ class PlannerViewModel
 
                 is PlannerAction.Select -> {
                     val fetchedAt = (local.value.results as? Results.Loaded)?.fetchedAt ?: now()
-                    local.update { it.copy(open = OpenJourney(action.itinerary, fetchedAt)) }
+                    local.update { it.copy(open = OpenJourney(action.itinerary, fetchedAt), tripMaps = emptyList()) }
+                    fetchTripsAhead(action.itinerary)
                 }
 
                 PlannerAction.Refresh -> {
@@ -466,6 +474,16 @@ class PlannerViewModel
                     state.copy(placeSearch = search.copy(recents = recents))
                 }
             }
+        }
+
+        /** So a ride opens with its trip and map in place; Oběhy is only asked once it does. */
+        private fun fetchTripsAhead(itinerary: Itinerary) {
+            tripsJob?.cancel()
+            tripsJob =
+                viewModelScope.launch {
+                    val fetched = trips.fetchAhead(itinerary.legs.filterIsInstance<Leg.Transit>())
+                    local.update { state -> state.copy(tripMaps = fetched.map { it.map }) }
+                }
         }
 
         /** The open journey's times again; it stays as it was when it can't be found again. */

@@ -116,6 +116,54 @@ fun rememberTimeColumnWidth(
     }
 }
 
+/** How wide the time column of a schedule must be for all of [times]. */
+@Composable
+fun rememberScheduleTimeWidth(times: List<TimePoint>): Dp {
+    val measurer = rememberTextMeasurer()
+    val density = LocalDensity.current
+    val style =
+        MaterialTheme.typography.bodyMedium.tabular
+            .copy(fontWeight = FontWeight.Bold)
+    return remember(times, density, style) {
+        with(density) { (times.maxOfOrNull { measurer.measure(it.expected.clock(), style).size.width } ?: 0).toDp() }
+    }
+}
+
+/** A time in a schedule, one size for every stop. */
+@Composable
+fun ScheduleTime(
+    time: TimePoint,
+    modifier: Modifier = Modifier,
+) {
+    val spoken = spokenTime(time)
+    Box(modifier.clearAndSetSemantics { contentDescription = spoken }, contentAlignment = Alignment.CenterEnd) {
+        CurrentTime(time, MaterialTheme.typography.bodyMedium, MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
+/** How wide a column of [TimetableTime]s must be for all of [times]; zero when none has moved. */
+@Composable
+fun rememberTimetableTimeWidth(times: List<TimePoint>): Dp {
+    val measurer = rememberTextMeasurer()
+    val density = LocalDensity.current
+    val style = MaterialTheme.typography.bodySmall.tabular
+    return remember(times, density, style) {
+        val widest = times.filter { it.moved }.maxOfOrNull { measurer.measure(it.scheduled.clock(), style).size.width }
+        with(density) { (widest ?: 0).toDp() }
+    }
+}
+
+/** The timetable time, struck through, beside a [ScheduleTime] that has moved off it; that one speaks for both. */
+@Composable
+fun TimetableTime(
+    time: TimePoint,
+    modifier: Modifier = Modifier,
+) {
+    if (time.moved) {
+        Box(modifier.clearAndSetSemantics {}) { TimetableTime(time, MaterialTheme.typography.bodySmall) }
+    }
+}
+
 /**
  * The time that counts at a stop, right-aligned in a column [width] wide next to the route line.
  * [small] is for a stop passed on the way.

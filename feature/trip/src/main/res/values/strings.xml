@@ -1,4 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="trip_title">Trip</string>
+    <string name="trip_failed">Couldn\'t load this trip.</string>
+    <string name="trip_retry">Try again</string>
+    <string name="trip_cancelled">This trip is cancelled</string>
+    <string name="trip_schedule">Schedule</string>
+    <string name="trip_vehicle">Vehicle</string>
+    <string name="trip_train_order">Train order</string>
+    <string name="trip_direction">Direction of travel</string>
+    <string name="trip_finding_order">Finding out the train\'s order…</string>
+    <string name="trip_checking">%s · checking…</string>
+    <string name="trip_span">%1$s – %2$s</string>
+    <string name="trip_notes">Notes</string>
+    <string name="trip_more_notes">More notes (%d)</string>
+    <string name="trip_fewer_notes">Fewer notes</string>
+    <string name="trip_connections">Connections</string>
+    <string name="trip_waits_for">Waits for %s</string>
+    <string name="trip_connects_to">Connects to %s</string>
+    <string name="trip_connection_any">a connecting service</string>
+    <string name="trip_wait_minutes">up to %d min</string>
+    <string name="stop_cancelled">Cancelled</string>
+    <string name="stop_on_request">Request stop</string>
+    <string name="stop_exit_only">Getting off only</string>
+    <string name="stop_boarding_only">Getting on only</string>
+    <string name="trip_links">More about this trip</string>
+    <string name="trip_link_tickets">Buy a ticket</string>
+    <string name="trip_link_line">Line page</string>
+    <string name="trip_link_operator">Operator\'s website</string>
+    <string name="trip_bikes">Carries bicycles</string>
+    <string name="trip_reservation">Seats can be booked</string>
+    <string name="trip_reservation_required">You need a seat booking</string>
+    <string name="vehicle_low_floor">Low-floor</string>
+    <string name="vehicle_air_conditioning">Air conditioning</string>
+    <string name="unit_through_coach">Through coach to %s</string>
+    <string name="unit_leaves_at">Leaves this train at %s</string>
+    <string name="unit_continues_as">Goes on as %s</string>
+    <string name="unit_only_between">Only between %1$s and %2$s</string>
 </resources>

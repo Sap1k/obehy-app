@@ -1,0 +1,697 @@
+{
+ "release_id": "20261104T030736Z-cc7b077ce778",
+ "generated_at": "2026-11-04T21:43:21.241752+01:00",
+ "trip_id": "czptt:trip:Pa%3A0054%3AKT----22530A%3A00%3A2026:1",
+ "service_date": "2026-11-04",
+ "from_location_id": null,
+ "status": "fresh",
+ "retry_after_s": null,
+ "requested_at": "2026-11-04T21:41:04.210285+01:00",
+ "answered_at": "2026-11-04T21:41:04.357178+01:00",
+ "sources": [
+  {
+   "lookup": "cd/composition",
+   "source": "cd",
+   "label": {
+    "cs": "České dráhy",
+    "en": "České dráhy"
+   },
+   "outcome": "answered",
+   "reason": null
+  }
+ ],
+ "units": [
+  {
+   "source": "cd",
+   "label": {
+    "cs": "České dráhy",
+    "en": "České dráhy"
+   },
+   "sequence": 1,
+   "kind": "locomotive",
+   "role": "train",
+   "vehicle_id": null,
+   "vehicle_type": null,
+   "coach_number": null,
+   "classes": [],
+   "features": [],
+   "destination": null,
+   "details": {
+    "type": "#3937",
+    "label": "Lokomotiva"
+   },
+   "from_call": {
+    "sequence": 5,
+    "location_id": "czptt:stop:CZ:57076",
+    "name": "Praha hlavní nádraží"
+   },
+   "to_call": {
+    "sequence": 115,
+    "location_id": "czptt:stop:CZ:33425",
+    "name": "Břeclav"
+   },
+   "open": true,
+   "observed_at": "2026-11-04T21:41:04.342731+01:00"
+  },
+  {
+   "source": "cd",
+   "label": {
+    "cs": "České dráhy",
+    "en": "České dráhy"
+   },
+   "sequence": 2,
+   "kind": "coach",
+   "role": "train",
+   "vehicle_id": null,
+   "vehicle_type": "Bcmz 834",
+   "coach_number": "364",
+   "classes": [],
+   "features": [
+    {
+     "feature": "couchette",
+     "label": {
+      "cs": "Lehátkový vůz",
+      "en": "Couchette car"
+     },
+     "icon": "couchette",
+     "text": null
+    },
+    {
+     "feature": "wifi",
+     "label": {
+      "cs": "Wi-Fi",
+      "en": "Wi-Fi"
+     },
+     "icon": "wifi",
+     "text": null
+    },
+    {
+     "feature": "power_sockets",
+     "label": {
+      "cs": "Zásuvky",
+      "en": "Power sockets"
+     },
+     "icon": "power_socket",
+     "text": null
+    }
+   ],
+   "destination": "Budapest-Nyugati pu",
+   "details": {
+    "label": "Lehátkový vůz",
+    "notes": "Lehátkový úsek Praha hl.n. - Budapest-Nyugati pu.",
+    "number_star": "true",
+    "direct_coach_train": "EN 477 Metropol",
+    "direct_coach_leaves_at": "Břeclav"
+   },
+   "from_call": {
+    "sequence": 5,
+    "location_id": "czptt:stop:CZ:57076",
+    "name": "Praha hlavní nádraží"
+   },
+   "to_call": {
+    "sequence": 115,
+    "location_id": "czptt:stop:CZ:33425",
+    "name": "Břeclav"
+   },
+   "open": true,
+   "observed_at": "2026-11-04T21:41:04.342731+01:00"
+  },
+  {
+   "source": "cd",
+   "label": {
+    "cs": "České dráhy",
+    "en": "České dráhy"
+   },
+   "sequence": 3,
+   "kind": "coach",
+   "role": "train",
+   "vehicle_id": null,
+   "vehicle_type": "WLABmee 823",
+   "coach_number": "365",
+   "classes": [],
+   "features": [
+    {
+     "feature": "sleeper",
+     "label": {
+      "cs": "Lůžkový vůz",
+      "en": "Sleeping car"
+     },
+     "icon": "sleeper",
+     "text": null
+    },
+    {
+     "feature": "power_sockets",
+     "label": {
+      "cs": "Zásuvky",
+      "en": "Power sockets"
+     },
+     "icon": "power_socket",
+     "text": null
+    }
+   ],
+   "destination": "Budapest-Nyugati pu",
+   "details": {
+    "label": "Lůžkový vůz",
+    "number_star": "true",
+    "direct_coach_train": "EN 477 Metropol",
+    "direct_coach_leaves_at": "Břeclav"
+   },
+   "from_call": {
+    "sequence": 5,
+    "location_id": "czptt:stop:CZ:57076",
+    "name": "Praha hlavní nádraží"
+   },
+   "to_call": {
+    "sequence": 115,
+    "location_id": "czptt:stop:CZ:33425",
+    "name": "Břeclav"
+   },
+   "open": true,
+   "observed_at": "2026-11-04T21:41:04.342731+01:00"
+  },
+  {
+   "source": "cd",
+   "label": {
+    "cs": "České dráhy",
+    "en": "České dráhy"
+   },
+   "sequence": 4,
+   "kind": "coach",
+   "role": "train",
+   "vehicle_id": null,
+   "vehicle_type": "Bmpz 893",
+   "coach_number": "21",
+   "classes": [
+    2
+   ],
+   "features": [
+    {
+     "feature": "bicycle_reservation_required",
+     "label": {
+      "cs": "Jízdní kolo s povinnou rezervací",
+      "en": "Bicycle reservation required"
+     },
+     "icon": "bicycle_reservation",
+     "text": null
+    },
+    {
+     "feature": "family_compartment",
+     "label": {
+      "cs": "Oddíl pro cestující s dětmi",
+      "en": "Family compartment"
+     },
+     "icon": "family",
+     "text": null
+    },
+    {
+     "feature": "open_saloon",
+     "label": {
+      "cs": "Velkoprostorový vůz",
+      "en": "Open saloon"
+     },
+     "icon": "open_saloon",
+     "text": null
+    },
+    {
+     "feature": "children_cinema",
+     "label": {
+      "cs": "Dětské kino",
+      "en": "Children's cinema"
+     },
+     "icon": "cinema",
+     "text": null
+    },
+    {
+     "feature": "wifi",
+     "label": {
+      "cs": "Wi-Fi",
+      "en": "Wi-Fi"
+     },
+     "icon": "wifi",
+     "text": null
+    },
+    {
+     "feature": "power_sockets",
+     "label": {
+      "cs": "Zásuvky",
+      "en": "Power sockets"
+     },
+     "icon": "power_socket",
+     "text": null
+    }
+   ],
+   "destination": null,
+   "details": {
+    "label": "Velkoprostorový vůz 2. třídy; rozšířená přeprava spoluzavazadel s povinnou rezervací místa pro jízdní kolo; vůz nebo oddíly, vyhrazené pro cestující s dětmi do 10 let",
+    "number_star": "true"
+   },
+   "from_call": {
+    "sequence": 5,
+    "location_id": "czptt:stop:CZ:57076",
+    "name": "Praha hlavní nádraží"
+   },
+   "to_call": {
+    "sequence": 115,
+    "location_id": "czptt:stop:CZ:33425",
+    "name": "Břeclav"
+   },
+   "open": true,
+   "observed_at": "2026-11-04T21:41:04.342731+01:00"
+  },
+  {
+   "source": "cd",
+   "label": {
+    "cs": "České dráhy",
+    "en": "České dráhy"
+   },
+   "sequence": 5,
+   "kind": "coach",
+   "role": "train",
+   "vehicle_id": null,
+   "vehicle_type": "Bmpz 891",
+   "coach_number": "22",
+   "classes": [
+    2
+   ],
+   "features": [
+    {
+     "feature": "open_saloon",
+     "label": {
+      "cs": "Velkoprostorový vůz",
+      "en": "Open saloon"
+     },
+     "icon": "open_saloon",
+     "text": null
+    },
+    {
+     "feature": "wifi",
+     "label": {
+      "cs": "Wi-Fi",
+      "en": "Wi-Fi"
+     },
+     "icon": "wifi",
+     "text": null
+    },
+    {
+     "feature": "power_sockets",
+     "label": {
+      "cs": "Zásuvky",
+      "en": "Power sockets"
+     },
+     "icon": "power_socket",
+     "text": null
+    }
+   ],
+   "destination": null,
+   "details": {
+    "label": "Velkoprostorový vůz 2. třídy",
+    "number_star": "true"
+   },
+   "from_call": {
+    "sequence": 5,
+    "location_id": "czptt:stop:CZ:57076",
+    "name": "Praha hlavní nádraží"
+   },
+   "to_call": {
+    "sequence": 115,
+    "location_id": "czptt:stop:CZ:33425",
+    "name": "Břeclav"
+   },
+   "open": true,
+   "observed_at": "2026-11-04T21:41:04.342731+01:00"
+  },
+  {
+   "source": "cd",
+   "label": {
+    "cs": "České dráhy",
+    "en": "České dráhy"
+   },
+   "sequence": 6,
+   "kind": "coach",
+   "role": "train",
+   "vehicle_id": null,
+   "vehicle_type": "Bmpz 891",
+   "coach_number": "23",
+   "classes": [
+    2
+   ],
+   "features": [
+    {
+     "feature": "open_saloon",
+     "label": {
+      "cs": "Velkoprostorový vůz",
+      "en": "Open saloon"
+     },
+     "icon": "open_saloon",
+     "text": null
+    },
+    {
+     "feature": "quiet_zone",
+     "label": {
+      "cs": "Tichý oddíl",
+      "en": "Quiet zone"
+     },
+     "icon": "quiet",
+     "text": null
+    },
+    {
+     "feature": "wifi",
+     "label": {
+      "cs": "Wi-Fi",
+      "en": "Wi-Fi"
+     },
+     "icon": "wifi",
+     "text": null
+    },
+    {
+     "feature": "power_sockets",
+     "label": {
+      "cs": "Zásuvky",
+      "en": "Power sockets"
+     },
+     "icon": "power_socket",
+     "text": null
+    }
+   ],
+   "destination": null,
+   "details": {
+    "label": "Velkoprostorový vůz 2. třídy",
+    "number_star": "true"
+   },
+   "from_call": {
+    "sequence": 5,
+    "location_id": "czptt:stop:CZ:57076",
+    "name": "Praha hlavní nádraží"
+   },
+   "to_call": {
+    "sequence": 115,
+    "location_id": "czptt:stop:CZ:33425",
+    "name": "Břeclav"
+   },
+   "open": true,
+   "observed_at": "2026-11-04T21:41:04.342731+01:00"
+  },
+  {
+   "source": "cd",
+   "label": {
+    "cs": "České dráhy",
+    "en": "České dráhy"
+   },
+   "sequence": 7,
+   "kind": "coach",
+   "role": "train",
+   "vehicle_id": null,
+   "vehicle_type": "Bmpz 891",
+   "coach_number": "24",
+   "classes": [
+    2
+   ],
+   "features": [
+    {
+     "feature": "open_saloon",
+     "label": {
+      "cs": "Velkoprostorový vůz",
+      "en": "Open saloon"
+     },
+     "icon": "open_saloon",
+     "text": null
+    },
+    {
+     "feature": "wifi",
+     "label": {
+      "cs": "Wi-Fi",
+      "en": "Wi-Fi"
+     },
+     "icon": "wifi",
+     "text": null
+    },
+    {
+     "feature": "power_sockets",
+     "label": {
+      "cs": "Zásuvky",
+      "en": "Power sockets"
+     },
+     "icon": "power_socket",
+     "text": null
+    }
+   ],
+   "destination": null,
+   "details": {
+    "label": "Velkoprostorový vůz 2. třídy",
+    "number_star": "true"
+   },
+   "from_call": {
+    "sequence": 5,
+    "location_id": "czptt:stop:CZ:57076",
+    "name": "Praha hlavní nádraží"
+   },
+   "to_call": {
+    "sequence": 115,
+    "location_id": "czptt:stop:CZ:33425",
+    "name": "Břeclav"
+   },
+   "open": true,
+   "observed_at": "2026-11-04T21:41:04.342731+01:00"
+  },
+  {
+   "source": "cd",
+   "label": {
+    "cs": "České dráhy",
+    "en": "České dráhy"
+   },
+   "sequence": 8,
+   "kind": "coach",
+   "role": "train",
+   "vehicle_id": null,
+   "vehicle_type": "Bmpz 891",
+   "coach_number": "25",
+   "classes": [
+    2
+   ],
+   "features": [
+    {
+     "feature": "open_saloon",
+     "label": {
+      "cs": "Velkoprostorový vůz",
+      "en": "Open saloon"
+     },
+     "icon": "open_saloon",
+     "text": null
+    },
+    {
+     "feature": "wifi",
+     "label": {
+      "cs": "Wi-Fi",
+      "en": "Wi-Fi"
+     },
+     "icon": "wifi",
+     "text": null
+    },
+    {
+     "feature": "power_sockets",
+     "label": {
+      "cs": "Zásuvky",
+      "en": "Power sockets"
+     },
+     "icon": "power_socket",
+     "text": null
+    }
+   ],
+   "destination": null,
+   "details": {
+    "label": "Velkoprostorový vůz 2. třídy",
+    "number_star": "true"
+   },
+   "from_call": {
+    "sequence": 5,
+    "location_id": "czptt:stop:CZ:57076",
+    "name": "Praha hlavní nádraží"
+   },
+   "to_call": {
+    "sequence": 115,
+    "location_id": "czptt:stop:CZ:33425",
+    "name": "Břeclav"
+   },
+   "open": true,
+   "observed_at": "2026-11-04T21:41:04.342731+01:00"
+  },
+  {
+   "source": "cd",
+   "label": {
+    "cs": "České dráhy",
+    "en": "České dráhy"
+   },
+   "sequence": 9,
+   "kind": "coach",
+   "role": "train",
+   "vehicle_id": null,
+   "vehicle_type": "ARbmpz 892",
+   "coach_number": "26",
+   "classes": [
+    1
+   ],
+   "features": [
+    {
+     "feature": "wheelchair_lift",
+     "label": {
+      "cs": "Zvedací plošina pro vozík",
+      "en": "Wheelchair lift"
+     },
+     "icon": "wheelchair_lift",
+     "text": null
+    },
+    {
+     "feature": "open_saloon",
+     "label": {
+      "cs": "Velkoprostorový vůz",
+      "en": "Open saloon"
+     },
+     "icon": "open_saloon",
+     "text": null
+    },
+    {
+     "feature": "restaurant",
+     "label": {
+      "cs": "Restaurační vůz",
+      "en": "Restaurant car"
+     },
+     "icon": "restaurant",
+     "text": null
+    },
+    {
+     "feature": "wifi",
+     "label": {
+      "cs": "Wi-Fi",
+      "en": "Wi-Fi"
+     },
+     "icon": "wifi",
+     "text": null
+    },
+    {
+     "feature": "power_sockets",
+     "label": {
+      "cs": "Zásuvky",
+      "en": "Power sockets"
+     },
+     "icon": "power_socket",
+     "text": null
+    }
+   ],
+   "destination": null,
+   "details": {
+    "label": "Velkoprostorový vůz 1. třídy; vůz vhodný pro přepravu cestujících na vozíku, vybavený zvedací plošinou; restaurační vůz",
+    "number_star": "true"
+   },
+   "from_call": {
+    "sequence": 5,
+    "location_id": "czptt:stop:CZ:57076",
+    "name": "Praha hlavní nádraží"
+   },
+   "to_call": {
+    "sequence": 115,
+    "location_id": "czptt:stop:CZ:33425",
+    "name": "Břeclav"
+   },
+   "open": true,
+   "observed_at": "2026-11-04T21:41:04.342731+01:00"
+  },
+  {
+   "source": "cd",
+   "label": {
+    "cs": "České dráhy",
+    "en": "České dráhy"
+   },
+   "sequence": 10,
+   "kind": "coach",
+   "role": "train",
+   "vehicle_id": null,
+   "vehicle_type": "Afmpz 890",
+   "coach_number": "27",
+   "classes": [
+    1
+   ],
+   "features": [
+    {
+     "feature": "open_saloon",
+     "label": {
+      "cs": "Velkoprostorový vůz",
+      "en": "Open saloon"
+     },
+     "icon": "open_saloon",
+     "text": null
+    },
+    {
+     "feature": "business_compartment",
+     "label": {
+      "cs": "Business oddíl",
+      "en": "Business compartment"
+     },
+     "icon": "business",
+     "text": null
+    },
+    {
+     "feature": "wifi",
+     "label": {
+      "cs": "Wi-Fi",
+      "en": "Wi-Fi"
+     },
+     "icon": "wifi",
+     "text": null
+    },
+    {
+     "feature": "power_sockets",
+     "label": {
+      "cs": "Zásuvky",
+      "en": "Power sockets"
+     },
+     "icon": "power_socket",
+     "text": null
+    }
+   ],
+   "destination": null,
+   "details": {
+    "cab": "true",
+    "label": "Velkoprostorový vůz 1. třídy",
+    "number_star": "true"
+   },
+   "from_call": {
+    "sequence": 5,
+    "location_id": "czptt:stop:CZ:57076",
+    "name": "Praha hlavní nádraží"
+   },
+   "to_call": {
+    "sequence": 115,
+    "location_id": "czptt:stop:CZ:33425",
+    "name": "Břeclav"
+   },
+   "open": true,
+   "observed_at": "2026-11-04T21:41:04.342731+01:00"
+  }
+ ],
+ "segments": [
+  {
+   "from_call": {
+    "sequence": 5,
+    "location_id": "czptt:stop:CZ:57076",
+    "name": "Praha hlavní nádraží"
+   },
+   "to_call": {
+    "sequence": 115,
+    "location_id": "czptt:stop:CZ:33425",
+    "name": "Břeclav"
+   },
+   "units": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+   ]
+  }
+ ]
+}

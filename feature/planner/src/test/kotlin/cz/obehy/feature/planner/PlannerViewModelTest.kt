@@ -10,6 +10,7 @@ import cz.obehy.core.data.PlaceRepository
 import cz.obehy.core.data.SearchHistoryRepository
 import cz.obehy.core.data.SearchHistoryStore
 import cz.obehy.core.data.SettingsRepository
+import cz.obehy.core.data.TripRepository
 import cz.obehy.core.model.AppMode
 import cz.obehy.core.model.JourneyQuery
 import cz.obehy.core.model.LatLon
@@ -19,8 +20,10 @@ import cz.obehy.core.model.SearchOptions
 import cz.obehy.core.model.Suggestion
 import cz.obehy.core.model.TransportType
 import cz.obehy.core.network.MotisJson
+import cz.obehy.core.network.ObehyJson
 import cz.obehy.core.network.apiClient
 import cz.obehy.core.network.motis.MotisApi
+import cz.obehy.core.network.obehy.ObehyApi
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.MockEngineConfig
 import io.ktor.client.engine.mock.respond
@@ -114,6 +117,7 @@ class PlannerViewModelTest {
                 settings,
                 PlaceRepository(motis, dispatcher),
                 JourneyRepository(motis, dispatcher),
+                TripRepository(motis, ObehyApi(apiClient(engine, ObehyJson, "test")), settings, dispatcher),
                 location,
                 SearchHistoryRepository(store, settings),
                 dispatcher,

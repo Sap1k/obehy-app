@@ -21,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -302,12 +303,29 @@ fun DelayLabel(
     }
 }
 
-/** A platform or stand; outlined, and in the error colour with a spoken note when it changed. */
+/** How wide a column of [compact][PlatformLabel] labels must be for all of [tracks]; zero without any. */
+@Composable
+fun rememberPlatformWidth(tracks: List<String>): Dp {
+    val measurer = rememberTextMeasurer()
+    val density = LocalDensity.current
+    val style = MaterialTheme.typography.labelMedium
+    val padding = ObehyTheme.spacing.xs * 2
+    return remember(tracks, density, style, padding) {
+        val widest = tracks.maxOfOrNull { measurer.measure(it, style).size.width } ?: return@remember 0.dp
+        with(density) { widest.toDp() } + padding
+    }
+}
+
+/**
+ * A platform or stand; outlined, and in the error colour with a spoken note when it changed.
+ * [compact] leaves out the word, for a column of them under a heading the reader already knows.
+ */
 @Composable
 fun PlatformLabel(
     track: String,
     changed: Boolean,
     modifier: Modifier = Modifier,
+    compact: Boolean = false,
 ) {
     val color = if (changed) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
     val spoken =
@@ -320,7 +338,7 @@ fun PlatformLabel(
             stringResource(R.string.platform, track)
         }
     Text(
-        stringResource(R.string.platform, track),
+        if (compact) track else stringResource(R.string.platform, track),
         modifier
             .semantics { contentDescription = spoken }
             .border(1.dp, color, MaterialTheme.shapes.extraSmall)

@@ -53,11 +53,19 @@ data class Sizes(
     /** A stop passed on the way, on the route line. */
     val routePassMarker: Dp = 10.dp,
     /** A journey's map at the head of its screen. */
-    val heroMap: Dp = 240.dp,
-    /** The small button that opens a map's credits. */
-    val mapCredits: Dp = 28.dp,
+    val heroMap: Dp = 320.dp,
+    /** What's left of it when the content has scrolled up: still a map worth looking at. */
+    val heroMapStrip: Dp = 240.dp,
     /** The widest the results stay when a journey's detail is open beside them. */
     val listPane: Dp = 400.dp,
+    /** One vehicle in a train's composition, and how far a cab end slants in. */
+    val coachWidth: Dp = 80.dp,
+    val coachHeight: Dp = 48.dp,
+    val coachCab: Dp = 14.dp,
+    /** The cookie a small icon sits on, at the start of a line of information. */
+    val iconCookie: Dp = 32.dp,
+    /** A vehicle on a map. */
+    val mapVehicle: Dp = 28.dp,
 )
 
 internal val LocalSpacing = staticCompositionLocalOf { Spacing() }

@@ -18,8 +18,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
+import cz.obehy.core.map.HeroFocus
+import cz.obehy.core.map.PreloadRouteMaps
 import cz.obehy.core.map.RouteMap
 import cz.obehy.core.model.JourneyQuery
+import cz.obehy.core.model.Leg
 import cz.obehy.core.ui.ObehyHeroScreen
 import cz.obehy.core.ui.ObehyTheme
 import cz.obehy.core.ui.SharedBounds
@@ -35,9 +38,10 @@ private val REFRESH_EVERY: Duration = Duration.ofMinutes(1)
 @Composable
 internal fun ItineraryDestination(
     viewModel: PlannerViewModel,
-    mapOpen: Boolean,
+    covered: Boolean,
     onBack: () -> Unit,
     onMap: () -> Unit,
+    onOpenTrip: (Leg.Transit) -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val open = state.open
@@ -47,6 +51,11 @@ internal fun ItineraryDestination(
         LaunchedEffect(Unit) { back() }
         return
     }
+    // The trips of its rides, so that opening one finds its map drawn.
+    val tripMaps by rememberUpdatedState(state.tripMaps)
+    PreloadRouteMaps(
+        around = { legs -> tripMaps.firstOrNull { it.legs === legs }?.around },
+    ) { tripMaps.map { it.legs } }
     // While the journey is on screen, its times are kept at most a minute old.
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val fetchedAt by rememberUpdatedState(open.fetchedAt)
@@ -59,7 +68,15 @@ internal fun ItineraryDestination(
             }
         }
     }
-    ItineraryScreen(open, state.query, mapOpen, onBack, onMap, onRefresh = { viewModel.act(PlannerAction.Refresh) })
+    ItineraryScreen(
+        open,
+        state.query,
+        covered,
+        onBack,
+        onMap,
+        onRefresh = { viewModel.act(PlannerAction.Refresh) },
+        onOpenTrip = onOpenTrip,
+    )
 }
 
 /** One journey: its map at the head, collapsing into the bar as the timeline scrolls. */
@@ -67,26 +84,29 @@ internal fun ItineraryDestination(
 internal fun ItineraryScreen(
     open: OpenJourney,
     query: JourneyQuery,
-    mapOpen: Boolean,
+    covered: Boolean,
     onBack: () -> Unit,
     onMap: () -> Unit,
     onRefresh: () -> Unit,
+    onOpenTrip: (Leg.Transit) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val itinerary = open.itinerary
-    SharedBounds(itinerary.key, modifier, holdOnExit = mapOpen) {
+    SharedBounds(itinerary.key, modifier, holdOnExit = covered) {
         ObehyHeroScreen(
             title = stringResource(R.string.times, itinerary.start.expected.clock(), itinerary.end.expected.clock()),
             subtitle = journeySummary(open),
             onBack = onBack,
-            hero = {
-                SharedBounds(mapKey(open), Modifier.fillMaxSize()) { RouteMap(itinerary.legs, Modifier.fillMaxSize()) }
+            hero = { shrunk ->
+                SharedBounds(mapKey(open), Modifier.fillMaxSize()) {
+                    RouteMap(itinerary.legs, Modifier.fillMaxSize(), shrunk = shrunk, focus = HeroFocus.Leave)
+                }
             },
             onHeroClick = onMap,
             refreshing = open.refreshing,
             onRefresh = onRefresh,
         ) {
-            ItineraryTimeline(itinerary, query.from?.label(), query.to?.label())
+            ItineraryTimeline(itinerary, query.from?.label(), query.to?.label(), onOpenTrip)
         }
     }
 }

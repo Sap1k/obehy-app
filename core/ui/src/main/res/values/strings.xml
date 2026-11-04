@@ -28,4 +28,8 @@
     <string name="live">live</string>
     <string name="time_moved">%1$s, live, planned for %2$s</string>
     <string name="time_live">%s, live</string>
+    <string name="unit_locomotive">Locomotive</string>
+    <string name="unit_coach">Coach</string>
+    <string name="unit_coach_numbered">Coach %s</string>
+    <string name="unit_with_class">%1$s, class %2$s</string>
 </resources>

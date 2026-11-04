@@ -8,9 +8,12 @@ import cz.obehy.core.model.Leg
 import cz.obehy.core.model.Mode
 import cz.obehy.core.model.Place
 import cz.obehy.core.model.PlaceKind
+import cz.obehy.core.model.Reservation
 import cz.obehy.core.model.SearchOptions
 import cz.obehy.core.model.StopCall
 import cz.obehy.core.model.TimePoint
+import cz.obehy.core.model.TripAlert
+import cz.obehy.core.model.TripLinks
 import java.time.Instant
 
 // MOTIS answers → domain types, and domain searches → MOTIS requests. Nothing MOTIS-shaped
@@ -89,6 +92,10 @@ internal fun MotisItinerary.toItinerary(): Itinerary =
 
 fun MotisItinerary.toDomain(): Itinerary = toItinerary()
 
+/** The ride of the trip [tripId] in this answer to a trip lookup. */
+fun MotisItinerary.toTrip(tripId: String): Leg.Transit? =
+    (legs.firstOrNull { it.tripId == tripId } ?: legs.firstOrNull { it.mode != "WALK" })?.toLeg() as? Leg.Transit
+
 internal fun MotisLeg.toLeg(): Leg {
     val start = TimePoint(instant(scheduledStartTime), instant(startTime), realTime)
     val end = TimePoint(instant(scheduledEndTime), instant(endTime), realTime)
@@ -119,19 +126,51 @@ internal fun MotisLeg.toLeg(): Leg {
         intermediateStops = intermediateStops.map { it.toStopCall(realTime) },
         staySeated = interlineWithPreviousLeg,
         path = path(),
+        tripShortName = tripShortName?.takeIf { it.isNotBlank() },
+        bikesAllowed = bikesAllowed,
+        links = TripLinks(agencyFareUrl.webLink(), routeUrl.webLink(), agencyUrl.webLink()),
+        reservation =
+            when (reservation) {
+                null, "NONE" -> null
+                "COMPULSORY" -> Reservation.Required
+                else -> Reservation.Possible
+            },
+        alerts = alerts.mapNotNull { it.toAlert() },
     )
 }
+
+/** A feed's link, if it's one a browser should be sent to. */
+private fun String?.webLink(): String? =
+    this?.trim()?.takeIf { it.startsWith("https://", ignoreCase = true) || it.startsWith("http://", ignoreCase = true) }
+
+/** Whether a time is live: MOTIS says per time, and the leg's flag only answers for servers that don't. */
+private fun isLive(
+    reason: String?,
+    realtime: Boolean,
+): Boolean =
+    when (reason) {
+        null -> realtime
+        "NO_RT_DATA", "SCHEDULED" -> false
+        else -> true
+    }
+
+private fun MotisAlert.toAlert(): TripAlert? =
+    headerText?.takeIf { it.isNotBlank() }?.let { title ->
+        TripAlert(title, descriptionText?.takeIf { it.isNotBlank() }, severityLevel.equals("SEVERE", ignoreCase = true))
+    }
 
 private fun MotisPlace.toStopCall(realtime: Boolean): StopCall =
     StopCall(
         name = name,
         stopId = stopId,
-        arrival = timePoint(scheduledArrival, arrival, realtime),
-        departure = timePoint(scheduledDeparture, departure, realtime),
+        arrival = timePoint(scheduledArrival, arrival, isLive(arrivalTimestampReason, realtime)),
+        departure = timePoint(scheduledDeparture, departure, isLive(departureTimestampReason, realtime)),
         track = track ?: scheduledTrack,
         scheduledTrack = scheduledTrack,
         cancelled = cancelled,
         position = LatLon(lat, lon),
+        noBoarding = pickupType == "NOT_ALLOWED",
+        noAlighting = dropoffType == "NOT_ALLOWED",
     )
 
 private fun MotisLeg.path(): List<LatLon> =

@@ -36,6 +36,18 @@ data class LatLon(
     }
 }
 
+/** Where the feed points to for more about a ride. */
+data class TripLinks(
+    val tickets: String? = null,
+    val line: String? = null,
+    val operator: String? = null,
+) {
+    val isEmpty: Boolean get() = tickets == null && line == null && operator == null
+}
+
+/** What the feed says about booking a seat; the absence of this says nothing either way. */
+enum class Reservation { Possible, Required }
+
 /** A stop on a journey and its times there. */
 data class StopCall(
     val name: String,
@@ -47,6 +59,9 @@ data class StopCall(
     val scheduledTrack: String?,
     val cancelled: Boolean = false,
     val position: LatLon? = null,
+    /** The timetable lets nobody on, or nobody off, here. */
+    val noBoarding: Boolean = false,
+    val noAlighting: Boolean = false,
 ) {
     val trackChanged: Boolean get() = track != null && scheduledTrack != null && track != scheduledTrack
 }
@@ -102,6 +117,13 @@ sealed interface Leg {
         val staySeated: Boolean = false,
         override val path: List<LatLon> = emptyList(),
         val enrichment: LegEnrichment = LegEnrichment.Pending,
+        /** The train's own number or the like (`R 600`), apart from the line in [name]. */
+        val tripShortName: String? = null,
+        /** True or false when the feed says so, null when it doesn't. */
+        val bikesAllowed: Boolean? = null,
+        val reservation: Reservation? = null,
+        val links: TripLinks = TripLinks(),
+        val alerts: List<TripAlert> = emptyList(),
     ) : Leg
 }
 
