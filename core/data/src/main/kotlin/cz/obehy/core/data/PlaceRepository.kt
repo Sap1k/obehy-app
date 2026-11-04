@@ -55,14 +55,15 @@ internal fun mergeDuplicateStops(matches: List<MotisMatch>): List<Place> {
             }
         if (group != null) group += match else groups += mutableListOf(match)
     }
-    return groups.map { group ->
-        val best = group.firstOrNull { it.isDomestic() } ?: group.first()
-        val place = best.toPlace()
-        when (place.kind) {
-            PlaceKind.Stop -> place.copy(modes = group.flatMapTo(mutableSetOf()) { it.toPlace().modes })
-            else -> place
-        }
-    }
+    return groups
+        .map { group ->
+            val best = group.firstOrNull { it.isDomestic() } ?: group.first()
+            val place = best.toPlace()
+            when (place.kind) {
+                PlaceKind.Stop -> place.copy(modes = group.flatMapTo(mutableSetOf()) { it.toPlace().modes })
+                else -> place
+            }
+        }.distinctBy { it.id }
 }
 
 /** Whether the feed this stop comes from (the ID's `cz-…` tag) is from the stop's country. */

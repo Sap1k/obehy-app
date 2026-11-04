@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
@@ -60,6 +61,9 @@ internal fun PlaceSearchScreen(
 ) {
     val focus = remember { FocusRequester() }
     LaunchedEffect(Unit) { focus.requestFocus() }
+    val list = rememberLazyListState()
+    // A list keeps its place by item, so it would stay on an old result as new ones come in above.
+    LaunchedEffect(search.text, search.results) { list.requestScrollToItem(0) }
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -103,6 +107,7 @@ internal fun PlaceSearchScreen(
         // The list ends above the keyboard, so every result can be scrolled into view.
         LazyColumn(
             Modifier.fillMaxSize().padding(padding).consumeWindowInsets(padding),
+            state = list,
             contentPadding = WindowInsets.ime.asPaddingValues(),
         ) {
             if (search.loading) {

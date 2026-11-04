@@ -18,7 +18,8 @@ import java.time.Instant
 
 fun MotisMatch.toPlace(): Place =
     Place(
-        id = id,
+        // MOTIS gives addresses an empty id, but a place needs one of its own.
+        id = id.ifEmpty { "$lat,$lon" },
         name = name,
         area = areas.lastOrNull()?.name?.takeIf { it != name },
         kind =

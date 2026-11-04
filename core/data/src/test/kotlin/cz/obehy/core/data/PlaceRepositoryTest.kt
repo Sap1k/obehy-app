@@ -42,4 +42,18 @@ class PlaceRepositoryTest {
 
         assertEquals(2, places.size)
     }
+
+    @Test
+    fun `addresses without an id still get one each, as the results list needs`() {
+        val places =
+            mergeDuplicateStops(
+                listOf(
+                    MotisMatch("ADDRESS", "Husova 1", "", 49.95, 14.07),
+                    MotisMatch("ADDRESS", "Husova 1", "", 49.39, 15.58),
+                    MotisMatch("ADDRESS", "Husova 1", "", 49.39, 15.58),
+                ),
+            )
+
+        assertEquals(listOf("49.95,14.07", "49.39,15.58"), places.map { it.id })
+    }
 }
