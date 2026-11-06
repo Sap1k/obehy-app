@@ -15,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.ErrorOutline
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
@@ -69,25 +70,38 @@ internal fun CustomServerWizard(
 
                     is ServerWizard.Checking -> {
                         StepList(wizard.step, failed = false)
-                        TextButton(onClick = onClose) { Text(stringResource(R.string.server_cancel)) }
+                        TextButton(
+                            onClick = onClose,
+                            shapes = ButtonDefaults.shapes(),
+                        ) { Text(stringResource(R.string.server_cancel)) }
                     }
 
                     is ServerWizard.Passed -> {
                         StepList(current = null, failed = false)
                         Text(stringResource(R.string.server_passed_body, wizard.version))
-                        Button(onClick = onUse, modifier = Modifier.fillMaxWidth()) {
+                        Button(onClick = onUse, shapes = ButtonDefaults.shapes(), modifier = Modifier.fillMaxWidth()) {
                             Text(stringResource(R.string.server_use))
                         }
-                        TextButton(onClick = onEdit) { Text(stringResource(R.string.server_edit)) }
+                        TextButton(
+                            onClick = onEdit,
+                            shapes = ButtonDefaults.shapes(),
+                        ) { Text(stringResource(R.string.server_edit)) }
                     }
 
                     is ServerWizard.Failed -> {
                         StepList(wizard.step, failed = true)
                         Text(stringResource(wizard.step.failure))
-                        Button(onClick = onRetry, modifier = Modifier.fillMaxWidth()) {
+                        Button(
+                            onClick = onRetry,
+                            shapes = ButtonDefaults.shapes(),
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
                             Text(stringResource(R.string.server_retry))
                         }
-                        TextButton(onClick = onEdit) { Text(stringResource(R.string.server_edit)) }
+                        TextButton(
+                            onClick = onEdit,
+                            shapes = ButtonDefaults.shapes(),
+                        ) { Text(stringResource(R.string.server_edit)) }
                     }
                 }
             }
@@ -146,7 +160,12 @@ private fun AddressStage(
                 ),
             keyboardActions = KeyboardActions(onGo = { onCheck() }),
         )
-        Button(onClick = onCheck, modifier = Modifier.fillMaxWidth(), enabled = state.address.isNotBlank()) {
+        Button(
+            onClick = onCheck,
+            shapes = ButtonDefaults.shapes(),
+            modifier = Modifier.fillMaxWidth(),
+            enabled = state.address.isNotBlank(),
+        ) {
             Text(stringResource(R.string.server_check))
         }
     }

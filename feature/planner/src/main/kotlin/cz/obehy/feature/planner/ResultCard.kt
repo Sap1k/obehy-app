@@ -5,6 +5,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
@@ -32,10 +33,9 @@ import cz.obehy.core.ui.components.DelayLabel
 import cz.obehy.core.ui.components.JourneyBar
 import cz.obehy.core.ui.components.LowFloorIcon
 import cz.obehy.core.ui.components.TimeLabel
+import cz.obehy.core.ui.pressScale
+import cz.obehy.core.ui.scaledBy
 import java.time.Instant
-
-/** How far a connection sinks in while it is pressed. */
-private const val PRESSED_SCALE = 0.97f
 
 /**
  * One connection in a connected list of [count] results: when, then the bar of its legs, then how
@@ -52,23 +52,15 @@ internal fun ResultCard(
     modifier: Modifier = Modifier,
 ) {
     val press = remember { MutableInteractionSource() }
-    val pressed by press.collectIsPressedAsState()
-    val scale by animateFloatAsState(
-        if (pressed) PRESSED_SCALE else 1f,
-        MaterialTheme.motionScheme.fastSpatialSpec(),
-    )
+    val scale = pressScale(press)
     SegmentedListItem(
         selected = selected,
         onClick = onClick,
         shapes = ListItemDefaults.segmentedShapes(index, count),
-        modifier =
-            modifier.fillMaxWidth().graphicsLayer {
-                scaleX = scale
-                scaleY = scale
-            },
+        modifier = modifier.fillMaxWidth().scaledBy(scale),
         colors =
             ListItemDefaults.segmentedColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+                containerColor = ObehyTheme.cardColor,
                 selectedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
             ),
         interactionSource = press,
@@ -88,12 +80,14 @@ internal fun ResultCard(
                 TimeLabel(itinerary.end)
             }
             JourneyBar(itinerary.legs, measurer = measurer)
-            Row(
+            FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.s),
-                verticalAlignment = Alignment.CenterVertically,
+                itemVerticalAlignment = Alignment.CenterVertically,
             ) {
+                // How long it takes is what connections get compared by.
+                Text(itinerary.duration.spoken(), style = MaterialTheme.typography.labelLargeEmphasized)
                 Text(
-                    listOf(itinerary.duration.spoken(), transfersText(itinerary.transfers)).joinToString(" · "),
+                    transfersText(itinerary.transfers),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

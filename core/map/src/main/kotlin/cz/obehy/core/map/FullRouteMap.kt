@@ -54,6 +54,7 @@ fun FullRouteMap(
         )
         FilledTonalIconButton(
             onClick = onBack,
+            shapes = IconButtonDefaults.shapes(),
             modifier = Modifier.safeDrawingPadding().padding(ObehyTheme.spacing.s),
         ) {
             Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(UiR.string.back))
@@ -82,7 +83,13 @@ fun FollowButton(
     onFollowingChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    FilledIconToggleButton(following, onFollowingChange, modifier, colors = mapToggleColors()) {
+    FilledIconToggleButton(
+        following,
+        onFollowingChange,
+        shapes = IconButtonDefaults.toggleableShapes(),
+        modifier,
+        colors = mapToggleColors(),
+    ) {
         Icon(Icons.Rounded.NearMe, contentDescription = stringResource(R.string.map_follow))
     }
 }
@@ -94,7 +101,13 @@ fun WholeJourneyButton(
     onWholeChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    FilledIconToggleButton(whole, onWholeChange, modifier, colors = mapToggleColors()) {
+    FilledIconToggleButton(
+        whole,
+        onWholeChange,
+        shapes = IconButtonDefaults.toggleableShapes(),
+        modifier,
+        colors = mapToggleColors(),
+    ) {
         Icon(Icons.Rounded.ZoomOutMap, contentDescription = stringResource(R.string.map_whole_journey))
     }
 }

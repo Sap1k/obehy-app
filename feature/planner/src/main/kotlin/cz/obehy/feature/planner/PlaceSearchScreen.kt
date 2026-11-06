@@ -39,6 +39,7 @@ import androidx.compose.material.icons.rounded.NearMe
 import androidx.compose.material.icons.rounded.Place
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
@@ -59,7 +60,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
@@ -103,7 +106,7 @@ internal fun PlaceSearchScreen(
         topBar = {
             TopAppBar(
                 navigationIcon = {
-                    IconButton(onClick = onClose) {
+                    IconButton(onClick = onClose, shapes = IconButtonDefaults.shapes()) {
                         Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(UiR.string.back))
                     }
                 },
@@ -125,7 +128,7 @@ internal fun PlaceSearchScreen(
                         },
                         trailingIcon = {
                             if (search.text.isNotEmpty()) {
-                                IconButton(onClick = { onType("") }) {
+                                IconButton(onClick = { onType("") }, shapes = IconButtonDefaults.shapes()) {
                                     Icon(Icons.Rounded.Close, contentDescription = stringResource(R.string.place_clear))
                                 }
                             }
@@ -148,9 +151,7 @@ internal fun PlaceSearchScreen(
             state = list,
             contentPadding = WindowInsets.ime.asPaddingValues(),
         ) {
-            if (search.loading) {
-                item { LinearWavyProgressIndicator(Modifier.fillMaxWidth().padding(horizontal = ObehyTheme.spacing.l)) }
-            }
+            if (search.loading) item { SearchProgress() }
             val note =
                 when {
                     search.failed -> R.string.place_error
@@ -300,6 +301,19 @@ private fun NearbyLoading(modifier: Modifier = Modifier) {
 
 private const val KEYBOARD_ARRIVAL_MS = 1_000L
 
+/** Only for a wait worth showing: an answer in a moment shouldn't flash a bar on its way. */
+@Composable
+private fun SearchProgress(modifier: Modifier = Modifier) {
+    var shown by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        delay(NOTICEABLE_WAIT_MS)
+        shown = true
+    }
+    if (shown) LinearWavyProgressIndicator(modifier.fillMaxWidth().padding(horizontal = ObehyTheme.spacing.l))
+}
+
+private const val NOTICEABLE_WAIT_MS = 200L
+
 /** The title over a group of rows. */
 @Composable
 internal fun SectionTitle(
@@ -328,6 +342,7 @@ private fun PlaceRow(
     detail: String? = place.area,
     onLongClick: (() -> Unit)? = null,
 ) {
+    val haptics = LocalHapticFeedback.current
     ListItem(
         headlineContent = { Text(place.label()) },
         supportingContent = detail?.let { { Text(it) } },
@@ -351,7 +366,13 @@ private fun PlaceRow(
         modifier =
             modifier.combinedClickable(
                 onLongClickLabel = onLongClick?.let { stringResource(R.string.forget) },
-                onLongClick = onLongClick,
+                onLongClick =
+                    onLongClick?.let { forget ->
+                        {
+                            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                            forget()
+                        }
+                    },
                 onClick = onClick,
             ),
     )

@@ -28,6 +28,7 @@ import androidx.compose.material.icons.rounded.ExpandMore
 import androidx.compose.material.icons.rounded.HourglassTop
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.PanTool
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearWavyProgressIndicator
@@ -515,7 +516,7 @@ internal fun NotesSection(
             ) {
                 SegmentedRows(notes.long) { InfoRow(Icons.Rounded.Info, it.sentence()) }
             }
-            TextButton(onClick = { open = !open }) {
+            TextButton(onClick = { open = !open }, shapes = ButtonDefaults.shapes()) {
                 Text(
                     if (open) {
                         stringResource(R.string.trip_fewer_notes)
@@ -544,14 +545,14 @@ internal fun ConnectionsSection(
         SegmentedRows(connections) { connection ->
             val what =
                 listOfNotNull(connection.line, connection.destination)
-                    .joinToString(" · ")
+                    .joinToString(" → ")
                     .ifEmpty { stringResource(R.string.trip_connection_any) }
             val meta =
                 listOfNotNull(
                     connection.stopName,
                     connection.waitMinutes?.let { stringResource(R.string.trip_wait_minutes, it) },
                     connection.note,
-                ).joinToString(" · ")
+                ).joinToString(", ")
             InfoRow(
                 if (connection.waitsForIt) Icons.Rounded.HourglassTop else Icons.AutoMirrored.Rounded.ArrowForward,
                 stringResource(

@@ -75,7 +75,7 @@ class DesignSystemDetector :
     }
 
     override fun getApplicableMethodNames(): List<String> =
-        listOf("Color", "FontFamily", "RoundedCornerShape", "CutCornerShape", "Text")
+        listOf("Color", "FontFamily", "RoundedCornerShape", "CutCornerShape", "Text") + BUTTONS
 
     override fun visitMethodCall(
         context: JavaContext,
@@ -99,6 +99,17 @@ class DesignSystemDetector :
                     RAW_SHAPE,
                     "A hand-made shape: use `MaterialTheme.shapes`, `MaterialShapes` or the component's default",
                 )
+            }
+
+            owner.startsWith("androidx.compose.material3.") && method.name in BUTTONS -> {
+                if (node.valueArguments.none { it.getExpressionType()?.canonicalText?.endsWith("Shapes") == true }) {
+                    report(
+                        context,
+                        node,
+                        STATIC_BUTTON,
+                        "A button that doesn't react to the press: pass `shapes`, such as `ButtonDefaults.shapes()`",
+                    )
+                }
             }
 
             owner.startsWith("androidx.compose.material3.") && method.name.substringBefore('-') == "Text" -> {
@@ -193,6 +204,23 @@ class DesignSystemDetector :
 
         // Transparent and Unspecified are left out on purpose: "no colour" and "inherit".
 
+        private val BUTTONS =
+            listOf(
+                "Button",
+                "ElevatedButton",
+                "FilledTonalButton",
+                "OutlinedButton",
+                "TextButton",
+                "IconButton",
+                "FilledIconButton",
+                "FilledTonalIconButton",
+                "OutlinedIconButton",
+                "IconToggleButton",
+                "FilledIconToggleButton",
+                "FilledTonalIconToggleButton",
+                "OutlinedIconToggleButton",
+            )
+
         private fun issue(
             id: String,
             brief: String,
@@ -243,6 +271,14 @@ class DesignSystemDetector :
                     "Czech (`values-cs`) version.",
             )
 
-        val ISSUES = listOf(RAW_COLOR, RAW_TYPOGRAPHY, RAW_DIMENSION, RAW_SHAPE, HARDCODED_TEXT)
+        val STATIC_BUTTON =
+            issue(
+                "ObehyStaticButton",
+                "Button without shape morphing",
+                "Material 3 Expressive buttons change shape when pressed, but only through the overloads that " +
+                    "take `shapes`.",
+            )
+
+        val ISSUES = listOf(RAW_COLOR, RAW_TYPOGRAPHY, RAW_DIMENSION, RAW_SHAPE, HARDCODED_TEXT, STATIC_BUTTON)
     }
 }

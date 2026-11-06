@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
@@ -402,7 +403,7 @@ private fun MapCredits(
     modifier: Modifier = Modifier,
 ) {
     var open by rememberSaveable { mutableStateOf(false) }
-    FilledTonalIconButton(onClick = { open = true }, modifier) {
+    FilledTonalIconButton(onClick = { open = true }, shapes = IconButtonDefaults.shapes(), modifier) {
         Icon(Icons.Outlined.Info, contentDescription = stringResource(R.string.map_credits))
     }
     if (open) {

@@ -11,6 +11,10 @@ import androidx.compose.material.icons.outlined.DepartureBoard
 import androidx.compose.material.icons.outlined.Directions
 import androidx.compose.material.icons.outlined.Map
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.rounded.DepartureBoard
+import androidx.compose.material.icons.rounded.Directions
+import androidx.compose.material.icons.rounded.Map
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -60,17 +64,42 @@ private data class TopLevel(
     val routeClass: KClass<*>,
     @StringRes val label: Int,
     val icon: ImageVector,
+    val selectedIcon: ImageVector,
 )
 
 /** The top-level destinations per mode: the live map comes from Oběhy. */
 private fun destinations(mode: AppMode): List<TopLevel> =
     buildList {
-        add(TopLevel(PlannerRoute, PlannerRoute::class, R.string.nav_journeys, Icons.Outlined.Directions))
-        add(TopLevel(DeparturesRoute, DeparturesRoute::class, R.string.nav_departures, Icons.Outlined.DepartureBoard))
+        add(
+            TopLevel(
+                PlannerRoute,
+                PlannerRoute::class,
+                R.string.nav_journeys,
+                Icons.Outlined.Directions,
+                Icons.Rounded.Directions,
+            ),
+        )
+        add(
+            TopLevel(
+                DeparturesRoute,
+                DeparturesRoute::class,
+                R.string.nav_departures,
+                Icons.Outlined.DepartureBoard,
+                Icons.Rounded.DepartureBoard,
+            ),
+        )
         if (mode.usesObehy) {
-            add(TopLevel(MapRoute, MapRoute::class, R.string.nav_map, Icons.Outlined.Map))
+            add(TopLevel(MapRoute, MapRoute::class, R.string.nav_map, Icons.Outlined.Map, Icons.Rounded.Map))
         }
-        add(TopLevel(SettingsRoute, SettingsRoute::class, R.string.nav_settings, Icons.Outlined.Settings))
+        add(
+            TopLevel(
+                SettingsRoute,
+                SettingsRoute::class,
+                R.string.nav_settings,
+                Icons.Outlined.Settings,
+                Icons.Rounded.Settings,
+            ),
+        )
     }
 
 /** A screen that grows out of something on the one before, which stays put under it. */
@@ -102,11 +131,12 @@ fun ObehyShell(
         state = bar,
         navigationItems = {
             destinations(mode).forEach { top ->
+                // A trip is opened from a journey, so the journeys tab stays lit under it.
+                val selected =
+                    current?.hierarchy?.any { it.hasRoute(top.routeClass) } == true ||
+                        (top.routeClass == PlannerRoute::class && current?.hasRoute(TripRoute::class) == true)
                 NavigationSuiteItem(
-                    // A trip is opened from a journey, so the journeys tab stays lit under it.
-                    selected =
-                        current?.hierarchy?.any { it.hasRoute(top.routeClass) } == true ||
-                            (top.routeClass == PlannerRoute::class && current?.hasRoute(TripRoute::class) == true),
+                    selected = selected,
                     onClick = {
                         nav.navigate(top.route) {
                             popUpTo(nav.graph.findStartDestination().id) { saveState = true }
@@ -114,7 +144,7 @@ fun ObehyShell(
                             restoreState = true
                         }
                     },
-                    icon = { Icon(top.icon, contentDescription = null) },
+                    icon = { Icon(if (selected) top.selectedIcon else top.icon, contentDescription = null) },
                     label = { Text(stringResource(top.label)) },
                 )
             }

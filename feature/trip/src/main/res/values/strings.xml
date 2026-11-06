@@ -8,7 +8,7 @@
     <string name="trip_train_order">Train order</string>
     <string name="trip_direction">Direction of travel</string>
     <string name="trip_finding_order">Finding out the train\'s order…</string>
-    <string name="trip_checking">%s · checking…</string>
+    <string name="trip_checking">%s, checking…</string>
     <string name="trip_span">%1$s – %2$s</string>
     <string name="trip_notes">Notes</string>
     <string name="trip_more_notes">More notes (%d)</string>

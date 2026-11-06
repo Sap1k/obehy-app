@@ -27,10 +27,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -51,6 +51,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
+import cz.obehy.core.ui.components.ObehyPullToRefresh
 
 /** How tall a hero stands when the content has scrolled up, status bar included. */
 @Composable
@@ -63,7 +64,7 @@ fun heroFullHeight(): Dp = ObehyTheme.sizes.heroMap + WindowInsets.statusBars.as
 
 /**
  * A screen led by a picture (a journey's map), edge to edge under the status bar with a floating
- * back button. A sheet lies over its lower edge, holding the [title] and [subtitle], or [header]
+ * back button. A sheet lies over its lower edge, holding the [title], or [header]
  * in their place. As the content scrolls, the [hero] shrinks to a strip and the sheet stays right
  * under it; [hero] is told how far along that is, from 0 to 1, to keep what it shows in view.
  * Tapping the hero calls [onHeroClick]; pulling the content down calls [onRefresh]. With
@@ -75,7 +76,6 @@ fun ObehyHeroScreen(
     onBack: () -> Unit,
     hero: @Composable (shrunk: () -> Float) -> Unit,
     modifier: Modifier = Modifier,
-    subtitle: String? = null,
     header: (@Composable ColumnScope.() -> Unit)? = null,
     onHeroClick: (() -> Unit)? = null,
     refreshing: Boolean = false,
@@ -146,12 +146,13 @@ fun ObehyHeroScreen(
                         if (header != null) {
                             header()
                         } else {
-                            HeroTitle(title, subtitle)
+                            HeroTitle(title)
                         }
                     }
                 }
                 FilledTonalIconButton(
                     onClick = onBack,
+                    shapes = IconButtonDefaults.shapes(),
                     modifier = Modifier.statusBarsPadding().padding(ObehyTheme.spacing.s),
                 ) {
                     Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.back))
@@ -167,40 +168,26 @@ fun ObehyHeroScreen(
             }
         }
         if (onRefresh != null) {
-            PullToRefreshBox(
-                isRefreshing = refreshing,
-                onRefresh = onRefresh,
-                modifier = Modifier.fillMaxSize().padding(padding),
-            ) { body() }
+            ObehyPullToRefresh(refreshing, onRefresh, Modifier.fillMaxSize().padding(padding)) { body() }
         } else {
             Box(Modifier.fillMaxSize().padding(padding)) { body() }
         }
     }
 }
 
+/** The title on a hero's sheet, for a [ObehyHeroScreen] header that shows it only some of the time. */
 @Composable
-private fun HeroTitle(
+fun HeroTitle(
     title: String,
-    subtitle: String?,
     modifier: Modifier = Modifier,
 ) {
-    Column(modifier) {
-        Text(
-            title,
-            style = MaterialTheme.typography.titleLargeEmphasized,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
-        subtitle?.let {
-            Text(
-                it,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-        }
-    }
+    Text(
+        title,
+        modifier,
+        style = MaterialTheme.typography.titleLargeEmphasized,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+    )
 }
 
 /**

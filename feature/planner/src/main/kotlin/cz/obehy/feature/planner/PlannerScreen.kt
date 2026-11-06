@@ -3,20 +3,24 @@ package cz.obehy.feature.planner
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -25,28 +29,41 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.CloudOff
+import androidx.compose.material.icons.rounded.Directions
 import androidx.compose.material.icons.rounded.History
+import androidx.compose.material.icons.rounded.KeyboardArrowUp
+import androidx.compose.material.icons.rounded.LocationOff
 import androidx.compose.material.icons.rounded.RestartAlt
+import androidx.compose.material.icons.rounded.SearchOff
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedListItem
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -64,8 +81,11 @@ import cz.obehy.core.ui.ObehyScreen
 import cz.obehy.core.ui.ObehyTheme
 import cz.obehy.core.ui.SharedBounds
 import cz.obehy.core.ui.TitleBar
+import cz.obehy.core.ui.components.ObehyPullToRefresh
 import cz.obehy.core.ui.components.StaggeredEntry
+import cz.obehy.core.ui.components.StateMessage
 import cz.obehy.core.ui.isWideWindow
+import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.Instant
 
@@ -109,10 +129,15 @@ internal fun PlannerDestination(
                     .graphicsLayer { alpha = if (covered) 0f else 1f }
                     .then(if (covered) Modifier.clearAndSetSemantics {} else Modifier),
         )
+        val motion = MaterialTheme.motionScheme
         AnimatedVisibility(
             picker,
-            enter = fadeIn(tween(PICKER_MS)) + scaleIn(tween(PICKER_MS), PICKER_SCALE, PICKER_ORIGIN),
-            exit = fadeOut(tween(PICKER_MS)) + scaleOut(tween(PICKER_MS), PICKER_SCALE, PICKER_ORIGIN),
+            enter =
+                fadeIn(motion.defaultEffectsSpec()) +
+                    scaleIn(motion.defaultSpatialSpec(), PICKER_SCALE, PICKER_ORIGIN),
+            exit =
+                fadeOut(motion.fastEffectsSpec()) +
+                    scaleOut(motion.fastSpatialSpec(), PICKER_SCALE, PICKER_ORIGIN),
         ) {
             shown?.let {
                 PlaceSearchScreen(
@@ -128,7 +153,6 @@ internal fun PlannerDestination(
     }
 }
 
-private const val PICKER_MS = 220
 private const val PICKER_SCALE = 0.94f
 
 /** The picker grows out of the top of the screen, where the search form is. */
@@ -159,13 +183,13 @@ internal fun PlannerScreen(
     ObehyScreen(
         stringResource(R.string.planner_title),
         modifier = modifier,
-        titleBar = TitleBar.Small,
+        titleBar = TitleBar.Logo,
         width = if (wide) ContentWidth.Full else ContentWidth.Readable,
         scrollable = false,
         verticalArrangement = Arrangement.Top,
         actions = {
             if (state.canReset) {
-                IconButton(onClick = { onAction(PlannerAction.Reset) }) {
+                IconButton(onClick = { onAction(PlannerAction.Reset) }, shapes = IconButtonDefaults.shapes()) {
                     Icon(Icons.Rounded.RestartAlt, contentDescription = stringResource(R.string.new_search))
                 }
             }
@@ -232,11 +256,10 @@ private fun ResultsList(
     // Lines repeat from one result to the next, so the rows share their measurements.
     val measurer = rememberTextMeasurer(cacheSize = MEASURED_NAMES)
     if (loaded != null && !wide) PreloadResultMaps(loaded.itineraries, list, paused = state.placeSearch != null)
-    PullToRefreshBox(
-        isRefreshing = loaded?.refreshing == true,
-        onRefresh = { onAction(PlannerAction.RefreshResults) },
-        modifier = modifier,
-    ) {
+    SearchOutcomeHaptics(state.results)
+    val scope = rememberCoroutineScope()
+    val pastForm by remember(list) { derivedStateOf { list.firstVisibleItemIndex > 0 } }
+    ObehyPullToRefresh(loaded?.refreshing == true, { onAction(PlannerAction.RefreshResults) }, modifier) {
         LazyColumn(
             Modifier.fillMaxSize(),
             state = list,
@@ -258,9 +281,16 @@ private fun ResultsList(
                     if (state.suggestions.isNotEmpty()) {
                         item(key = "suggested") { SectionTitle(R.string.suggested) }
                     }
-                    items(state.suggestions, key = { "${it.from.id}>${it.to.id}" }) { suggestion ->
+                    itemsIndexed(state.suggestions, key = {
+                        _,
+                        it,
+                        ->
+                        "${it.from.id}>${it.to.id}"
+                    }) { index, suggestion ->
                         SuggestionRow(
                             suggestion,
+                            index,
+                            state.suggestions.size,
                             onClick = { onAction(PlannerAction.UseSuggestion(suggestion)) },
                             onLongClick = { onAction(PlannerAction.ForgetSuggestion(suggestion)) },
                         )
@@ -272,36 +302,49 @@ private fun ResultsList(
                 }
 
                 Results.Failed -> {
-                    item(key = "failed") { Note(R.string.results_error) { onAction(PlannerAction.Search) } }
+                    item(key = "failed") {
+                        Note(R.string.results_error, Icons.Rounded.CloudOff) { onAction(PlannerAction.Search) }
+                    }
                 }
 
                 Results.NoLocation -> {
-                    item(key = "no-location") { Note(R.string.results_no_location) { onAction(PlannerAction.Search) } }
+                    item(key = "no-location") {
+                        Note(R.string.results_no_location, Icons.Rounded.LocationOff) {
+                            onAction(PlannerAction.Search)
+                        }
+                    }
                 }
 
                 is Results.Loaded -> {
                     if (results.itineraries.isEmpty()) {
-                        item(key = "none") { Note(R.string.results_none) }
+                        item(key = "none") { Note(R.string.results_none, Icons.Rounded.SearchOff) }
                     } else {
                         item(key = "fresh") {
                             Row(
                                 Modifier.padding(bottom = ObehyTheme.spacing.xs),
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
-                                Text(
-                                    if (results.failed) {
-                                        stringResource(R.string.refresh_failed) + " · " +
-                                            updatedAgo(results.fetchedAt)
-                                    } else {
-                                        updatedAgo(results.fetchedAt)
-                                    },
+                                FlowRow(
                                     Modifier.weight(1f),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
+                                    horizontalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.s),
+                                ) {
+                                    if (results.failed) {
+                                        Text(
+                                            stringResource(R.string.refresh_failed),
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.error,
+                                        )
+                                    }
+                                    Text(
+                                        updatedAgo(results.fetchedAt),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
                                 if (results.earlierCursor != null) {
                                     TextButton(
                                         onClick = { onAction(PlannerAction.Earlier) },
+                                        shapes = ButtonDefaults.shapes(),
                                     ) { Text(stringResource(R.string.earlier)) }
                                 }
                             }
@@ -335,12 +378,91 @@ private fun ResultsList(
                             Centered {
                                 TextButton(
                                     onClick = { onAction(PlannerAction.Later) },
+                                    shapes = ButtonDefaults.shapes(),
                                 ) { Text(stringResource(R.string.later)) }
                             }
                         }
                     }
                 }
             }
+        }
+        val motion = MaterialTheme.motionScheme
+        AnimatedVisibility(
+            pastForm && state.query.isComplete,
+            Modifier.align(Alignment.TopCenter).fillMaxWidth(),
+            enter = fadeIn(motion.defaultEffectsSpec()) + slideInVertically(motion.defaultSpatialSpec()) { -it },
+            exit = fadeOut(motion.fastEffectsSpec()) + slideOutVertically(motion.fastSpatialSpec()) { -it },
+        ) {
+            QuerySummary(state.query, onClick = { scope.launch { list.animateScrollToItem(0) } })
+        }
+    }
+}
+
+/** A short buzz when a search the user is waiting on lands, or fails. */
+@Composable
+private fun SearchOutcomeHaptics(results: Results) {
+    val haptics = LocalHapticFeedback.current
+    var waiting by remember { mutableStateOf(false) }
+    LaunchedEffect(results) {
+        when {
+            results is Results.Loading -> {
+                waiting = true
+            }
+
+            !waiting -> {
+                Unit
+            }
+
+            results is Results.Loaded -> {
+                haptics.performHapticFeedback(HapticFeedbackType.Confirm)
+                waiting = false
+            }
+
+            else -> {
+                haptics.performHapticFeedback(HapticFeedbackType.Reject)
+                waiting = false
+            }
+        }
+    }
+}
+
+/** The search form folded down to what's being searched for, over the results; a tap goes back up to it. */
+@Composable
+private fun QuerySummary(
+    query: JourneyQuery,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val from = query.from?.label().orEmpty()
+    val to = query.to?.label().orEmpty()
+    Surface(
+        onClick = onClick,
+        modifier = modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.surfaceContainerHighest,
+        shadowElevation = ObehyTheme.spacing.xs,
+    ) {
+        Row(
+            Modifier.padding(horizontal = ObehyTheme.spacing.l, vertical = ObehyTheme.spacing.s),
+            horizontalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.s),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(Modifier.weight(1f)) {
+                Text(
+                    stringResource(R.string.suggested_journey, from, to),
+                    style = MaterialTheme.typography.titleSmallEmphasized,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                    query.timeLabel(),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+            Icon(Icons.Rounded.KeyboardArrowUp, contentDescription = null)
         }
     }
 }
@@ -349,27 +471,31 @@ private fun ResultsList(
 @Composable
 private fun SuggestionRow(
     suggestion: Suggestion,
+    index: Int,
+    count: Int,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    ListItem(
-        headlineContent = {
-            Text(
-                stringResource(R.string.suggested_journey, suggestion.from.label(), suggestion.to.label()),
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-            )
-        },
+    val haptics = LocalHapticFeedback.current
+    SegmentedListItem(
+        onClick = onClick,
+        shapes = ListItemDefaults.segmentedShapes(index, count),
+        modifier = modifier,
         leadingContent = { Icon(Icons.Rounded.History, contentDescription = null) },
-        colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surface),
-        modifier =
-            modifier.combinedClickable(
-                onLongClickLabel = stringResource(R.string.forget),
-                onLongClick = onLongClick,
-                onClick = onClick,
-            ),
-    )
+        onLongClick = {
+            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+            onLongClick()
+        },
+        onLongClickLabel = stringResource(R.string.forget),
+        colors = ListItemDefaults.segmentedColors(containerColor = ObehyTheme.cardColor),
+    ) {
+        Text(
+            stringResource(R.string.suggested_journey, suggestion.from.label(), suggestion.to.label()),
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
 }
 
 @Composable
@@ -383,20 +509,17 @@ private fun Centered(
 @Composable
 private fun Note(
     text: Int,
+    icon: ImageVector,
     modifier: Modifier = Modifier,
     onRetry: (() -> Unit)? = null,
 ) {
-    Column(
-        modifier.fillMaxWidth().padding(vertical = ObehyTheme.spacing.l),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text(
-            stringResource(text),
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        if (onRetry != null) TextButton(onClick = onRetry) { Text(stringResource(R.string.retry)) }
-    }
+    StateMessage(
+        icon,
+        stringResource(text),
+        modifier,
+        action = onRetry?.let { stringResource(R.string.retry) },
+        onAction = { onRetry?.invoke() },
+    )
 }
 
 /** The journey open beside the results on a wide window: its map, then its timeline. */
@@ -410,7 +533,7 @@ private fun DetailPane(
 ) {
     if (open == null) {
         Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text(stringResource(R.string.pick_journey), color = MaterialTheme.colorScheme.onSurfaceVariant)
+            StateMessage(Icons.Rounded.Directions, stringResource(R.string.pick_journey))
         }
         return
     }
@@ -419,11 +542,8 @@ private fun DetailPane(
         verticalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.m),
     ) {
         RouteMap(open.itinerary.legs, Modifier.fillMaxWidth().height(ObehyTheme.sizes.heroMap), interactive = true)
-        Text(
-            journeySummary(open),
-            style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        ItineraryTimeline(open.itinerary, query.from?.label(), query.to?.label(), onOpenTrip, onReplan)
+        JourneySummary(open)
+        JourneyBanner(open.itinerary, query.to?.label(), onReplan)
+        ItineraryTimeline(open.itinerary, query.from?.label(), query.to?.label(), onOpenTrip)
     }
 }

@@ -1,9 +1,12 @@
 package cz.obehy.core.ui
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -72,11 +75,24 @@ data class Sizes(
     val mapVehicleTip: Dp = 8.dp,
 )
 
+private const val HALF_LIGHT = 0.5f
+
 internal val LocalSpacing = staticCompositionLocalOf { Spacing() }
 internal val LocalSizes = staticCompositionLocalOf { Sizes() }
 
 /** The Oběhy tokens on top of [androidx.compose.material3.MaterialTheme]: read them like `ObehyTheme.spacing.l`. */
 object ObehyTheme {
+    /**
+     * What a card lies on, so it stands off the page in both themes. Material's lowest container is
+     * the brightest on light but sinks below the page on dark.
+     */
+    val cardColor: Color
+        @Composable @ReadOnlyComposable
+        get() =
+            MaterialTheme.colorScheme.run {
+                if (surface.luminance() < HALF_LIGHT) surfaceContainerHigh else surfaceContainerLowest
+            }
+
     val spacing: Spacing
         @Composable @ReadOnlyComposable
         get() = LocalSpacing.current

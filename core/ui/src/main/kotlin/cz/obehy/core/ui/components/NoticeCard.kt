@@ -61,7 +61,7 @@ fun NoticeCard(
     var open by rememberSaveable(title) { mutableStateOf(false) }
     var cutShort by remember(title) { mutableStateOf(false) }
     val folds = text != null || cutShort
-    val chevron by animateFloatAsState(if (open) 180f else 0f, motion.defaultSpatialSpec())
+    val chevron by animateFloatAsState(if (open) 180f else 0f, motion.fastSpatialSpec())
     val label = stringResource(if (open) R.string.notice_less else R.string.notice_more)
     Row(
         modifier
@@ -82,7 +82,7 @@ fun NoticeCard(
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.xs)) {
             Text(
                 title,
-                style = MaterialTheme.typography.titleSmall,
+                style = MaterialTheme.typography.titleSmallEmphasized,
                 color = content,
                 maxLines = if (open) Int.MAX_VALUE else FOLDED_TITLE_LINES,
                 overflow = TextOverflow.Ellipsis,
@@ -92,6 +92,7 @@ fun NoticeCard(
             action?.let {
                 Button(
                     onClick = onAction,
+                    shapes = ButtonDefaults.shapes(),
                     colors = ButtonDefaults.buttonColors(containerColor = content, contentColor = background),
                 ) { Text(it) }
             }

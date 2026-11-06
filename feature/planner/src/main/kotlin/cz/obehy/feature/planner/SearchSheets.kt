@@ -17,21 +17,26 @@ import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.CalendarToday
 import androidx.compose.material.icons.rounded.Schedule
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TimeInput
 import androidx.compose.material3.TimePicker
+import androidx.compose.material3.TimePickerDialog
+import androidx.compose.material3.TimePickerDialogDefaults
+import androidx.compose.material3.TimePickerDisplayMode
 import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
@@ -91,14 +96,22 @@ internal fun TimeSheet(
                 exit = shrinkVertically(motion.defaultSpatialSpec()) + fadeOut(motion.defaultEffectsSpec()),
             ) {
                 Row(horizontalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.s)) {
-                    OutlinedButton(onClick = { picking = Picker.Date }, modifier = Modifier.weight(1f)) {
+                    OutlinedButton(
+                        onClick = { picking = Picker.Date },
+                        shapes = ButtonDefaults.shapes(),
+                        modifier = Modifier.weight(1f),
+                    ) {
                         Icon(Icons.Rounded.CalendarToday, null, Modifier.size(ObehyTheme.sizes.iconSmall))
                         Text(
                             DateTimeFormatter.ofPattern(stringResource(R.string.date_pattern)).format(date),
                             Modifier.padding(start = ObehyTheme.spacing.s),
                         )
                     }
-                    OutlinedButton(onClick = { picking = Picker.Time }, modifier = Modifier.weight(1f)) {
+                    OutlinedButton(
+                        onClick = { picking = Picker.Time },
+                        shapes = ButtonDefaults.shapes(),
+                        modifier = Modifier.weight(1f),
+                    ) {
                         Icon(Icons.Rounded.Schedule, null, Modifier.size(ObehyTheme.sizes.iconSmall))
                         Text(
                             LocalDateTime
@@ -118,6 +131,7 @@ internal fun TimeSheet(
                         arriveBy,
                     )
                 },
+                shapes = ButtonDefaults.shapes(),
                 modifier = Modifier.fillMaxWidth(),
             ) { Text(stringResource(R.string.done)) }
         }
@@ -136,26 +150,49 @@ internal fun TimeSheet(
                         }
                         now = false
                         picking = null
-                    }) { Text(stringResource(R.string.done)) }
+                    }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.done)) }
                 },
-                dismissButton = { TextButton(onClick = { picking = null }) { Text(stringResource(R.string.cancel)) } },
+                dismissButton = {
+                    TextButton(
+                        onClick = { picking = null },
+                        shapes = ButtonDefaults.shapes(),
+                    ) { Text(stringResource(R.string.cancel)) }
+                },
             ) { DatePicker(state) }
         }
 
         Picker.Time -> {
             val state = rememberTimePickerState(time.hour, time.minute)
-            AlertDialog(
+            var mode by remember { mutableStateOf(TimePickerDisplayMode.Picker) }
+            TimePickerDialog(
                 onDismissRequest = { picking = null },
                 confirmButton = {
                     TextButton(onClick = {
                         time = LocalTime.of(state.hour, state.minute)
                         now = false
                         picking = null
-                    }) { Text(stringResource(R.string.done)) }
+                    }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.done)) }
                 },
-                dismissButton = { TextButton(onClick = { picking = null }) { Text(stringResource(R.string.cancel)) } },
-                text = { TimePicker(state) },
-            )
+                title = { TimePickerDialogDefaults.Title(mode) },
+                modeToggleButton = {
+                    TimePickerDialogDefaults.DisplayModeToggle(
+                        {
+                            mode =
+                                if (mode == TimePickerDisplayMode.Picker) {
+                                    TimePickerDisplayMode.Input
+                                } else {
+                                    TimePickerDisplayMode.Picker
+                                }
+                        },
+                        mode,
+                    )
+                },
+                dismissButton = {
+                    TextButton(onClick = { picking = null }, shapes = ButtonDefaults.shapes()) {
+                        Text(stringResource(R.string.cancel))
+                    }
+                },
+            ) { if (mode == TimePickerDisplayMode.Picker) TimePicker(state) else TimeInput(state) }
         }
 
         null -> {
@@ -191,6 +228,29 @@ private fun ConnectedChoice(
             modifier = Modifier.weight(1f).semantics { role = Role.RadioButton },
             shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(),
         ) { Text(stringResource(other)) }
+    }
+}
+
+/** The [index]th of the two switches in the options; the whole row flips it. */
+@Composable
+private fun OptionRow(
+    @StringRes title: Int,
+    @StringRes body: Int,
+    on: Boolean,
+    index: Int,
+    onChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SegmentedListItem(
+        checked = on,
+        onCheckedChange = onChange,
+        shapes = ListItemDefaults.segmentedShapes(index, 2),
+        modifier = modifier.semantics { role = Role.Switch },
+        supportingContent = { Text(stringResource(body)) },
+        trailingContent = { Switch(on, onCheckedChange = null) },
+        colors = ListItemDefaults.segmentedColors(containerColor = ObehyTheme.cardColor),
+    ) {
+        Text(stringResource(title))
     }
 }
 
@@ -258,21 +318,21 @@ internal fun OptionsSheet(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
-            ListItem(
-                headlineContent = { Text(stringResource(R.string.low_floor_title)) },
-                supportingContent = { Text(stringResource(R.string.low_floor_body)) },
-                trailingContent = { Switch(options.lowFloor, { onChange(options.copy(lowFloor = it)) }) },
-                modifier = Modifier.padding(horizontal = ObehyTheme.spacing.s),
-            )
-            ListItem(
-                headlineContent = { Text(stringResource(R.string.routed_title)) },
-                supportingContent = { Text(stringResource(R.string.routed_body)) },
-                trailingContent = { Switch(options.routedTransfers, { onChange(options.copy(routedTransfers = it)) }) },
-                modifier = Modifier.padding(horizontal = ObehyTheme.spacing.s),
-            )
+            Column(
+                Modifier.padding(horizontal = ObehyTheme.spacing.l, vertical = ObehyTheme.spacing.l),
+                verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
+            ) {
+                OptionRow(R.string.low_floor_title, R.string.low_floor_body, options.lowFloor, 0, {
+                    onChange(options.copy(lowFloor = it))
+                })
+                OptionRow(R.string.routed_title, R.string.routed_body, options.routedTransfers, 1, {
+                    onChange(options.copy(routedTransfers = it))
+                })
+            }
             if (options != SearchOptions()) {
                 TextButton(
                     onClick = { onChange(SearchOptions()) },
+                    shapes = ButtonDefaults.shapes(),
                     Modifier.padding(horizontal = ObehyTheme.spacing.l),
                 ) {
                     Text(stringResource(R.string.reset))

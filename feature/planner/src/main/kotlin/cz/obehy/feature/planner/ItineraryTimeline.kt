@@ -7,10 +7,13 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,14 +25,18 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material.icons.automirrored.rounded.DirectionsWalk
 import androidx.compose.material.icons.rounded.ExpandMore
+import androidx.compose.material.icons.rounded.HourglassTop
 import androidx.compose.material.icons.rounded.WarningAmber
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,6 +47,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.pluralStringResource
@@ -50,8 +58,10 @@ import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.graphics.shapes.RoundedPolygon
 import cz.obehy.core.model.Itinerary
 import cz.obehy.core.model.JourneyStage
 import cz.obehy.core.model.JourneyTrouble
@@ -62,12 +72,15 @@ import cz.obehy.core.model.TimePoint
 import cz.obehy.core.model.stageAt
 import cz.obehy.core.model.timelineSpans
 import cz.obehy.core.model.troubleAt
+import cz.obehy.core.ui.HeroTitle
+import cz.obehy.core.ui.MorphingBadge
 import cz.obehy.core.ui.ObehyTheme
 import cz.obehy.core.ui.SharedBounds
 import cz.obehy.core.ui.components.LineBadge
 import cz.obehy.core.ui.components.LowFloorIcon
 import cz.obehy.core.ui.components.NoticeCard
 import cz.obehy.core.ui.components.PlatformLabel
+import cz.obehy.core.ui.components.RollingText
 import cz.obehy.core.ui.components.RouteHere
 import cz.obehy.core.ui.components.RouteHereBadge
 import cz.obehy.core.ui.components.RouteMark
@@ -86,7 +99,9 @@ import cz.obehy.core.ui.components.routeLineColor
 import cz.obehy.core.ui.components.walkHere
 import cz.obehy.core.ui.components.walkStroke
 import cz.obehy.core.ui.icon
+import cz.obehy.core.ui.pressScale
 import cz.obehy.core.ui.rideMorphKey
+import cz.obehy.core.ui.scaledBy
 import java.time.Duration
 import java.time.Instant
 
@@ -96,9 +111,8 @@ private const val PROGRESS_EVERY_MS = 10_000L
 /**
  * A journey as one continuous line: each ride in its route's colour between the stops where you
  * board and alight, walks dotted with the time to spare, the stops in between folded away. Once
- * under way, what's gone by is muted and a line above says where you should be, and when it stops
- * working out it says so, offering [onReplan]. [fromName] and [toName] name the ends when they are
- * an address rather than a stop.
+ * under way, what's gone by is muted. [fromName] and [toName] name the ends when they are an
+ * address rather than a stop.
  */
 @Composable
 internal fun ItineraryTimeline(
@@ -106,7 +120,6 @@ internal fun ItineraryTimeline(
     fromName: String?,
     toName: String?,
     onOpenTrip: (Leg.Transit) -> Unit,
-    onReplan: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val walk = walkStroke()
@@ -118,8 +131,6 @@ internal fun ItineraryTimeline(
     var unfolded by rememberSaveable(itinerary.key) { mutableStateOf(listOf<Int>()) }
     val spans = remember(legs, unfolded) { legs.timelineSpans(unfolded.toSet()) }
     Column(modifier) {
-        trouble?.let { TroubleCard(it, onReplan, Modifier.padding(bottom = ObehyTheme.spacing.s)) }
-        Stage(legs, toName, now, Modifier.padding(bottom = ObehyTheme.spacing.s))
         // One span for each row, handed out in the order the rows are laid out.
         val rows = spans.iterator()
 
@@ -257,34 +268,100 @@ private fun Duration.roundedUp(): Duration = plusSeconds(SECONDS_TO_ROUND_UP)
 
 private const val SECONDS_TO_ROUND_UP = 59L
 
-/** Where you should be by now, in words: the line says the same to those who can't see it. */
+/**
+ * What matters most on a journey under way, kept in sight above its timeline: what has gone wrong,
+ * and the way out of it, or else where you should be by now. Before and after the journey, nothing.
+ */
+@Composable
+internal fun JourneyBanner(
+    itinerary: Itinerary,
+    toName: String?,
+    onReplan: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val clock by rememberNow(PROGRESS_EVERY_MS)
+    val trouble = remember(itinerary, clock) { itinerary.troubleAt(clock) }
+    if (trouble != null) {
+        TroubleCard(trouble, onReplan, modifier)
+    } else {
+        Stage(itinerary.legs, toName, clock, modifier)
+    }
+}
+
+/**
+ * The top of a journey's sheet. Once it's under way the stage takes over from the [title], whose
+ * times are all in the timeline, with the summary as a quiet line under it. When it has gone wrong,
+ * the title stays and what happened goes under it.
+ */
+@Composable
+internal fun JourneyHeader(
+    open: OpenJourney,
+    title: String,
+    toName: String?,
+    onReplan: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val itinerary = open.itinerary
+    val clock by rememberNow(PROGRESS_EVERY_MS)
+    val trouble = remember(itinerary, clock) { itinerary.troubleAt(clock) }
+    val under = trouble == null && itinerary.legs.stageAt(clock) != null
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.s)) {
+        if (under) {
+            Stage(itinerary.legs, toName, clock)
+            JourneySummary(open)
+        } else {
+            HeroTitle(title)
+            JourneySummary(open)
+            trouble?.let { TroubleCard(it, onReplan) }
+        }
+    }
+}
+
+/** The shape under each stage. They only mark the change from one to the next. */
+private val JourneyStage.shape: RoundedPolygon
+    get() =
+        when (this) {
+            is JourneyStage.Walking -> MaterialShapes.Circle
+            is JourneyStage.Waiting -> MaterialShapes.Cookie9Sided
+            is JourneyStage.Riding -> MaterialShapes.Clover4Leaf
+        }
+
+/**
+ * Where you should be by now, the journey's big moment: how long this stage still has to go, large
+ * enough to read at a glance, and what it's leading to. It's read out as a sentence, as the line
+ * says the same to those who can't see it.
+ */
 @Composable
 private fun Stage(
     legs: List<Leg>,
     toName: String?,
-    now: () -> Instant,
+    time: Instant,
     modifier: Modifier = Modifier,
 ) {
-    val time = now()
     val stage = legs.stageAt(time) ?: return
-    val here =
-        when (stage) {
-            is JourneyStage.Walking -> walkHere()
-            is JourneyStage.Waiting -> rideHere(stage.ride)
-            is JourneyStage.Riding -> rideHere(stage.ride)
+    val left =
+        Duration
+            .between(
+                time,
+                when (stage) {
+                    is JourneyStage.Walking -> stage.walk.end.expected
+                    is JourneyStage.Waiting -> stage.ride.start.expected
+                    is JourneyStage.Riding -> stage.ride.end.expected
+                },
+            ).roundedUp()
+            .spoken()
+    val walkingTo =
+        (stage as? JourneyStage.Walking)?.walk?.let { walk ->
+            if (walk === legs.last()) toName ?: walk.to.name else walk.to.name
         }
-    val text =
+    val spoken =
         when (stage) {
             is JourneyStage.Walking -> {
-                val left = Duration.between(time, stage.walk.end.expected).roundedUp().spoken()
-                val to = if (stage.walk === legs.last()) toName ?: stage.walk.to.name else stage.walk.to.name
-                stringResource(R.string.stage_walking, to, left)
+                stringResource(R.string.stage_walking, walkingTo.orEmpty(), left)
             }
 
             is JourneyStage.Waiting -> {
-                val ride = stage.ride
-                val wait = Duration.between(time, ride.start.expected).roundedUp().spoken()
-                stringResource(R.string.stage_waiting, ride.shortName, wait, ride.from.name)
+                stringResource(R.string.stage_waiting, stage.ride.shortName, left, stage.ride.from.name)
             }
 
             is JourneyStage.Riding -> {
@@ -292,17 +369,72 @@ private fun Stage(
                 stringResource(R.string.stage_riding, ride.shortName, ride.to.name, ride.end.expected.clock())
             }
         }
+    val ink = MaterialTheme.colorScheme.onPrimaryContainer
     Row(
         modifier
             .fillMaxWidth()
-            .clip(MaterialTheme.shapes.large)
-            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .clip(MaterialTheme.shapes.largeIncreased)
+            .background(MaterialTheme.colorScheme.primaryContainer)
+            .clearAndSetSemantics { contentDescription = spoken }
             .padding(horizontal = ObehyTheme.spacing.m, vertical = ObehyTheme.spacing.s),
-        horizontalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.s),
+        horizontalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.m),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        RouteHereBadge(here)
-        Text(text, style = MaterialTheme.typography.titleSmall)
+        MorphingBadge(stage.shape, ink, Modifier.size(ObehyTheme.sizes.iconBadge)) {
+            Icon(
+                when (stage) {
+                    is JourneyStage.Walking -> Mode.Walk.icon
+                    is JourneyStage.Waiting -> Icons.Rounded.HourglassTop
+                    is JourneyStage.Riding -> stage.ride.mode.icon
+                },
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primaryContainer,
+            )
+        }
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.xs / 2)) {
+            RollingText(left, MaterialTheme.typography.headlineMediumEmphasized, ink)
+            CompositionLocalProvider(LocalContentColor provides ink) {
+                when (stage) {
+                    is JourneyStage.Walking -> {
+                        Text(
+                            stringResource(R.string.stage_walking_to, walkingTo.orEmpty()),
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    }
+
+                    is JourneyStage.Waiting -> {
+                        StageRide(stage.ride) { Headsign(stage.ride.headsign ?: stage.ride.to.name, tint = ink) }
+                    }
+
+                    is JourneyStage.Riding -> {
+                        // Where to get off, which is not always as far as the vehicle goes.
+                        StageRide(stage.ride) {
+                            Text(
+                                stringResource(R.string.stage_riding_to, stage.ride.to.name),
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/** The [ride]'s badge and where it's going; a long pair folds onto a second line rather than being cut short. */
+@Composable
+private fun StageRide(
+    ride: Leg.Transit,
+    modifier: Modifier = Modifier,
+    whereTo: @Composable () -> Unit,
+) {
+    FlowRow(
+        modifier,
+        horizontalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.s),
+        itemVerticalAlignment = Alignment.CenterVertically,
+    ) {
+        LineBadge(ride)
+        whereTo()
     }
 }
 
@@ -479,13 +611,19 @@ private fun RideCard(
     modifier: Modifier = Modifier,
 ) {
     val details = stringResource(R.string.open_trip)
+    val press = remember { MutableInteractionSource() }
     Column(
         modifier
             .fillMaxWidth()
+            .scaledBy(pressScale(press))
             .clip(MaterialTheme.shapes.large)
             .background(MaterialTheme.colorScheme.surfaceContainer)
             .then(
-                if (ride.tripId != null) Modifier.clickable(onClickLabel = details) { onOpenTrip(ride) } else Modifier,
+                if (ride.tripId != null) {
+                    Modifier.clickable(press, LocalIndication.current, onClickLabel = details) { onOpenTrip(ride) }
+                } else {
+                    Modifier
+                },
             ),
     ) {
         if (ride.staySeated) SameVehicle(ride.mode)
@@ -530,7 +668,7 @@ private fun StopsToggle(
     onToggle: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val chevron by animateFloatAsState(if (open) 180f else 0f, MaterialTheme.motionScheme.defaultSpatialSpec())
+    val chevron by animateFloatAsState(if (open) 180f else 0f, MaterialTheme.motionScheme.fastSpatialSpec())
     val spoken = stringResource(if (open) R.string.hide_stops else R.string.show_stops)
     val height = ButtonDefaults.ExtraSmallContainerHeight
     ToggleButton(
@@ -665,6 +803,7 @@ private fun PassedStop(
 private fun Headsign(
     destination: String,
     modifier: Modifier = Modifier,
+    tint: Color = MaterialTheme.colorScheme.onSurfaceVariant,
 ) {
     val spoken = stringResource(R.string.towards, destination)
     Row(
@@ -676,7 +815,7 @@ private fun Headsign(
             contentDescription = null,
             // Level with the first line when a long destination wraps.
             modifier = Modifier.padding(top = ObehyTheme.spacing.xs / 2).size(ObehyTheme.sizes.iconSmall),
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            tint = tint,
         )
         Text(destination, style = MaterialTheme.typography.bodyMedium)
     }

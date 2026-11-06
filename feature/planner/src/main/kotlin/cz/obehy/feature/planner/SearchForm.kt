@@ -25,6 +25,7 @@ import androidx.compose.material.icons.rounded.Schedule
 import androidx.compose.material.icons.rounded.SwapVert
 import androidx.compose.material.icons.rounded.Tune
 import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledTonalIconButton
@@ -46,7 +47,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.layout
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
@@ -81,8 +84,9 @@ internal fun SearchForm(
     modifier: Modifier = Modifier,
 ) {
     val line = RouteStroke(MaterialTheme.colorScheme.primary)
+    val haptics = LocalHapticFeedback.current
     var swaps by rememberSaveable { mutableIntStateOf(0) }
-    val turn by animateFloatAsState(swaps * 180f, MaterialTheme.motionScheme.defaultSpatialSpec())
+    val turn by animateFloatAsState(swaps * 180f, MaterialTheme.motionScheme.fastSpatialSpec())
     Column(modifier, verticalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.s)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
@@ -117,6 +121,7 @@ internal fun SearchForm(
             }
             FilledTonalIconButton(
                 onClick = {
+                    haptics.performHapticFeedback(HapticFeedbackType.SegmentTick)
                     swaps++
                     onAction(PlannerAction.Swap)
                 },
@@ -145,9 +150,18 @@ internal fun SearchForm(
                 label = { Text(stringResource(UiR.string.low_floor)) },
                 leadingIcon = { LowFloorIcon() },
             )
-            FilterChip(
-                selected = options.changedCount > 0,
+            AssistChip(
                 onClick = onOptions,
+                colors =
+                    if (options.changedCount > 0) {
+                        AssistChipDefaults.assistChipColors(
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                            labelColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                            leadingIconContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                        )
+                    } else {
+                        AssistChipDefaults.assistChipColors()
+                    },
                 label = {
                     Text(
                         if (options.changedCount > 0) {
@@ -274,7 +288,7 @@ private fun PlaceField(
                 }
             }
             if (onRemove != null) {
-                IconButton(onClick = onRemove) {
+                IconButton(onClick = onRemove, shapes = IconButtonDefaults.shapes()) {
                     Icon(Icons.Rounded.Close, contentDescription = stringResource(R.string.remove_via))
                 }
             }

@@ -17,6 +17,9 @@ private val Lime = Color(0xFFC5ED62)
 private val Night = Color(0xFF102B2D)
 private val Paper = Color(0xFFF4F7EF)
 private val Ink = Color(0xFF153438)
+private val LimeDim = Color(0xFFAAD64A)
+private val Mist = Color(0xFFDEEEEA)
+private val MistDim = Color(0xFFB6C8BD)
 
 private val Light =
     lightColorScheme(
@@ -55,6 +58,18 @@ private val Light =
         surfaceContainer = Color(0xFFEEF3E9),
         surfaceContainerHigh = Color(0xFFE7EEE3),
         surfaceContainerHighest = Color(0xFFE0E8DC),
+        primaryFixed = Lime,
+        primaryFixedDim = LimeDim,
+        onPrimaryFixed = Night,
+        onPrimaryFixedVariant = Petrol,
+        secondaryFixed = Mist,
+        secondaryFixedDim = MistDim,
+        onSecondaryFixed = Night,
+        onSecondaryFixedVariant = Petrol,
+        tertiaryFixed = Mist,
+        tertiaryFixedDim = MistDim,
+        onTertiaryFixed = Night,
+        onTertiaryFixedVariant = Petrol,
     )
 
 private val Dark =
@@ -94,6 +109,18 @@ private val Dark =
         surfaceContainer = Color(0xFF18383A),
         surfaceContainerHigh = Color(0xFF1E4144),
         surfaceContainerHighest = Color(0xFF254A4C),
+        primaryFixed = Lime,
+        primaryFixedDim = LimeDim,
+        onPrimaryFixed = Night,
+        onPrimaryFixedVariant = Petrol,
+        secondaryFixed = Mist,
+        secondaryFixedDim = MistDim,
+        onSecondaryFixed = Night,
+        onSecondaryFixedVariant = Petrol,
+        tertiaryFixed = Mist,
+        tertiaryFixedDim = MistDim,
+        onTertiaryFixed = Night,
+        onTertiaryFixedVariant = Petrol,
     )
 
 /**

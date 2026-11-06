@@ -1,11 +1,18 @@
 package cz.obehy.feature.planner
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.Lifecycle
@@ -29,6 +36,7 @@ import cz.obehy.core.model.Leg
 import cz.obehy.core.model.RouteSurroundings
 import cz.obehy.core.model.focusAt
 import cz.obehy.core.ui.ObehyHeroScreen
+import cz.obehy.core.ui.ObehyTheme
 import cz.obehy.core.ui.SharedBounds
 import cz.obehy.core.ui.components.clock
 import cz.obehy.core.ui.components.rememberNow
@@ -163,10 +171,10 @@ internal fun ItineraryScreen(
     modifier: Modifier = Modifier,
 ) {
     val itinerary = open.itinerary
+    val title = stringResource(R.string.times, itinerary.start.expected.clock(), itinerary.end.expected.clock())
     SharedBounds(itinerary.key, modifier, holdOnExit = covered) {
         ObehyHeroScreen(
-            title = stringResource(R.string.times, itinerary.start.expected.clock(), itinerary.end.expected.clock()),
-            subtitle = journeySummary(open),
+            title = title,
             onBack = onBack,
             hero = { shrunk ->
                 SharedBounds(mapKey(open), Modifier.fillMaxSize()) {
@@ -187,8 +195,9 @@ internal fun ItineraryScreen(
             actions = {
                 if (view.focused) WholeJourneyButton(view.framing == MapFraming.Whole, onWhole)
             },
+            header = { JourneyHeader(open, title, query.to?.label(), onReplan) },
         ) {
-            ItineraryTimeline(itinerary, query.from?.label(), query.to?.label(), onOpenTrip, onReplan)
+            ItineraryTimeline(itinerary, query.from?.label(), query.to?.label(), onOpenTrip)
         }
     }
 }
@@ -229,14 +238,34 @@ internal fun JourneyMapDestination(
     }
 }
 
-/** "3 h 19 min · 2 changes · 1 min ago", or how long ago a refresh last worked. */
+/** How long a journey takes, its changes, and at the far end how fresh this all is, if it could be refreshed. */
 @Composable
-internal fun journeySummary(open: OpenJourney): String =
-    listOf(
-        open.itinerary.duration.spoken(),
-        transfersText(open.itinerary.transfers),
-        if (open.failed) stringResource(R.string.refresh_failed) else ago(open.fetchedAt),
-    ).joinToString(" · ")
+internal fun JourneySummary(
+    open: OpenJourney,
+    modifier: Modifier = Modifier,
+) {
+    val quiet = MaterialTheme.colorScheme.onSurfaceVariant
+    Row(
+        modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.s),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(open.itinerary.duration.spoken(), style = MaterialTheme.typography.labelLargeEmphasized, maxLines = 1)
+        Text(
+            transfersText(open.itinerary.transfers),
+            style = MaterialTheme.typography.bodySmall,
+            color = quiet,
+            maxLines = 1,
+        )
+        Spacer(Modifier.weight(1f))
+        Text(
+            if (open.failed) stringResource(R.string.refresh_failed) else ago(open.fetchedAt),
+            style = MaterialTheme.typography.bodySmall,
+            color = if (open.failed) MaterialTheme.colorScheme.error else quiet,
+            maxLines = 1,
+        )
+    }
+}
 
 /** "Updated 3 min ago" for the results, ticking on its own. */
 @Composable

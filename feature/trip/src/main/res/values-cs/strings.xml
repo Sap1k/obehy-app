@@ -8,7 +8,7 @@
     <string name="trip_train_order">Řazení vlaku</string>
     <string name="trip_direction">Směr jízdy</string>
     <string name="trip_finding_order">Zjišťujeme řazení vlaku…</string>
-    <string name="trip_checking">%s · ověřujeme…</string>
+    <string name="trip_checking">%s, ověřujeme…</string>
     <string name="trip_span">%1$s – %2$s</string>
     <string name="trip_notes">Poznámky</string>
     <string name="trip_more_notes">Další poznámky (%d)</string>

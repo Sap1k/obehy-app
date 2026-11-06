@@ -19,6 +19,7 @@ import androidx.compose.material.icons.rounded.Dns
 import androidx.compose.material.icons.rounded.History
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
@@ -102,7 +103,7 @@ internal fun SettingsScreen(
             ownServer?.let { OwnServerNote(it, onResetServer) }
             ChoiceList(modeChoices.toItems(), settings.mode, onMode, enabled = ownServer == null)
             if (isMotisOnly && ownServer == null) {
-                TextButton(onClick = onOwnServer) {
+                TextButton(onClick = onOwnServer, shapes = ButtonDefaults.shapes()) {
                     Icon(Icons.Rounded.Dns, contentDescription = null)
                     Spacer(Modifier.width(ObehyTheme.spacing.s))
                     Text(stringResource(R.string.server_entry))
@@ -139,7 +140,7 @@ private fun OwnServerNote(
             }
             Text(url.removeSuffix("/"), maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text(stringResource(R.string.server_in_use_body), style = MaterialTheme.typography.bodyMedium)
-            Button(onClick = onReset) { Text(stringResource(R.string.server_reset)) }
+            Button(onClick = onReset, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.server_reset)) }
         }
     }
 }
@@ -155,7 +156,7 @@ private fun HistoryControls(
     Surface(
         modifier = modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.large,
-        color = MaterialTheme.colorScheme.surfaceContainerLowest,
+        color = ObehyTheme.cardColor,
     ) {
         Column(
             Modifier.padding(ObehyTheme.spacing.l),
@@ -184,7 +185,11 @@ private fun HistoryControls(
                 )
             }
             AnimatedVisibility(!cleared) {
-                OutlinedButton(onClick = { confirming = true }, modifier = Modifier.fillMaxWidth()) {
+                OutlinedButton(
+                    onClick = { confirming = true },
+                    shapes = ButtonDefaults.shapes(),
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
                     Icon(Icons.Rounded.DeleteOutline, contentDescription = null)
                     Spacer(Modifier.width(ObehyTheme.spacing.s))
                     Text(stringResource(R.string.history_clear))
@@ -202,10 +207,12 @@ private fun HistoryControls(
                     onClear()
                     cleared = true
                     confirming = false
-                }) { Text(stringResource(R.string.history_clear_confirm)) }
+                }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.history_clear_confirm)) }
             },
             dismissButton = {
-                TextButton(onClick = { confirming = false }) { Text(stringResource(R.string.history_clear_cancel)) }
+                TextButton(onClick = {
+                    confirming = false
+                }, shapes = ButtonDefaults.shapes()) { Text(stringResource(R.string.history_clear_cancel)) }
             },
         )
     }

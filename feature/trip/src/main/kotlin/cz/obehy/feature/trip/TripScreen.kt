@@ -11,16 +11,20 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.CloudOff
 import androidx.compose.material.icons.rounded.MoreVert
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -65,6 +69,7 @@ import cz.obehy.core.ui.SharedBounds
 import cz.obehy.core.ui.components.DelayLabel
 import cz.obehy.core.ui.components.LineBadge
 import cz.obehy.core.ui.components.NoticeCard
+import cz.obehy.core.ui.components.StateMessage
 import cz.obehy.core.ui.components.featureIcon
 import cz.obehy.core.ui.components.rememberNow
 import cz.obehy.core.ui.icon
@@ -328,15 +333,25 @@ private fun TripHeader(
         ) {
             // A train's number means something to riders; a bus's is just line and trip (`100195 1224`).
             val number = ride.tripShortName?.takeIf { ride.mode in TRAINS && it !in ride.name }
-            val about = listOfNotNull(ride.agency, number)
-            Text(
-                about.joinToString(" · "),
-                Modifier.weight(1f),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
+            ride.agency?.let {
+                Text(
+                    it,
+                    Modifier.weight(1f, fill = false),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+            number?.let {
+                Text(
+                    it,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                )
+            }
+            Spacer(Modifier.weight(1f))
             trip.attributes.forEach { attribute ->
                 featureIcon(attribute.icon)?.let {
                     Icon(
@@ -383,7 +398,7 @@ private fun TripLinksMenu(
         )
     }
     Box(modifier) {
-        FilledTonalIconButton(onClick = { open = true }) {
+        FilledTonalIconButton(onClick = { open = true }, shapes = IconButtonDefaults.shapes()) {
             Icon(Icons.Rounded.MoreVert, contentDescription = stringResource(R.string.trip_links))
         }
         DropdownMenu(open, onDismissRequest = { open = false }) {
@@ -411,16 +426,11 @@ private fun Failed(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier.fillMaxWidth().padding(ObehyTheme.spacing.xl),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.s),
-    ) {
-        Text(
-            stringResource(R.string.trip_failed),
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        TextButton(onClick = onRetry) { Text(stringResource(R.string.trip_retry)) }
-    }
+    StateMessage(
+        Icons.Rounded.CloudOff,
+        stringResource(R.string.trip_failed),
+        modifier,
+        action = stringResource(R.string.trip_retry),
+        onAction = onRetry,
+    )
 }

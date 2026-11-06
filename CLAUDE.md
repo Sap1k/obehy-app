@@ -48,11 +48,17 @@ The look is defined once, in `core:ui`, and everything else reads it:
 | A list arriving | `StaggeredEntry(order, enabled) { … }`: items rise in one after another | `components/` |
 | One thing on two screens | `SharedBounds(key) { … }` on both: it morphs between them | `SharedMotion.kt` |
 | Pick-one options | `ChoiceList` | `components/` |
+| A card's background | `ObehyTheme.cardColor`: stands off the page in both themes | `Dimens.kt` |
+| A state shown by a shape | `MorphingBadge(shape, color) { … }`: morphs in the layer alone | `ShapeMorph.kt` |
+| Pull to refresh | `ObehyPullToRefresh`: Material's loading indicator | `components/` |
+| Nothing to show, or a failure | `StateMessage(icon, text, action)` | `components/` |
+| A card that gives under the finger | `pressScale(source)` with `Modifier.scaledBy` | `PressScale.kt` |
 | Logo | `ObehyLogo()` | `Logo.kt` |
 
-- Lint fails the build on a colour, `sp`, `dp` (other than `0.dp`), hand-made shape, `TextStyle`/`FontFamily`, or
-  a text literal in `Text(…)`/`contentDescription` anywhere outside `core:ui` (`ObehyRawColor`, `ObehyRawTypography`,
-  `ObehyRawDimension`, `ObehyRawShape`, `ObehyHardcodedText`). Fix it by using the theme; if the theme lacks it,
+- Lint fails the build on a colour, `sp`, `dp` (other than `0.dp`), hand-made shape, `TextStyle`/`FontFamily`, a
+  text literal in `Text(…)`/`contentDescription`, or a button without `shapes` anywhere outside `core:ui`
+  (`ObehyRawColor`, `ObehyRawTypography`, `ObehyRawDimension`, `ObehyRawShape`, `ObehyHardcodedText`,
+  `ObehyStaticButton`). Fix it by using the theme; if the theme lacks it,
   add a token or component to `core:ui`. `@SuppressLint("…")` only for a real exception, with a comment saying why.
 - Don't pass colours, paddings or text styles into a core component to restyle it per screen. If a variant is
   needed, add it to the component as a named option.
@@ -61,8 +67,13 @@ The look is defined once, in `core:ui`, and everything else reads it:
 - Material 3 **Expressive** components (`SegmentedListItem`, `ButtonDefaults.shapesFor`, `MaterialShapes`,
   `LargeFlexibleTopAppBar`, the wavy progress indicators) are the default; the opt-ins are set in the build, so no
   `@OptIn` is needed for them.
-- Brand (Figma "Oběhy – marketing"): Lime marks only the main action or a selected state, always with dark text on
-  it. Route and operator colours are data: show them as they come, never recoloured to the brand. Never let colour
+- Expressive stays where it helps: the journey under way and the search button are the app's big moments, and
+  there shouldn't be more than these two. One strongly emphasized thing per screen. Abstract shapes only as decoration
+  or to mark a change of state, never on the timeline, the journey bar or line badges. Springs (`MaterialTheme.motionScheme`)
+  for all motion, fast for small things and slow for whole screens; only what the back gesture scrubs stays on a tween
+  (`SharedMotion.kt` says why).
+- Brand (Figma "Oběhy – marketing"): Lime marks a selected or current state, and the main action on dark, always with
+  dark text on it. On light the main action is Petrol, as Lime would vanish into Paper. Route and operator colours are data: show them as they come, never recoloured to the brand. Never let colour
   alone carry a status (delay, cancellation): pair it with text or an icon.
 
 ## Writing a screen
@@ -83,6 +94,8 @@ applies it to its root. Spotless (with the Compose rules) checks this and more.
 - Write like a friendly, plain-spoken person: short sentences, "you", no jargon, no internals. Say what something
   does for the user ("Covers most of Europe"), not how it works ("MOTIS instance").
 - Czech uses vykání ("Vyberte", "Kdykoli to změníte").
+- No "·" between pieces of information. Give each piece its own element, style and spacing; use `LineBadge` for a line,
+  `→` for where something goes, and a comma or a proper sentence in running or spoken text.
 
 ## Commands
 

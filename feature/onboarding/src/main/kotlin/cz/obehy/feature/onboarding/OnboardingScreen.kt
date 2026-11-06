@@ -97,7 +97,7 @@ fun OnboardingScreen(
             )
         },
     ) { padding ->
-        val slide = MaterialTheme.motionScheme.defaultSpatialSpec<IntOffset>()
+        val slide = MaterialTheme.motionScheme.slowSpatialSpec<IntOffset>()
         AnimatedContent(
             targetState = step,
             modifier = Modifier.fillMaxSize().padding(padding).consumeWindowInsets(padding),

@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
+import cz.obehy.core.ui.MorphingBadge
 import cz.obehy.core.ui.ObehyTheme
 
 /** One option of a [ChoiceList], with its texts already resolved. */
@@ -68,7 +69,7 @@ fun <T> ChoiceList(
                 modifier = Modifier.semantics { role = Role.RadioButton },
                 colors =
                     ListItemDefaults.segmentedColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+                        containerColor = ObehyTheme.cardColor,
                         selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
                         selectedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                         selectedSupportingContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -95,16 +96,12 @@ private fun ChoiceBadge(
     selected: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val turn by animateFloatAsState(if (selected) 90f else 0f, MaterialTheme.motionScheme.defaultSpatialSpec())
-    val shape = (if (selected) MaterialShapes.Cookie9Sided else MaterialShapes.Circle).toShape()
+    val turn by animateFloatAsState(if (selected) 90f else 0f, MaterialTheme.motionScheme.fastSpatialSpec())
     val colors = MaterialTheme.colorScheme
-    Box(
-        modifier
-            .size(ObehyTheme.sizes.iconBadge)
-            .rotate(turn)
-            .clip(shape)
-            .background(if (selected) colors.onPrimaryContainer else colors.secondaryContainer),
-        contentAlignment = Alignment.Center,
+    MorphingBadge(
+        if (selected) MaterialShapes.Cookie9Sided else MaterialShapes.Circle,
+        if (selected) colors.onPrimaryContainer else colors.secondaryContainer,
+        modifier.size(ObehyTheme.sizes.iconBadge).rotate(turn),
     ) {
         Icon(
             icon,

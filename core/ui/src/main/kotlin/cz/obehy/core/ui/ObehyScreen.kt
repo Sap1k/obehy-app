@@ -15,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LargeFlexibleTopAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -27,6 +28,8 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.unit.dp
 
 /** How a screen's title bar looks. */
@@ -36,6 +39,9 @@ enum class TitleBar {
 
     /** A single-line title: detail and placeholder screens. */
     Small,
+
+    /** The wordmark, read out as the title: the home screen, which the tab already names. */
+    Logo,
 }
 
 /** How wide a screen's content gets. */
@@ -67,14 +73,18 @@ fun ObehyScreen(
     actions: @Composable RowScope.() -> Unit = {},
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val collapse = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    // Each bar's own: without a bar to set its limit, the collapse would swallow every scroll.
+    val scrolling =
+        when (titleBar) {
+            TitleBar.Large -> TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+            TitleBar.Small, TitleBar.Logo -> TopAppBarDefaults.pinnedScrollBehavior()
+        }
     Scaffold(
-        // Only the large bar collapses. Without a bar to set its limit, the collapse would swallow every scroll.
-        modifier = if (titleBar == TitleBar.Large) modifier.nestedScroll(collapse.nestedScrollConnection) else modifier,
+        modifier = modifier.nestedScroll(scrolling.nestedScrollConnection),
         topBar = {
             val back: @Composable () -> Unit = {
                 if (onBack != null) {
-                    IconButton(onClick = onBack) {
+                    IconButton(onClick = onBack, shapes = IconButtonDefaults.shapes()) {
                         Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
@@ -85,12 +95,23 @@ fun ObehyScreen(
                         title = { Text(title) },
                         navigationIcon = back,
                         actions = actions,
-                        scrollBehavior = collapse,
+                        scrollBehavior = scrolling,
                     )
                 }
 
-                TitleBar.Small -> {
-                    TopAppBar(title = { Text(title) }, navigationIcon = back, actions = actions)
+                TitleBar.Small, TitleBar.Logo -> {
+                    TopAppBar(
+                        title = {
+                            if (titleBar == TitleBar.Logo) {
+                                ObehyLogo(Modifier.clearAndSetSemantics { contentDescription = title })
+                            } else {
+                                Text(title)
+                            }
+                        },
+                        navigationIcon = back,
+                        actions = actions,
+                        scrollBehavior = scrolling,
+                    )
                 }
             }
         },

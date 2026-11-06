@@ -78,6 +78,29 @@ class DesignSystemDetectorTest {
             .expectContains("[ObehyHardcodedText]")
     }
 
+    @Test
+    fun `only buttons that morph pass`() {
+        lint()
+            .files(
+                *stubs,
+                kotlin(
+                    """
+                package cz.obehy.feature.x
+
+                import androidx.compose.material3.Button
+                import androidx.compose.material3.ButtonShapes
+
+                fun Screen(shapes: ButtonShapes) {
+                    Button(onClick = {}, shapes = shapes)
+                    Button(onClick = {})
+                }
+                """,
+                ).indented(),
+            ).check()
+            .expectErrorCount(1)
+            .expectContains("[ObehyStaticButton]")
+    }
+
     // Aliasing an import of CircleShape or FontFamily (only) hides it from the check; nobody does that.
     private fun TestLintTask.check() =
         issues(*DesignSystemDetector.ISSUES.toTypedArray())
@@ -146,6 +169,15 @@ class DesignSystemDetectorTest {
                 """
             package androidx.compose.material3
             fun Text(text: String, modifier: Any? = null) {}
+            """,
+            ).indented(),
+            kotlin(
+                "src/androidx/compose/material3/Button.kt",
+                """
+            package androidx.compose.material3
+            class ButtonShapes
+            fun Button(onClick: () -> Unit, modifier: Any? = null, shape: Any? = null) {}
+            fun Button(onClick: () -> Unit, shapes: ButtonShapes, modifier: Any? = null) {}
             """,
             ).indented(),
             kotlin(
