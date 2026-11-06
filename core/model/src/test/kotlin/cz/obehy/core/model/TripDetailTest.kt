@@ -57,7 +57,7 @@ class TripDetailTest {
         assertEquals("C", leg.to.name)
         assertEquals(listOf(b, LatLon(50.0, 14.15), c), leg.path)
         assertEquals(ride.path, map.around.path)
-        assertEquals(listOf(a, d), map.around.stops)
+        assertEquals(listOf(a, d), map.around.stops.map { it.position })
     }
 
     @Test
@@ -66,7 +66,7 @@ class TripDetailTest {
 
         assertSame(ride, map.legs.single())
         assertEquals(emptyList<LatLon>(), map.around.path)
-        assertEquals(listOf(b, c), map.around.stops)
+        assertEquals(listOf(b, c), map.around.stops.map { it.position })
     }
 
     @Test
@@ -153,5 +153,60 @@ class TripDetailTest {
         assertEquals(4L, plain.delayMinutes)
         assertEquals(7L, plain.copy(info = info).delayMinutes)
         assertNull(TripDetail(ride, listOf(TripStop(stop("A", a))), null).delayMinutes)
+    }
+
+    @Test
+    fun `the approach is the way to where the journey boards`() {
+        val around = TripDetail(ride, TripDetail.stopsOf(ride), 1..2).map.around
+
+        assertEquals(listOf(a, b), around.approach)
+        assertEquals(listOf(false, false), around.stops.map { it.ridden })
+    }
+
+    @Test
+    fun `boarding where the trip begins there's no approach`() {
+        assertEquals(emptyList<LatLon>(), TripDetail(ride, TripDetail.stopsOf(ride), 0..2).map.around.approach)
+    }
+
+    @Test
+    fun `a bearing is degrees clockwise from north`() {
+        val east = listOf(LatLon(50.0, 14.0), LatLon(50.0, 14.1))
+        val south = listOf(LatLon(50.0, 14.0), LatLon(49.9, 14.0))
+
+        assertEquals(90.0, east.bearingAt(east[0])!!, 0.01)
+        assertEquals(180.0, south.bearingAt(south[1])!!, 0.01)
+        assertNull(listOf(a).bearingAt(a))
+    }
+
+    @Test
+    fun `reported vehicles win over the estimate, and take a heading from the path`() {
+        val here = VehiclePosition(LatLon(50.0, 14.05))
+        val info =
+            TripInfo(
+                "t",
+                "2026-11-04",
+                false,
+                null,
+                emptyList(),
+                TripNotes(),
+                emptyList(),
+                emptyList(),
+                false,
+                positions = listOf(here),
+            )
+
+        val shown = TripDetail(ride, TripDetail.stopsOf(ride), null, info).vehiclesAt(time.scheduled).single()
+
+        assertEquals(here.position, shown.position)
+        assertEquals(90.0, shown.bearing!!, 0.01)
+    }
+
+    @Test
+    fun `a report goes stale after a couple of minutes`() {
+        val report = VehiclePosition(a, seenAt = time.scheduled)
+
+        assertEquals(false, report.isStaleAt(time.scheduled.plusSeconds(60)))
+        assertEquals(true, report.isStaleAt(time.scheduled.plusSeconds(180)))
+        assertEquals(false, VehiclePosition(a).isStaleAt(time.scheduled))
     }
 }

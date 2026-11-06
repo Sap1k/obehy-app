@@ -28,10 +28,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,8 +47,15 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
+import cz.obehy.core.map.FollowButton
+import cz.obehy.core.map.FullRouteMap
+import cz.obehy.core.map.GLIDE_MS
 import cz.obehy.core.map.HeroFocus
+import cz.obehy.core.map.MapFraming
+import cz.obehy.core.map.MapVehicle
 import cz.obehy.core.map.RouteMap
+import cz.obehy.core.map.followZoom
+import cz.obehy.core.map.mapVehicles
 import cz.obehy.core.model.MarkedNote
 import cz.obehy.core.model.Mode
 import cz.obehy.core.model.TripAlert
@@ -53,6 +63,7 @@ import cz.obehy.core.model.TripDetail
 import cz.obehy.core.model.TripLinks
 import cz.obehy.core.ui.ObehyHeroScreen
 import cz.obehy.core.ui.ObehyTheme
+import cz.obehy.core.ui.SharedBounds
 import cz.obehy.core.ui.components.DelayLabel
 import cz.obehy.core.ui.components.LineBadge
 import cz.obehy.core.ui.components.featureIcon
@@ -70,44 +81,151 @@ private const val ESTIMATE_EVERY_MS = 5_000L
 /** How often an open trip asks for fresh times while it is on screen. */
 private const val REFRESH_EVERY_MS = 30_000L
 
+/** How often a map following a vehicle asks where it is. */
+private const val FOLLOW_EVERY_MS = 10_000L
+
+/** While it's on screen, a trip is kept fresh; closer still when a map is [following] its vehicle. */
 @Composable
-internal fun TripDestination(
-    onBack: () -> Unit,
-    viewModel: TripViewModel = hiltViewModel(),
+private fun KeepFresh(
+    following: Boolean,
+    onRefresh: () -> Unit,
+    onRefreshPositions: () -> Unit,
 ) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
+    val refresh by rememberUpdatedState(onRefresh)
+    val refreshPositions by rememberUpdatedState(onRefreshPositions)
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     LaunchedEffect(lifecycle) {
         lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             while (true) {
                 delay(REFRESH_EVERY_MS)
-                viewModel.refresh(asked = false)
+                refresh()
             }
         }
     }
-    TripScreen(state, onBack, onRefresh = { viewModel.refresh() }, onRetry = viewModel::load)
+    LaunchedEffect(lifecycle, following) {
+        if (!following) return@LaunchedEffect
+        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            while (true) {
+                delay(FOLLOW_EVERY_MS)
+                refreshPositions()
+            }
+        }
+    }
 }
+
+/** What a trip's maps show right now. */
+private data class TripView(
+    val vehicles: List<MapVehicle> = emptyList(),
+    val framing: MapFraming = MapFraming.Whole,
+    val glideMillis: Int = GLIDE_MS,
+)
+
+/** [TripView]s as the clock moves the estimate of where a vehicle is on, and as [trip] changes. */
+@Composable
+private fun tripView(
+    trip: TripDetail?,
+    following: Boolean,
+): State<TripView> {
+    val now =
+        produceState(Instant.now()) {
+            while (true) {
+                delay(ESTIMATE_EVERY_MS)
+                value = Instant.now()
+            }
+        }
+    return remember(trip, following) {
+        derivedStateOf {
+            val vehicles = trip?.mapVehicles(now.value).orEmpty()
+            val followed = vehicles.firstOrNull()?.takeIf { following } ?: return@derivedStateOf TripView(vehicles)
+            TripView(
+                vehicles,
+                MapFraming.Follow(followed.at.position, followZoom(followed.ride.mode)),
+                (if (followed.at.estimated) ESTIMATE_EVERY_MS else FOLLOW_EVERY_MS).toInt(),
+            )
+        }
+    }
+}
+
+@Composable
+internal fun TripDestination(
+    onBack: () -> Unit,
+    onMap: () -> Unit,
+    viewModel: TripViewModel = hiltViewModel(),
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    KeepFresh(state.following, { viewModel.refresh(asked = false) }, viewModel::refreshPositions)
+    TripScreen(
+        state,
+        onBack,
+        onMap,
+        onFollow = viewModel::follow,
+        onRefresh = { viewModel.refresh() },
+        onRetry = viewModel::load,
+    )
+}
+
+/** The trip on a map of its own. */
+@Composable
+internal fun TripMapDestination(
+    viewModel: TripViewModel,
+    onBack: () -> Unit,
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    KeepFresh(state.following, { viewModel.refresh(asked = false) }, viewModel::refreshPositions)
+    val trip = state.trip
+    val view by tripView(trip, state.following)
+    if (trip == null) {
+        val back by rememberUpdatedState(onBack)
+        LaunchedEffect(Unit) { back() }
+        return
+    }
+    SharedBounds(mapKey(state), Modifier.fillMaxSize()) {
+        FullRouteMap(
+            trip.map.legs,
+            onBack,
+            around = trip.map.around,
+            vehicles = view.vehicles,
+            glideMillis = view.glideMillis,
+            framing = view.framing,
+            onGesture = { viewModel.follow(false) },
+        ) {
+            if (view.vehicles.isNotEmpty()) FollowButton(state.following, viewModel::follow)
+        }
+    }
+}
+
+/** The header map and the full-screen map are one thing, morphing between the two screens. */
+private fun mapKey(state: TripState): String = "map:trip:" + state.motisTripId
 
 /** One trip whole, grown out of its ride: where it runs, then its stops, the train, and the timetable's notes. */
 @Composable
 internal fun TripScreen(
     state: TripState,
     onBack: () -> Unit,
+    onMap: () -> Unit,
+    onFollow: (Boolean) -> Unit,
     onRefresh: () -> Unit,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val trip = state.trip
+    val view = tripView(trip, state.following)
     ObehyHeroScreen(
         title = state.title,
         onBack = onBack,
-        hero = { shrunk -> TripMap(trip, shrunk) },
+        hero = { shrunk ->
+            SharedBounds(mapKey(state), Modifier.fillMaxSize()) { TripMap(trip, view.value, shrunk) }
+        },
         modifier = modifier,
+        onHeroClick = onMap.takeIf { trip != null },
         header = trip?.let { { TripHeader(it) } },
         refreshing = state.refreshing,
         onRefresh = if (trip != null) onRefresh else null,
         contentMorphKey = rideMorphKey(state.motisTripId),
-        actions = { trip?.ride?.links?.let { TripLinksMenu(it) } },
+        actions = {
+            if (view.value.vehicles.isNotEmpty()) FollowButton(state.following, onFollow)
+            trip?.ride?.links?.let { TripLinksMenu(it) }
+        },
     ) {
         when {
             trip != null -> {
@@ -128,6 +246,7 @@ internal fun TripScreen(
 @Composable
 private fun TripMap(
     trip: TripDetail?,
+    view: TripView,
     shrunk: () -> Float,
     modifier: Modifier = Modifier,
 ) {
@@ -135,20 +254,13 @@ private fun TripMap(
         Box(modifier.fillMaxSize().background(MaterialTheme.colorScheme.surfaceContainer))
         return
     }
-    val reported = trip.info?.positions.orEmpty()
-    val now by produceState(Instant.now()) {
-        while (true) {
-            delay(ESTIMATE_EVERY_MS)
-            value = Instant.now()
-        }
-    }
-    val estimated = remember(trip, now) { trip.estimatedPosition(now) }
     RouteMap(
         trip.map.legs,
         modifier.fillMaxSize(),
         around = trip.map.around,
-        vehicles = reported.ifEmpty { listOfNotNull(estimated) },
-        vehicleIcon = trip.ride.mode.icon,
+        vehicles = view.vehicles,
+        glideMillis = view.glideMillis,
+        framing = view.framing,
         shrunk = shrunk,
         focus = HeroFocus.Arrive,
     )

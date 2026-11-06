@@ -128,6 +128,17 @@ class TripRepository
             return copy(sequence = old.sequence, flags = flags + old.flags)
         }
 
+        /** [trip] with where Oběhy last saw its vehicles and how late they are; as it is if that can't be had. */
+        suspend fun positions(trip: TripDetail): TripDetail {
+            val info = trip.info ?: return trip
+            return runCatching {
+                withContext(computation) {
+                    val fresh = obehy.trip(info.tripId, info.serviceDate).toTripInfo(appLanguage())
+                    trip.copy(info = info.copy(positions = fresh.positions, delayMinutes = fresh.delayMinutes))
+                }
+            }.getOrDefault(trip)
+        }
+
         /** What's known of the train of [info] from where the journey boards; may still be on its way. */
         suspend fun composition(info: TripInfo): Result<Composition> =
             runCatching {

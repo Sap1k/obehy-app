@@ -64,8 +64,9 @@ data class Sizes(
     val coachCab: Dp = 14.dp,
     /** The cookie a small icon sits on, at the start of a line of information. */
     val iconCookie: Dp = 32.dp,
-    /** A vehicle on a map. */
-    val mapVehicle: Dp = 28.dp,
+    /** How tall a vehicle's pill stands on a map, and how far its tip reaches beyond the pill. */
+    val mapVehicle: Dp = 22.dp,
+    val mapVehicleTip: Dp = 8.dp,
 )
 
 internal val LocalSpacing = staticCompositionLocalOf { Spacing() }

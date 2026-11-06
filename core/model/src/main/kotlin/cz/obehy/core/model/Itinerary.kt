@@ -188,6 +188,26 @@ data class Itinerary(
                 .maxOrNull()
 }
 
+/** The stretch of a journey that matters right now: [legs] to show, and the [ride] they lead to. */
+data class JourneyFocus(
+    val legs: List<Leg>,
+    val ride: Leg.Transit?,
+)
+
+/** How long before a journey sets off it's what you're doing, rather than a plan. */
+private val FOCUS_AHEAD: Duration = Duration.ofHours(1)
+
+/**
+ * What of these legs matters at [now]: the ride you're on, or the next one with any walk to it,
+ * which may be all of them. Null further than an hour ahead, and once it's over.
+ */
+fun List<Leg>.focusAt(now: Instant): JourneyFocus? {
+    if (isEmpty() || now < first().start.expected.minus(FOCUS_AHEAD) || now >= last().end.expected) return null
+    val current = indexOfFirst { now < it.end.expected }
+    val last = (current until size).firstOrNull { this[it] is Leg.Transit } ?: lastIndex
+    return JourneyFocus(subList(current, last + 1).toList(), this[last] as? Leg.Transit)
+}
+
 /** A page of results, with the cursors for earlier and later ones. */
 data class JourneyPage(
     val itineraries: List<Itinerary>,

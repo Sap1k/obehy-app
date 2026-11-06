@@ -21,6 +21,7 @@
 
     <string name="delay_late">%d min late</string>
     <string name="delay_short">+%d min</string>
+    <string name="delay_marker">+%d</string>
     <string name="platform">Pl. %s</string>
     <string name="platform_changed">Platform changed to %s</string>
     <string name="low_floor">Low-floor</string>

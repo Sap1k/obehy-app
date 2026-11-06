@@ -3,6 +3,8 @@ package cz.obehy.core.model
 import kotlinx.serialization.Serializable
 import java.time.Duration
 import java.time.Instant
+import kotlin.math.atan2
+import kotlin.math.cos
 
 /** What a timetable says about getting on or off at one stop. */
 enum class CallFlag { RequestStop, ExitOnly, BoardingOnly }
@@ -56,11 +58,20 @@ data class TripDetail(
                 val share =
                     Duration.between(leaves, now).toMillis().toDouble() / Duration.between(leaves, arrives).toMillis()
                 val way = ride.path.between(start, end).takeIf { it.size >= 2 } ?: listOf(start, end)
-                return VehiclePosition(way.along(share), estimated = true)
+                val here = way.along(share)
+                return VehiclePosition(here, way.bearingAt(here), estimated = true)
             }
         }
         return null
     }
+
+    /** Where to show this trip's vehicles at [now]: what's reported, or else where one should be. */
+    fun vehiclesAt(now: Instant): List<VehiclePosition> =
+        info
+            ?.positions
+            .orEmpty()
+            .map { it.copy(bearing = it.bearing ?: ride.path.bearingAt(it.position)) }
+            .ifEmpty { listOfNotNull(estimatedPosition(now)) }
 
     /** Everything said about disruptions, each once. */
     val alerts: List<TripAlert> get() = (ride.alerts + info?.alerts.orEmpty()).distinctBy { it.title }
@@ -116,10 +127,22 @@ private val ATTRIBUTE_GROUPS =
         listOf("family"),
     )
 
-/** The rest of a trip around the legs on a map: drawn quietly, and framed along with them. */
+/** A stop on the way that a map names only once there's room. [ridden] when the journey rides past it. */
+data class MapStop(
+    val position: LatLon,
+    val name: String,
+    val ridden: Boolean,
+)
+
+/**
+ * The rest of a trip around the legs on a map: drawn quietly, and framed along with them. [approach]
+ * is the way its vehicle comes to where the journey boards, in the route's [approachColor].
+ */
 data class RouteSurroundings(
-    val path: List<LatLon>,
-    val stops: List<LatLon>,
+    val path: List<LatLon> = emptyList(),
+    val stops: List<MapStop> = emptyList(),
+    val approach: List<LatLon> = emptyList(),
+    val approachColor: String? = null,
 )
 
 /** A trip on a map: the stretch ridden in its colour, or all of it if that isn't known, the rest quietly around it. */
@@ -135,11 +158,21 @@ data class TripMap(
         ): TripMap {
             val leg = boarded?.let { ride.part(stops[it.first].call, stops[it.last].call) } ?: ride
             val others =
-                stops
-                    .mapNotNull {
-                        it.call.position
-                    }.filter { it != leg.from.position && it != leg.to.position }
-            return TripMap(listOf(leg), RouteSurroundings(ride.path.takeIf { leg !== ride }.orEmpty(), others))
+                stops.mapIndexedNotNull { index, stop ->
+                    val at = stop.call.position
+                    if (at == null || at == leg.from.position || at == leg.to.position) {
+                        null
+                    } else {
+                        MapStop(at, stop.call.name, boarded == null || index in boarded)
+                    }
+                }
+            val rest = ride.path.takeIf { leg !== ride }.orEmpty()
+            val approach =
+                leg.from.position
+                    ?.takeIf { boarded?.first != 0 }
+                    ?.let { rest.upTo(it) }
+                    .orEmpty()
+            return TripMap(listOf(leg), RouteSurroundings(rest, others, approach, ride.color))
         }
     }
 }
@@ -155,12 +188,23 @@ internal fun Leg.Transit.part(
     return copy(from = from, to = to, intermediateStops = emptyList(), path = stretch)
 }
 
-/** Where a vehicle on a trip is now, or should be, when [estimated] rather than reported. */
+/**
+ * Where a vehicle on a trip is now, or should be, when [estimated] rather than reported. [bearing]
+ * is in degrees clockwise from north; [seenAt] is when a report placed it there.
+ */
 data class VehiclePosition(
     val position: LatLon,
     val bearing: Double? = null,
     val estimated: Boolean = false,
-)
+    val seenAt: Instant? = null,
+) {
+    /** The report is too old at [now] to say where the vehicle really is. */
+    fun isStaleAt(now: Instant): Boolean = seenAt != null && Duration.between(seenAt, now) > STALE_AFTER
+
+    private companion object {
+        val STALE_AFTER: Duration = Duration.ofMinutes(2)
+    }
+}
 
 /** What only Oběhy knows about a trip. */
 data class TripInfo(
@@ -224,6 +268,26 @@ internal fun List<LatLon>.along(share: Double): LatLon {
         left -= length
     }
     return last()
+}
+
+/** Which way this path heads where it passes closest to [point], in degrees clockwise from north. */
+fun List<LatLon>.bearingAt(point: LatLon): Double? {
+    val (a, b) =
+        zipWithNext()
+            .filter { (a, b) -> a != b }
+            .minByOrNull { (a, b) -> LatLon((a.lat + b.lat) / 2, (a.lon + b.lon) / 2).metresTo(point) }
+            ?: return null
+    val north = b.lat - a.lat
+    val east = (b.lon - a.lon) * cos(Math.toRadians((a.lat + b.lat) / 2))
+    return (Math.toDegrees(atan2(east, north)) + FULL_CIRCLE) % FULL_CIRCLE
+}
+
+private const val FULL_CIRCLE = 360.0
+
+/** This path from its start to the point nearest [end]. */
+internal fun List<LatLon>.upTo(end: LatLon): List<LatLon> {
+    if (size < 2) return emptyList()
+    return subList(0, indices.minBy { this[it].metresTo(end) } + 1).toList()
 }
 
 /** One point along a path nearest to [from], and the path on from there to the point nearest [to]. */

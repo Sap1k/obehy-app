@@ -17,6 +17,7 @@ import cz.obehy.core.model.TripVehicleInfo
 import cz.obehy.core.model.UnitKind
 import cz.obehy.core.model.VehiclePosition
 import cz.obehy.core.model.tripNotes
+import java.time.OffsetDateTime
 
 // Oběhy answers → domain types. Nothing Oběhy-shaped leaves this file's callers.
 
@@ -62,7 +63,12 @@ fun ObehyTrip.toTripInfo(
             vehicles.mapNotNull { vehicle ->
                 val lat = vehicle.latitude
                 val lon = vehicle.longitude
-                if (lat != null && lon != null) VehiclePosition(LatLon(lat, lon), vehicle.bearing) else null
+                if (lat != null && lon != null) {
+                    val seenAt = OffsetDateTime.parse(vehicle.positionAt ?: vehicle.lastSeen).toInstant()
+                    VehiclePosition(LatLon(lat, lon), vehicle.bearing, seenAt = seenAt)
+                } else {
+                    null
+                }
             },
     )
 

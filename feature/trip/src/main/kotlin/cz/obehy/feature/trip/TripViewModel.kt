@@ -33,6 +33,8 @@ internal data class TripState(
     /** The user asked for fresh times and they're on their way. */
     val refreshing: Boolean = false,
     val failed: Boolean = false,
+    /** The maps stay on the vehicle. */
+    val following: Boolean = false,
 )
 
 @HiltViewModel
@@ -87,6 +89,17 @@ internal class TripViewModel
                 local.update { it.copy(trip = fresh ?: it.trip, refreshing = false) }
             }
         }
+
+        /** Where the vehicles are, on its own: a map following one wants this more often than fresh times. */
+        fun refreshPositions() {
+            val trip = local.value.trip ?: return
+            viewModelScope.launch {
+                val fresh = trips.positions(trip)
+                local.update { state -> state.copy(trip = state.trip?.copy(info = fresh.info)) }
+            }
+        }
+
+        fun follow(following: Boolean) = local.update { it.copy(following = following) }
 
         /** The API asks its source lazily: an answer on its way is asked for again at its pace. */
         private fun watchComposition(info: TripInfo) {

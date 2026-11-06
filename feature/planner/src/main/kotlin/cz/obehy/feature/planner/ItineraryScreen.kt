@@ -1,16 +1,11 @@
 package cz.obehy.feature.planner
 
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.ArrowBack
-import androidx.compose.material3.FilledTonalIconButton
-import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -18,22 +13,34 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
+import cz.obehy.core.map.FullRouteMap
 import cz.obehy.core.map.HeroFocus
+import cz.obehy.core.map.MapFraming
+import cz.obehy.core.map.MapVehicle
 import cz.obehy.core.map.PreloadRouteMaps
 import cz.obehy.core.map.RouteMap
+import cz.obehy.core.map.WholeJourneyButton
+import cz.obehy.core.map.heldVehiclePlace
+import cz.obehy.core.map.heroFraming
+import cz.obehy.core.map.mapVehicles
+import cz.obehy.core.map.takingIn
 import cz.obehy.core.model.JourneyQuery
+import cz.obehy.core.model.LatLon
 import cz.obehy.core.model.Leg
+import cz.obehy.core.model.RouteSurroundings
+import cz.obehy.core.model.focusAt
 import cz.obehy.core.ui.ObehyHeroScreen
-import cz.obehy.core.ui.ObehyTheme
 import cz.obehy.core.ui.SharedBounds
 import cz.obehy.core.ui.components.clock
 import kotlinx.coroutines.delay
 import java.time.Duration
 import java.time.Instant
-import cz.obehy.core.ui.R as UiR
 
 /** How often an open journey asks for fresh times while it is on screen. */
 private val REFRESH_EVERY: Duration = Duration.ofMinutes(1)
+
+/** How often its maps catch up with the clock. */
+private const val VIEW_EVERY_MS = 10_000L
 
 @Composable
 internal fun ItineraryDestination(
@@ -72,12 +79,73 @@ internal fun ItineraryDestination(
     ItineraryScreen(
         open,
         state.query,
+        journeyView(viewModel, state, open),
         covered,
         onBack,
         onMap,
         onRefresh = { viewModel.act(PlannerAction.Refresh) },
+        onWhole = { viewModel.act(PlannerAction.ShowWholeJourney(it)) },
         onOpenTrip = onOpenTrip,
     )
+}
+
+/** How a journey's maps look right now: where they frame, and what's on its way to you. */
+internal data class JourneyView(
+    val framing: MapFraming = MapFraming.Whole,
+    /** There's a part of the journey that matters more now, whether it's shown or not. */
+    val focused: Boolean = false,
+    val around: RouteSurroundings? = null,
+    val vehicles: List<MapVehicle> = emptyList(),
+)
+
+/** What [open]'s maps show as time goes by, watching the ride that matters while on screen. */
+@Composable
+private fun journeyView(
+    viewModel: PlannerViewModel,
+    state: PlannerState,
+    open: OpenJourney,
+): JourneyView {
+    val legs = open.itinerary.legs
+    val now by produceState(Instant.now()) {
+        while (true) {
+            delay(VIEW_EVERY_MS)
+            value = Instant.now()
+        }
+    }
+    val focus = remember(legs, now) { legs.focusAt(now) }
+    val ride = focus?.ride
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    val watching by rememberUpdatedState(ride)
+    LaunchedEffect(lifecycle, ride?.tripId) {
+        val wanted = watching ?: return@LaunchedEffect
+        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) { viewModel.watchRide(wanted) }
+    }
+    val base =
+        remember(legs, focus, state.wholeJourney) {
+            if (state.wholeJourney) MapFraming.Whole else heroFraming(legs, now)
+        }
+    val trip = state.watched?.takeIf { ride != null && it.ride.tripId == ride.tripId }
+    val waiting = trip != null && ride != null && now < ride.start.expected
+    val around =
+        remember(trip?.map, waiting) {
+            trip?.map?.around?.takeIf { waiting && it.approach.size >= 2 }?.let {
+                RouteSurroundings(approach = it.approach, approachColor = it.approachColor)
+            }
+        }
+    val vehicles = remember(trip, now) { trip?.mapVehicles(now).orEmpty() }
+    // While you wait, what you're waiting for is worth seeing, if that doesn't lose the rest.
+    val boarding = ride?.from?.position
+    val coming =
+        vehicles
+            .firstOrNull()
+            ?.takeIf { waiting }
+            ?.at
+            ?.position
+    val held = remember(ride?.tripId) { arrayOfNulls<LatLon>(1) }
+    val place = remember(held, coming) { heldVehiclePlace(held[0], coming, boarding).also { held[0] = it } }
+    val framing = remember(base, place, boarding) { base.takingIn(place, boarding) }
+    val partOfIt = focus != null && focus.legs.size < legs.size
+    return JourneyView(framing, focused = partOfIt, around, vehicles)
 }
 
 /** One journey: its map at the head, collapsing into the bar as the timeline scrolls. */
@@ -85,10 +153,12 @@ internal fun ItineraryDestination(
 internal fun ItineraryScreen(
     open: OpenJourney,
     query: JourneyQuery,
+    view: JourneyView,
     covered: Boolean,
     onBack: () -> Unit,
     onMap: () -> Unit,
     onRefresh: () -> Unit,
+    onWhole: (Boolean) -> Unit,
     onOpenTrip: (Leg.Transit) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -100,12 +170,23 @@ internal fun ItineraryScreen(
             onBack = onBack,
             hero = { shrunk ->
                 SharedBounds(mapKey(open), Modifier.fillMaxSize()) {
-                    RouteMap(itinerary.legs, Modifier.fillMaxSize(), shrunk = shrunk, focus = HeroFocus.Leave)
+                    RouteMap(
+                        itinerary.legs,
+                        Modifier.fillMaxSize(),
+                        around = view.around,
+                        vehicles = view.vehicles,
+                        framing = view.framing,
+                        shrunk = shrunk,
+                        focus = HeroFocus.Leave,
+                    )
                 }
             },
             onHeroClick = onMap,
             refreshing = open.refreshing,
             onRefresh = onRefresh,
+            actions = {
+                if (view.focused) WholeJourneyButton(view.framing == MapFraming.Whole, onWhole)
+            },
         ) {
             ItineraryTimeline(itinerary, query.from?.label(), query.to?.label(), onOpenTrip)
         }
@@ -128,14 +209,22 @@ internal fun JourneyMapDestination(
         LaunchedEffect(Unit) { back() }
         return
     }
-    // Edge to edge, so it leaves ObehyScreen's frame: only the back button floats over the map.
+    val view = journeyView(viewModel, state, open)
+    // Edge to edge, so it leaves ObehyScreen's frame.
     SharedBounds(mapKey(open), Modifier.fillMaxSize()) {
-        RouteMap(open.itinerary.legs, Modifier.fillMaxSize(), interactive = true, fullscreen = true)
-        FilledTonalIconButton(
-            onClick = onBack,
-            modifier = Modifier.safeDrawingPadding().padding(ObehyTheme.spacing.s),
+        FullRouteMap(
+            open.itinerary.legs,
+            onBack,
+            around = view.around,
+            vehicles = view.vehicles,
+            framing = view.framing,
         ) {
-            Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(UiR.string.back))
+            if (view.focused) {
+                WholeJourneyButton(
+                    view.framing == MapFraming.Whole,
+                    { viewModel.act(PlannerAction.ShowWholeJourney(it)) },
+                )
+            }
         }
     }
 }

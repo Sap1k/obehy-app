@@ -116,6 +116,7 @@ data class TripVehicle(
     val vehicleId: String,
     val state: String,
     val lastSeen: String,
+    val positionAt: String? = null,
     val latitude: Double? = null,
     val longitude: Double? = null,
     val bearing: Double? = null,

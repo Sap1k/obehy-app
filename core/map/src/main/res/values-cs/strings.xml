@@ -3,4 +3,6 @@
     <string name="map_credits">Zdroje mapy</string>
     <string name="map_vehicle">Kde je vozidlo teď</string>
     <string name="map_vehicle_estimated">Kde by vozidlo teď mělo být podle časů</string>
+    <string name="map_follow">Sledovat vozidlo</string>
+    <string name="map_whole_journey">Ukázat celou cestu</string>
 </resources>

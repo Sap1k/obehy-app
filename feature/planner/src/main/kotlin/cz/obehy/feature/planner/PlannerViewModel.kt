@@ -12,6 +12,7 @@ import cz.obehy.core.data.SearchHistoryRepository
 import cz.obehy.core.data.SessionStore
 import cz.obehy.core.data.SettingsRepository
 import cz.obehy.core.data.TripRepository
+import cz.obehy.core.data.tripRequest
 import cz.obehy.core.model.InstantSerializer
 import cz.obehy.core.model.Itinerary
 import cz.obehy.core.model.JourneyQuery
@@ -22,11 +23,13 @@ import cz.obehy.core.model.Place
 import cz.obehy.core.model.PlaceKind
 import cz.obehy.core.model.SearchOptions
 import cz.obehy.core.model.Suggestion
+import cz.obehy.core.model.TripDetail
 import cz.obehy.core.model.TripMap
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -70,6 +73,9 @@ sealed interface PlaceTarget {
 
 /** Whether nearby stops can be shown, and if not, what would make them appear. */
 enum class NearbyStatus { Unknown, Loading, Ready, NeedsPermission, Off }
+
+/** How often the ride that matters on an open journey asks where its vehicle is. */
+private const val WATCH_EVERY_MS = 30_000L
 
 /** Nearby stops fetched ahead of the picker opening. */
 private class PreloadedStops(
@@ -134,6 +140,10 @@ data class PlannerState(
     val open: OpenJourney? = null,
     /** The maps of the trips ridden on the [open] journey, fetched ahead. */
     val tripMaps: List<TripMap> = emptyList(),
+    /** The ride of the [open] journey that matters now, kept up to date while it's on screen. */
+    val watched: TripDetail? = null,
+    /** The user asked to see the whole of the [open] journey rather than the part that matters now. */
+    val wholeJourney: Boolean = false,
     /** Journeys to offer before a search. */
     val suggestions: List<Suggestion> = emptyList(),
     /** The app was killed and is reading back where the user was: nothing to show or act on yet. */
@@ -172,6 +182,10 @@ sealed interface PlannerAction {
 
     data class ForgetPlace(
         val place: Place,
+    ) : PlannerAction
+
+    data class ShowWholeJourney(
+        val whole: Boolean,
     ) : PlannerAction
 
     /** The app came back, or the permission was answered: the location's status may have changed. */
@@ -393,12 +407,23 @@ class PlannerViewModel
 
                 is PlannerAction.Select -> {
                     val fetchedAt = (local.value.results as? Results.Loaded)?.fetchedAt ?: now()
-                    local.update { it.copy(open = OpenJourney(action.itinerary, fetchedAt), tripMaps = emptyList()) }
+                    local.update {
+                        it.copy(
+                            open = OpenJourney(action.itinerary, fetchedAt),
+                            tripMaps = emptyList(),
+                            watched = null,
+                            wholeJourney = false,
+                        )
+                    }
                     fetchTripsAhead(action.itinerary)
                 }
 
                 PlannerAction.Refresh -> {
                     refresh()
+                }
+
+                is PlannerAction.ShowWholeJourney -> {
+                    local.update { it.copy(wholeJourney = action.whole) }
                 }
 
                 PlannerAction.RefreshResults -> {
@@ -541,6 +566,18 @@ class PlannerViewModel
                     val fetched = trips.fetchAhead(itinerary.legs.filterIsInstance<Leg.Transit>())
                     local.update { state -> state.copy(tripMaps = fetched.map { it.map }) }
                 }
+        }
+
+        /** Keeps [PlannerState.watched] on [ride], its trip and where its vehicle is, until cancelled. */
+        suspend fun watchRide(ride: Leg.Transit) {
+            val request = ride.tripRequest ?: return
+            val plain = trips.plain(request).getOrNull() ?: return
+            var trip = trips.withDetails(plain, request)
+            while (true) {
+                local.update { it.copy(watched = trip) }
+                delay(WATCH_EVERY_MS)
+                trip = trips.positions(trip)
+            }
         }
 
         /** The open journey's times again; it stays as it was when it can't be found again. */

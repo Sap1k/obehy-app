@@ -20,6 +20,7 @@
 
     <string name="delay_late">Zpoždění %d min</string>
     <string name="delay_short">+%d min</string>
+    <string name="delay_marker">+%d</string>
     <string name="platform">nást. %s</string>
     <string name="platform_changed">Změna nástupiště na %s</string>
     <string name="low_floor">Nízkopodlažní</string>

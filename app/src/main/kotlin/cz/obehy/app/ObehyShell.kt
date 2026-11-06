@@ -42,6 +42,7 @@ import cz.obehy.feature.onboarding.settingsScreen
 import cz.obehy.feature.planner.JourneyMapRoute
 import cz.obehy.feature.planner.PlannerRoute
 import cz.obehy.feature.planner.plannerScreen
+import cz.obehy.feature.trip.TripMapRoute
 import cz.obehy.feature.trip.TripRoute
 import cz.obehy.feature.trip.navigateToTrip
 import cz.obehy.feature.trip.tripScreen
@@ -74,7 +75,11 @@ private fun destinations(mode: AppMode): List<TopLevel> =
 
 /** A screen that grows out of something on the one before, which stays put under it. */
 private val NavDestination.morphsIn: Boolean
-    get() = hasRoute(JourneyMapRoute::class) || hasRoute(TripRoute::class)
+    get() = isFullMap || hasRoute(TripRoute::class)
+
+/** A map filling the window, the navigation bar out of its way. */
+private val NavDestination.isFullMap: Boolean
+    get() = hasRoute(JourneyMapRoute::class) || hasRoute(TripMapRoute::class)
 
 /**
  * The app's frame in Material 3 Expressive: the short bottom bar on phones, the wide navigation
@@ -88,7 +93,7 @@ fun ObehyShell(
     val nav = rememberNavController()
     val entry by nav.currentBackStackEntryAsState()
     val current = entry?.destination
-    val onMap = current?.hasRoute(JourneyMapRoute::class) == true
+    val onMap = current?.isFullMap == true
     val bar = rememberNavigationSuiteScaffoldState()
     // The bar slides away for the map, and back along with its shrinking into the journey.
     LaunchedEffect(onMap) { if (onMap) bar.hide() else bar.show() }
@@ -125,7 +130,7 @@ fun ObehyShell(
                 nav,
                 startDestination = PlannerRoute,
                 enterTransition = {
-                    if (targetState.destination.hasRoute(JourneyMapRoute::class)) {
+                    if (targetState.destination.isFullMap) {
                         EnterTransition.None
                     } else if (targetState.destination.hasRoute(TripRoute::class)) {
                         fadeIn(tween(BACK_MS, easing = BackEasing))

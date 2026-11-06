@@ -1,5 +1,7 @@
 package cz.obehy.feature.trip
 
+import androidx.compose.runtime.remember
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -18,10 +20,20 @@ data class TripRoute(
     val toStopId: String? = null,
 )
 
+/** The open trip on a full-screen map; the app's navigation bar makes way for it. */
+@Serializable
+data object TripMapRoute
+
 fun NavController.navigateToTrip(route: TripRoute) = navigate(route)
 
 fun NavGraphBuilder.tripScreen(nav: NavController) {
     composable<TripRoute> {
-        AnimatedDestination(this) { TripDestination(onBack = { nav.popBackStack() }) }
+        AnimatedDestination(this) {
+            TripDestination(onBack = { nav.popBackStack() }, onMap = { nav.navigate(TripMapRoute) })
+        }
+    }
+    composable<TripMapRoute> { entry ->
+        val trip = remember(entry) { nav.getBackStackEntry<TripRoute>() }
+        AnimatedDestination(this) { TripMapDestination(hiltViewModel(trip), onBack = { nav.popBackStack() }) }
     }
 }

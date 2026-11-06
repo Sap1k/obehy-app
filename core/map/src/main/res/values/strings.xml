@@ -3,4 +3,6 @@
     <string name="map_credits">Map credits</string>
     <string name="map_vehicle">Where the vehicle is now</string>
     <string name="map_vehicle_estimated">Where the vehicle should be now, going by its times</string>
+    <string name="map_follow">Follow the vehicle</string>
+    <string name="map_whole_journey">Show the whole journey</string>
 </resources>
