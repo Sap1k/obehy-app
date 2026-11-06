@@ -30,6 +30,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimeInput
@@ -38,6 +39,7 @@ import androidx.compose.material3.TimePickerDialog
 import androidx.compose.material3.TimePickerDialogDefaults
 import androidx.compose.material3.TimePickerDisplayMode
 import androidx.compose.material3.ToggleButton
+import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
@@ -57,6 +59,7 @@ import cz.obehy.core.model.SearchOptions
 import cz.obehy.core.model.TransportType
 import cz.obehy.core.ui.ObehyTheme
 import cz.obehy.core.ui.components.clock
+import cz.obehy.core.ui.components.limeFilterChipColors
 import cz.obehy.core.ui.icon
 import cz.obehy.core.ui.label
 import java.time.Instant
@@ -212,6 +215,11 @@ private fun ConnectedChoice(
     onChoose: (second: Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val colors =
+        ToggleButtonDefaults.colors(
+            checkedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            checkedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        )
     Row(
         modifier.fillMaxWidth().selectableGroup(),
         horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
@@ -221,12 +229,14 @@ private fun ConnectedChoice(
             onCheckedChange = { onChoose(false) },
             modifier = Modifier.weight(1f).semantics { role = Role.RadioButton },
             shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(),
+            colors = colors,
         ) { Text(stringResource(first)) }
         ToggleButton(
             checked = second,
             onCheckedChange = { onChoose(true) },
             modifier = Modifier.weight(1f).semantics { role = Role.RadioButton },
             shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(),
+            colors = colors,
         ) { Text(stringResource(other)) }
     }
 }
@@ -247,7 +257,18 @@ private fun OptionRow(
         shapes = ListItemDefaults.segmentedShapes(index, 2),
         modifier = modifier.semantics { role = Role.Switch },
         supportingContent = { Text(stringResource(body)) },
-        trailingContent = { Switch(on, onCheckedChange = null) },
+        trailingContent = {
+            Switch(
+                on,
+                onCheckedChange = null,
+                colors =
+                    SwitchDefaults.colors(
+                        checkedTrackColor = MaterialTheme.colorScheme.primaryContainer,
+                        checkedThumbColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        checkedIconColor = MaterialTheme.colorScheme.primaryContainer,
+                    ),
+            )
+        },
         colors = ListItemDefaults.segmentedColors(containerColor = ObehyTheme.cardColor),
     ) {
         Text(stringResource(title))
@@ -307,6 +328,7 @@ internal fun OptionsSheet(
                         },
                         label = { Text(stringResource(type.label)) },
                         leadingIcon = { Icon(type.icon, null, Modifier.size(ObehyTheme.sizes.iconSmall)) },
+                        colors = limeFilterChipColors(),
                     )
                 }
             }

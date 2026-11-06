@@ -80,8 +80,8 @@ import java.time.Instant
 private val TRAINS =
     setOf(Mode.RegionalRail, Mode.SuburbanRail, Mode.LongDistanceRail, Mode.HighSpeedRail, Mode.NightRail)
 
-/** How often the estimate of where a vehicle is moves on. */
-private const val ESTIMATE_EVERY_MS = 5_000L
+/** How often the estimate of where a vehicle is moves on; it slides from one to the next without a stop. */
+private const val ESTIMATE_EVERY_MS = 2_000L
 
 /** How often an open trip asks for fresh times while it is on screen. */
 private const val REFRESH_EVERY_MS = 30_000L
@@ -135,12 +135,11 @@ private fun tripView(
     return remember(trip, following) {
         derivedStateOf {
             val vehicles = trip?.mapVehicles(now.value).orEmpty()
-            val followed = vehicles.firstOrNull()?.takeIf { following } ?: return@derivedStateOf TripView(vehicles)
-            TripView(
-                vehicles,
-                MapFraming.Follow(followed.at.position, followZoom(followed.ride.mode)),
-                (if (followed.at.estimated) ESTIMATE_EVERY_MS else FOLLOW_EVERY_MS).toInt(),
-            )
+            val glide = if (vehicles.firstOrNull()?.at?.estimated == true) ESTIMATE_EVERY_MS.toInt() else GLIDE_MS
+            val followed =
+                vehicles.firstOrNull()?.takeIf { following }
+                    ?: return@derivedStateOf TripView(vehicles, glideMillis = glide)
+            TripView(vehicles, MapFraming.Follow(followed.at.position, followZoom(followed.ride.mode)), glide)
         }
     }
 }

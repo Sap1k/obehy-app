@@ -89,7 +89,7 @@
     <string name="trouble_missed">Na %1$s v zastávce %2$s nestihnete přestoupit, chybí %3$s</string>
     <string name="find_another_way">Najít jinou cestu</string>
     <string name="stage_walking_to">pěšky: %s</string>
-    <string name="stage_riding_to">do zastávky %s</string>
+    <string name="stage_riding_to">výstup</string>
     <string name="stage_walking">Pěšky: %1$s, zbývá %2$s</string>
     <string name="stage_waiting">%1$s odjíždí ze zastávky %3$s za %2$s</string>
     <string name="stage_riding">%1$s do zastávky %2$s, %3$s</string>

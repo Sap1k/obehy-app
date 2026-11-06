@@ -20,6 +20,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.withFrameMillis
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -75,6 +76,21 @@ fun rememberNow(everyMillis: Long): State<Instant> =
             delay(everyMillis)
         }
     }
+
+/**
+ * The clock for something that creeps along, to be read only while drawing: a tick moves it by less
+ * than a pixel, and redraws without recomposing. It rests while no frames are being drawn.
+ */
+@Composable
+fun rememberSmoothNow(): State<Instant> =
+    produceState(Instant.now()) {
+        while (true) {
+            withFrameMillis { value = Instant.now() }
+            delay(SMOOTH_STEP_MS)
+        }
+    }
+
+private const val SMOOTH_STEP_MS = 250L
 
 private val TimePoint.moved: Boolean
     get() = realtime && expected.truncatedTo(ChronoUnit.MINUTES) != scheduled.truncatedTo(ChronoUnit.MINUTES)

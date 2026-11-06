@@ -369,13 +369,16 @@ fun LiveMark(modifier: Modifier = Modifier) {
     )
 }
 
-/** The low-floor mark: an icon, spoken as "Low-floor". */
+/** The low-floor mark: an icon, spoken as "Low-floor". With [onLime], for when it lies on a selected thing. */
 @Composable
-fun LowFloorIcon(modifier: Modifier = Modifier) {
+fun LowFloorIcon(
+    modifier: Modifier = Modifier,
+    onLime: Boolean = false,
+) {
     Icon(
         Icons.Rounded.Accessible,
         contentDescription = stringResource(R.string.low_floor),
         modifier = modifier.size(ObehyTheme.sizes.iconSmall),
-        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+        tint = if (onLime) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
     )
 }

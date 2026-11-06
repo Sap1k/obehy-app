@@ -72,8 +72,9 @@ The look is defined once, in `core:ui`, and everything else reads it:
   or to mark a change of state, never on the timeline, the journey bar or line badges. Springs (`MaterialTheme.motionScheme`)
   for all motion, fast for small things and slow for whole screens; only what the back gesture scrubs stays on a tween
   (`SharedMotion.kt` says why).
-- Brand (Figma "Oběhy – marketing"): Lime marks a selected or current state, and the main action on dark, always with
-  dark text on it. On light the main action is Petrol, as Lime would vanish into Paper. Route and operator colours are data: show them as they come, never recoloured to the brand. Never let colour
+- Brand (Figma "Oběhy – marketing"): anything selected, on or current is Lime with dark text on it, whatever the
+  control: options, tabs, chips (`limeFilterChipColors`), toggles and switches. Material's defaults use other colours
+  for these, so set them. Actions, text and lines are `primary`: Petrol on light, as Lime would vanish into Paper. Route and operator colours are data: show them as they come, never recoloured to the brand. Never let colour
   alone carry a status (delay, cancellation): pair it with text or an icon.
 
 ## Writing a screen

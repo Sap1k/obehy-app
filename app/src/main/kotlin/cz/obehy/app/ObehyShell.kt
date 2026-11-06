@@ -17,6 +17,7 @@ import androidx.compose.material.icons.rounded.Map
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ShortNavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteItem
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
@@ -124,6 +125,14 @@ fun ObehyShell(
     val current = entry?.destination
     val onMap = current?.isFullMap == true
     val bar = rememberNavigationSuiteScaffoldState()
+    // Lime like anything else that's selected. A label lies on it only beside its icon.
+    val tabColors =
+        ShortNavigationBarItemDefaults.colors(
+            selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            selectedTextColorTopIconPosition = MaterialTheme.colorScheme.onSurface,
+            selectedTextColorStartIconPosition = MaterialTheme.colorScheme.onPrimaryContainer,
+            selectedIndicatorColor = MaterialTheme.colorScheme.primaryContainer,
+        )
     // The bar slides away for the map, and back along with its shrinking into the journey.
     LaunchedEffect(onMap) { if (onMap) bar.hide() else bar.show() }
     NavigationSuiteScaffold(
@@ -136,6 +145,7 @@ fun ObehyShell(
                     current?.hierarchy?.any { it.hasRoute(top.routeClass) } == true ||
                         (top.routeClass == PlannerRoute::class && current?.hasRoute(TripRoute::class) == true)
                 NavigationSuiteItem(
+                    colors = tabColors,
                     selected = selected,
                     onClick = {
                         nav.navigate(top.route) {

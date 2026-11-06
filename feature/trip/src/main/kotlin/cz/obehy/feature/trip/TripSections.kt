@@ -83,18 +83,15 @@ import cz.obehy.core.ui.components.VehicleId
 import cz.obehy.core.ui.components.featureIcon
 import cz.obehy.core.ui.components.passedLabel
 import cz.obehy.core.ui.components.quietStroke
-import cz.obehy.core.ui.components.rememberNow
 import cz.obehy.core.ui.components.rememberPassed
 import cz.obehy.core.ui.components.rememberPlatformWidth
 import cz.obehy.core.ui.components.rememberScheduleTimeWidth
+import cz.obehy.core.ui.components.rememberSmoothNow
 import cz.obehy.core.ui.components.rememberTimetableTimeWidth
 import cz.obehy.core.ui.components.rideHere
 import cz.obehy.core.ui.components.routeLineColor
 import cz.obehy.core.ui.components.unitName
 import java.time.Instant
-
-/** How often the point reached on a schedule moves on. */
-private const val PROGRESS_EVERY_MS = 10_000L
 
 @Composable
 private fun Section(
@@ -141,7 +138,7 @@ internal fun Schedule(
 
     fun stroke(index: Int) = if (index in span && index + 1 in span) ride else quiet
 
-    val clock = rememberNow(PROGRESS_EVERY_MS)
+    val clock = rememberSmoothNow()
     val now = remember(clock) { { clock.value } }
     val here = rideHere(trip.ride)
     // Nothing to follow on a trip that isn't running.

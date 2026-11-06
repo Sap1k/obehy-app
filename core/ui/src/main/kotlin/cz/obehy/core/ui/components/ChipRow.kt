@@ -6,6 +6,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SelectableChipColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
@@ -63,3 +66,12 @@ fun ScrollingChipRow(
         content = content,
     )
 }
+
+/** A filter chip's colours: Lime when it is on, like anything else that is selected. */
+@Composable
+fun limeFilterChipColors(): SelectableChipColors =
+    FilterChipDefaults.filterChipColors(
+        selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+        selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+    )

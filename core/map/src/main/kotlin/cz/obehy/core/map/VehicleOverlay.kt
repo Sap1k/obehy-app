@@ -47,7 +47,10 @@ fun TripDetail.mapVehicles(now: Instant): List<MapVehicle> =
         vehiclesAt(now).map { MapVehicle(it, ride, delayMinutes, it.isStaleAt(now)) }
     }
 
-/** How long a vehicle takes to slide to a new position that isn't part of a steady stream of them. */
+/**
+ * How long a vehicle takes to slide to a position it was reported at: just enough for the eye to
+ * follow, since all the while it's shown behind where it's known to be.
+ */
 const val GLIDE_MS = 1_500
 
 /** How often a sliding vehicle is moved: it covers a fraction of a dp between two moves. */

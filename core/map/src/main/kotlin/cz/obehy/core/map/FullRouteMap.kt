@@ -66,14 +66,14 @@ fun FullRouteMap(
     }
 }
 
-/** Off, it's solid over a map like the tonal buttons beside it; on, it's the theme's own filled look. */
+/** Off, it's solid over a map like the tonal buttons beside it; on, it's Lime like anything else that's on. */
 @Composable
 private fun mapToggleColors() =
     IconButtonDefaults.filledIconToggleButtonColors(
         containerColor = MaterialTheme.colorScheme.secondaryContainer,
         contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-        checkedContainerColor = MaterialTheme.colorScheme.primary,
-        checkedContentColor = MaterialTheme.colorScheme.onPrimary,
+        checkedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+        checkedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
     )
 
 /** Keeps a map on the vehicle while [following]. */

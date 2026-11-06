@@ -65,6 +65,7 @@ import cz.obehy.core.ui.components.RouteMark
 import cz.obehy.core.ui.components.RouteRow
 import cz.obehy.core.ui.components.RouteStroke
 import cz.obehy.core.ui.components.ScrollingChipRow
+import cz.obehy.core.ui.components.limeFilterChipColors
 import kotlin.math.roundToInt
 import cz.obehy.core.ui.R as UiR
 
@@ -148,7 +149,8 @@ internal fun SearchForm(
                 selected = options.lowFloor,
                 onClick = { onAction(PlannerAction.SetOptions(options.copy(lowFloor = !options.lowFloor))) },
                 label = { Text(stringResource(UiR.string.low_floor)) },
-                leadingIcon = { LowFloorIcon() },
+                leadingIcon = { LowFloorIcon(onLime = options.lowFloor) },
+                colors = limeFilterChipColors(),
             )
             AssistChip(
                 onClick = onOptions,

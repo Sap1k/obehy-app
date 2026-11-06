@@ -2,6 +2,7 @@ package cz.obehy.feature.planner
 
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -46,6 +47,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -61,6 +63,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.graphics.shapes.RoundedPolygon
 import cz.obehy.core.model.Itinerary
 import cz.obehy.core.model.JourneyStage
@@ -93,6 +96,7 @@ import cz.obehy.core.ui.components.clock
 import cz.obehy.core.ui.components.passedLabel
 import cz.obehy.core.ui.components.rememberNow
 import cz.obehy.core.ui.components.rememberPassed
+import cz.obehy.core.ui.components.rememberSmoothNow
 import cz.obehy.core.ui.components.rememberTimeColumnWidth
 import cz.obehy.core.ui.components.rideHere
 import cz.obehy.core.ui.components.routeLineColor
@@ -105,7 +109,7 @@ import cz.obehy.core.ui.scaledBy
 import java.time.Duration
 import java.time.Instant
 
-/** How often the point reached on a journey moves on. */
+/** How often a journey is checked for what has gone wrong, and its stage brought up to date. */
 private const val PROGRESS_EVERY_MS = 10_000L
 
 /**
@@ -125,9 +129,10 @@ internal fun ItineraryTimeline(
     val walk = walkStroke()
     val legs = itinerary.legs
     val width = rememberTimeColumnWidth(legs.flatMap { it.times() }, legs.map { it.duration.spoken() })
-    val clock = rememberNow(PROGRESS_EVERY_MS)
+    val clock = rememberSmoothNow()
     val now = remember(clock) { { clock.value } }
-    val trouble by remember(itinerary) { derivedStateOf { itinerary.troubleAt(now()) } }
+    val checkedAt = rememberNow(PROGRESS_EVERY_MS)
+    val trouble by remember(itinerary) { derivedStateOf { itinerary.troubleAt(checkedAt.value) } }
     var unfolded by rememberSaveable(itinerary.key) { mutableStateOf(listOf<Int>()) }
     val spans = remember(legs, unfolded) { legs.timelineSpans(unfolded.toSet()) }
     Column(modifier) {
@@ -409,10 +414,18 @@ private fun Stage(
                     is JourneyStage.Riding -> {
                         // Where to get off, which is not always as far as the vehicle goes.
                         StageRide(stage.ride) {
-                            Text(
-                                stringResource(R.string.stage_riding_to, stage.ride.to.name),
-                                style = MaterialTheme.typography.bodyMedium,
-                            )
+                            Row(horizontalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.xs)) {
+                                Text(
+                                    stringResource(R.string.stage_riding_to),
+                                    Modifier.alignByBaseline(),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                )
+                                Text(
+                                    stage.ride.to.name,
+                                    Modifier.alignByBaseline(),
+                                    style = MaterialTheme.typography.titleSmallEmphasized,
+                                )
+                            }
                         }
                     }
                 }
@@ -588,10 +601,19 @@ private fun RideRow(
             inPlace = true,
         ) { RideCard(ride, open, onOpenTrip, onToggle) }
     }
+    val unfolding = remember { MutableTransitionState(open) }
+    unfolding.targetState = open
+    val settled = unfolding.isIdle
+    val holding by remember(stops) { derivedStateOf { stops.any { it.span.holds(it.now()) } } }
     AnimatedVisibility(
-        visible = open,
-        enter = expandVertically(motion.defaultSpatialSpec()) + fadeIn(motion.defaultEffectsSpec()),
-        exit = shrinkVertically(motion.defaultSpatialSpec()) + fadeOut(motion.defaultEffectsSpec()),
+        unfolding,
+        // The rows lift the badge above their neighbours only within this block, so the block has to
+        // lift it above the row after it, and may cut it off only for as long as it's folding.
+        Modifier
+            .zIndex(if (holding) 1f else 0f)
+            .then(if (settled) Modifier else Modifier.clipToBounds()),
+        enter = expandVertically(motion.defaultSpatialSpec(), clip = false) + fadeIn(motion.defaultEffectsSpec()),
+        exit = shrinkVertically(motion.defaultSpatialSpec(), clip = false) + fadeOut(motion.defaultEffectsSpec()),
     ) {
         Column {
             ride.intermediateStops.forEachIndexed { index, stop ->
