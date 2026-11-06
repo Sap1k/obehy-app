@@ -7,8 +7,12 @@ import cz.obehy.core.model.Mode
 import cz.obehy.core.model.Place
 import cz.obehy.core.model.PlaceKind
 import cz.obehy.core.model.SearchOptions
+import cz.obehy.core.model.TimePoint
 import cz.obehy.core.model.TransportType
 import cz.obehy.core.network.motis.MotisApi
+import cz.obehy.core.network.motis.MotisItinerary
+import cz.obehy.core.network.motis.MotisLeg
+import cz.obehy.core.network.motis.MotisPlace
 import cz.obehy.core.network.motis.MotisPlanRequest
 import cz.obehy.core.network.motis.MotisRouting
 import cz.obehy.core.network.motis.decodePolyline
@@ -54,6 +58,74 @@ class MotisApiTest {
             assertTrue(legs[5].tripId!!.contains("_de-DELFI_"))
             assertNull(legs[0].tripId)
         }
+
+    private fun leg(
+        mode: String,
+        scheduled: Pair<String, String>,
+        expected: Pair<String, String>,
+        realTime: Boolean,
+    ): MotisLeg {
+        fun time(clock: String) = "2026-11-06T$clock:00Z"
+        val place = MotisPlace("Stop", 50.0, 14.0)
+        return MotisLeg(
+            mode = mode,
+            from = place,
+            to = place,
+            duration = 60,
+            startTime = time(expected.first),
+            endTime = time(expected.second),
+            scheduledStartTime = time(scheduled.first),
+            scheduledEndTime = time(scheduled.second),
+            realTime = realTime,
+        )
+    }
+
+    /** As MOTIS sends them: walks are fitted to the rides' expected times, yet look like the timetable. */
+    private fun walkRideWalk(late: Boolean) =
+        MotisItinerary(
+            duration = 0,
+            startTime = "2026-11-06T21:43:00Z",
+            endTime = "2026-11-06T22:10:00Z",
+            transfers = 0,
+            legs =
+                listOf(
+                    leg("WALK", "21:43" to "21:46", "21:43" to "21:46", realTime = false),
+                    leg("TRAM", "21:44" to "22:06", "21:46" to "22:08", realTime = late),
+                    leg("WALK", "22:08" to "22:10", "22:08" to "22:10", realTime = false),
+                ),
+        ).toDomain()
+
+    @Test
+    fun `a journey's first and last walks show the delay of the ride next to them`() {
+        val legs = walkRideWalk(late = true).legs
+
+        assertEquals(TimePoint(at("21:41"), at("21:43"), realtime = true), legs.first().start)
+        assertEquals(TimePoint(at("21:44"), at("21:46"), realtime = true), legs.first().end)
+        assertEquals(TimePoint(at("22:06"), at("22:08"), realtime = true), legs.last().start)
+        assertEquals(TimePoint(at("22:08"), at("22:10"), realtime = true), legs.last().end)
+    }
+
+    @Test
+    fun `walks stay plain beside a ride with nothing live`() {
+        assertFalse(
+            walkRideWalk(late = false)
+                .legs
+                .first()
+                .start.realtime,
+        )
+    }
+
+    @Test
+    fun `a walk between two rides keeps its times`() {
+        val walk = leg("WALK", "22:08" to "22:10", "22:08" to "22:10", realTime = false)
+        val ride = leg("TRAM", "21:44" to "22:06", "21:46" to "22:08", realTime = true)
+        val legs =
+            MotisItinerary(0, ride.startTime, ride.endTime, 1, listOf(ride, walk, ride)).toDomain().legs
+
+        assertFalse(legs[1].start.realtime)
+    }
+
+    private fun at(clock: String) = Instant.parse("2026-11-06T$clock:00Z")
 
     @Test
     fun `plan asks the v6 endpoint of the current provider with every option`() =

@@ -14,6 +14,7 @@ import cz.obehy.core.model.StopCall
 import cz.obehy.core.model.TimePoint
 import cz.obehy.core.model.TripAlert
 import cz.obehy.core.model.TripLinks
+import java.time.Duration
 import java.time.Instant
 
 // MOTIS answers → domain types, and domain searches → MOTIS requests. Nothing MOTIS-shaped
@@ -85,10 +86,33 @@ fun MotisPlan.toJourneyPage(): JourneyPage =
 internal fun MotisItinerary.toItinerary(): Itinerary =
     Itinerary(
         // Zero-length walks are MOTIS's way of saying "change at the same platform".
-        legs = legs.filterNot { it.mode == "WALK" && it.duration == 0L }.map { it.toLeg() },
+        legs = legs.filterNot { it.mode == "WALK" && it.duration == 0L }.map { it.toLeg() }.withWalkDelays(),
         transfers = transfers,
         refreshId = id,
     )
+
+/**
+ * MOTIS fits walks around the rides' expected times, but gives them as plain timetable times. A
+ * journey that starts or ends on foot would look on time however late its rides are, so those
+ * walks take on the delay of the ride they lead to or follow.
+ */
+private fun List<Leg>.withWalkDelays(): List<Leg> =
+    mapIndexed { index, leg ->
+        val neighbour =
+            when (index) {
+                0 -> (getOrNull(1) as? Leg.Transit)?.start
+                lastIndex -> (getOrNull(index - 1) as? Leg.Transit)?.end
+                else -> null
+            }
+        if (leg is Leg.Walk && neighbour?.realtime == true) leg.delayedLike(neighbour) else leg
+    }
+
+private fun Leg.Walk.delayedLike(ride: TimePoint): Leg.Walk {
+    val delay = Duration.between(ride.scheduled, ride.expected)
+    return copy(start = start.delayedBy(delay), end = end.delayedBy(delay))
+}
+
+private fun TimePoint.delayedBy(delay: Duration) = copy(scheduled = expected - delay, realtime = true)
 
 fun MotisItinerary.toDomain(): Itinerary = toItinerary()
 
