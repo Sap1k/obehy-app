@@ -78,6 +78,15 @@
     </plurals>
     <string name="walk">%s walk</string>
     <string name="spare">%s to spare</string>
+    <string name="short_by">%s too late</string>
+    <string name="ride_cancelled">Cancelled</string>
+    <string name="change_missed">Change missed</string>
+    <string name="trouble_cancelled">The %s is cancelled</string>
+    <string name="trouble_missed">You\'d miss the %1$s at %2$s by %3$s</string>
+    <string name="find_another_way">Find another way</string>
+    <string name="stage_walking">On foot to %1$s, %2$s left</string>
+    <string name="stage_waiting">%1$s leaves in %2$s · %3$s</string>
+    <string name="stage_riding">On the %1$s until %2$s, %3$s</string>
     <string name="open_trip">Open trip details</string>
     <string name="same_train">Same train, continuing as</string>
     <string name="same_subway">Same metro, continuing as</string>

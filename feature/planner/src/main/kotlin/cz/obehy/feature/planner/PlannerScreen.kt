@@ -179,7 +179,13 @@ internal fun PlannerScreen(
         if (wide) {
             Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.xl)) {
                 results(Modifier.width(ObehyTheme.sizes.listPane))
-                DetailPane(state.open, state.query, onOpenTrip, Modifier.weight(1f))
+                DetailPane(
+                    state.open,
+                    state.query,
+                    onOpenTrip,
+                    onReplan = { onAction(PlannerAction.Replan) },
+                    Modifier.weight(1f),
+                )
             }
         } else {
             results(Modifier.fillMaxSize())
@@ -399,6 +405,7 @@ private fun DetailPane(
     open: OpenJourney?,
     query: JourneyQuery,
     onOpenTrip: (Leg.Transit) -> Unit,
+    onReplan: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (open == null) {
@@ -417,6 +424,6 @@ private fun DetailPane(
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        ItineraryTimeline(open.itinerary, query.from?.label(), query.to?.label(), onOpenTrip)
+        ItineraryTimeline(open.itinerary, query.from?.label(), query.to?.label(), onOpenTrip, onReplan)
     }
 }

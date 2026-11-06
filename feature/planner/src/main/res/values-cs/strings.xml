@@ -82,6 +82,15 @@
     </plurals>
     <string name="walk">%s chůze</string>
     <string name="spare">%s rezerva</string>
+    <string name="short_by">Pozdě o %s</string>
+    <string name="ride_cancelled">Zrušeno</string>
+    <string name="change_missed">Přestup nestihnete</string>
+    <string name="trouble_cancelled">Spoj %s je zrušený</string>
+    <string name="trouble_missed">Na %1$s v zastávce %2$s nestihnete přestoupit, chybí %3$s</string>
+    <string name="find_another_way">Najít jinou cestu</string>
+    <string name="stage_walking">Pěšky: %1$s, zbývá %2$s</string>
+    <string name="stage_waiting">%1$s odjíždí za %2$s · %3$s</string>
+    <string name="stage_riding">%1$s do zastávky %2$s, %3$s</string>
     <string name="open_trip">Otevřít detail spoje</string>
     <string name="same_train">Stejný vlak pokračuje jako</string>
     <string name="same_subway">Stejné metro pokračuje jako</string>

@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
@@ -32,6 +31,7 @@ import cz.obehy.core.model.focusAt
 import cz.obehy.core.ui.ObehyHeroScreen
 import cz.obehy.core.ui.SharedBounds
 import cz.obehy.core.ui.components.clock
+import cz.obehy.core.ui.components.rememberNow
 import kotlinx.coroutines.delay
 import java.time.Duration
 import java.time.Instant
@@ -41,6 +41,9 @@ private val REFRESH_EVERY: Duration = Duration.ofMinutes(1)
 
 /** How often its maps catch up with the clock. */
 private const val VIEW_EVERY_MS = 10_000L
+
+/** How often "3 min ago" is brought up to date. */
+private const val AGO_EVERY_MS = 30_000L
 
 @Composable
 internal fun ItineraryDestination(
@@ -86,6 +89,7 @@ internal fun ItineraryDestination(
         onRefresh = { viewModel.act(PlannerAction.Refresh) },
         onWhole = { viewModel.act(PlannerAction.ShowWholeJourney(it)) },
         onOpenTrip = onOpenTrip,
+        onReplan = { viewModel.act(PlannerAction.Replan) },
     )
 }
 
@@ -106,12 +110,7 @@ private fun journeyView(
     open: OpenJourney,
 ): JourneyView {
     val legs = open.itinerary.legs
-    val now by produceState(Instant.now()) {
-        while (true) {
-            delay(VIEW_EVERY_MS)
-            value = Instant.now()
-        }
-    }
+    val now by rememberNow(VIEW_EVERY_MS)
     val focus = remember(legs, now) { legs.focusAt(now) }
     val ride = focus?.ride
     val lifecycle = LocalLifecycleOwner.current.lifecycle
@@ -160,6 +159,7 @@ internal fun ItineraryScreen(
     onRefresh: () -> Unit,
     onWhole: (Boolean) -> Unit,
     onOpenTrip: (Leg.Transit) -> Unit,
+    onReplan: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val itinerary = open.itinerary
@@ -188,7 +188,7 @@ internal fun ItineraryScreen(
                 if (view.focused) WholeJourneyButton(view.framing == MapFraming.Whole, onWhole)
             },
         ) {
-            ItineraryTimeline(itinerary, query.from?.label(), query.to?.label(), onOpenTrip)
+            ItineraryTimeline(itinerary, query.from?.label(), query.to?.label(), onOpenTrip, onReplan)
         }
     }
 }
@@ -245,12 +245,7 @@ internal fun updatedAgo(fetchedAt: Instant): String = stringResource(R.string.up
 /** "3 min ago" / "just now", kept current every half minute. */
 @Composable
 private fun ago(at: Instant): String {
-    val now by produceState(Instant.now(), at) {
-        while (true) {
-            value = Instant.now()
-            delay(30_000)
-        }
-    }
+    val now by rememberNow(AGO_EVERY_MS)
     val age = Duration.between(at, now)
     return if (age.toMinutes() < 1) stringResource(R.string.just_now) else stringResource(R.string.ago, age.spoken())
 }

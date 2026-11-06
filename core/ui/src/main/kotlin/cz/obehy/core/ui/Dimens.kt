@@ -45,13 +45,16 @@ data class Sizes(
     val iconSmall: Dp = 16.dp,
     /** The proportional journey bar in a result card. */
     val journeyBar: Dp = 24.dp,
-    /** The column the route line is drawn in, beside places and stops. */
-    val routeGutter: Dp = 20.dp,
+    /** The column the route line is drawn in, beside places and stops: wide enough for the badge on it. */
+    val routeGutter: Dp = 24.dp,
     /** A stop on the route line, and the line's thickness. */
     val routeMarker: Dp = 12.dp,
     val routeStroke: Dp = 4.dp,
     /** A stop passed on the way, on the route line. */
     val routePassMarker: Dp = 10.dp,
+    /** The badge on the route line saying how far along things are, and the icon in it. */
+    val routeHere: Dp = 20.dp,
+    val routeHereIcon: Dp = 12.dp,
     /** A journey's map at the head of its screen. */
     val heroMap: Dp = 320.dp,
     /** What's left of it when the content has scrolled up: still a map worth looking at. */

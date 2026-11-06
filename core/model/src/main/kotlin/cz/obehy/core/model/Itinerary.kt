@@ -70,6 +70,19 @@ data class StopCall(
     val noAlighting: Boolean = false,
 ) {
     val trackChanged: Boolean get() = track != null && scheduledTrack != null && track != scheduledTrack
+
+    /** This stop as a place to search from; null when it isn't known where it is. */
+    fun toPlace(): Place? =
+        position?.let {
+            Place(
+                stopId ?: "${it.lat},${it.lon}",
+                name,
+                area = null,
+                kind = if (stopId != null) PlaceKind.Stop else PlaceKind.Address,
+                lat = it.lat,
+                lon = it.lon,
+            )
+        }
 }
 
 /** One part of a journey. */
@@ -206,6 +219,186 @@ fun List<Leg>.focusAt(now: Instant): JourneyFocus? {
     val current = indexOfFirst { now < it.end.expected }
     val last = (current until size).firstOrNull { this[it] is Leg.Transit } ?: lastIndex
     return JourneyFocus(subList(current, last + 1).toList(), this[last] as? Leg.Transit)
+}
+
+/** Where in a journey you should be by now, going by the clock: nothing says you really are. */
+sealed interface JourneyStage {
+    data class Walking(
+        val walk: Leg.Walk,
+    ) : JourneyStage
+
+    data class Waiting(
+        val ride: Leg.Transit,
+    ) : JourneyStage
+
+    data class Riding(
+        val ride: Leg.Transit,
+    ) : JourneyStage
+}
+
+/** The stage of these legs at [now]; null before they start and once they're over. */
+fun List<Leg>.stageAt(now: Instant): JourneyStage? {
+    if (isEmpty() || now < first().start.expected || now >= last().end.expected) return null
+    return when (val leg = first { now < it.end.expected }) {
+        is Leg.Walk -> JourneyStage.Walking(leg)
+        is Leg.Transit -> if (now < leg.start.expected) JourneyStage.Waiting(leg) else JourneyStage.Riding(leg)
+    }
+}
+
+/**
+ * The time a row of a timeline stands for, and the stretch of time it covers: [from] and [to] are
+ * halfway to its neighbours, so one row hands over to the next whatever their heights.
+ */
+data class RowSpan(
+    val from: Instant,
+    val at: Instant,
+    val to: Instant,
+) {
+    /** Whether [now] is within this row. */
+    fun holds(now: Instant): Boolean = now >= from && now < to
+
+    /** How far down a row of [height] things have got at [now], with [at] drawn at [mark]. */
+    fun reached(
+        now: Instant,
+        mark: Float,
+        height: Float,
+    ): Float =
+        when {
+            now < from -> 0f
+            now >= to -> height
+            now < at -> mark * share(from, now, at)
+            else -> mark + (height - mark) * share(at, now, to)
+        }
+
+    private fun share(
+        start: Instant,
+        now: Instant,
+        end: Instant,
+    ): Float = Duration.between(start, now).toMillis().toFloat() / Duration.between(start, end).toMillis()
+}
+
+/**
+ * The [RowSpan]s of a timeline's rows from the time of each, top to bottom. A row without a time
+ * goes with the one above it, and a time earlier than the row above (an early vehicle) is held
+ * back to it, so the spans always run forwards. Empty when there are no times at all.
+ */
+fun List<Instant?>.rowSpans(): List<RowSpan> {
+    val known = firstNotNullOfOrNull { it } ?: return emptyList()
+    val times =
+        drop(1).runningFold(first() ?: known) { above, time -> if (time != null && time > above) time else above }
+    return times.indices.map { index ->
+        val at = times[index]
+        RowSpan(
+            from = times.getOrNull(index - 1)?.let { midpoint(it, at) } ?: at,
+            at = at,
+            to = times.getOrNull(index + 1)?.let { midpoint(at, it) } ?: at,
+        )
+    }
+}
+
+private fun midpoint(
+    start: Instant,
+    end: Instant,
+): Instant = start.plus(Duration.between(start, end).dividedBy(2))
+
+/**
+ * One [RowSpan] per row of a journey's timeline, top to bottom: the stop you set off from, each
+ * walk, each ride with the stops where you board and alight, and the stops passed on the rides
+ * at the [unfolded] indices of these legs.
+ */
+fun List<Leg>.timelineSpans(unfolded: Set<Int> = emptySet()): List<RowSpan> {
+    val legs = this
+    return flatMapIndexed { index, leg ->
+        buildList<Instant?> {
+            when (leg) {
+                is Leg.Walk -> {
+                    if (index == 0) add(leg.start.expected)
+                    add(midpoint(leg.start.expected, leg.end.expected))
+                    if (index == legs.lastIndex) add(leg.end.expected)
+                }
+
+                is Leg.Transit -> {
+                    if (!leg.staySeated) add(leg.start.expected)
+                    val passed =
+                        if (index in unfolded) {
+                            leg.intermediateStops.map { (it.departure ?: it.arrival)?.expected }
+                        } else {
+                            emptyList()
+                        }
+                    add(midpoint(leg.start.expected, passed.firstNotNullOfOrNull { it } ?: leg.end.expected))
+                    addAll(passed)
+                    add(leg.end.expected)
+                }
+            }
+        }
+    }.rowSpans()
+}
+
+/** Why a journey won't work out as it stands. */
+sealed interface JourneyTrouble {
+    /** The [ride] won't run, or won't call where it's needed. */
+    data class Cancelled(
+        val ride: Leg.Transit,
+    ) : JourneyTrouble
+
+    /** [departing] leaves [shortBy] before you can get to it from [arriving]. */
+    data class MissedChange(
+        val arriving: Leg.Transit,
+        val departing: Leg.Transit,
+        val shortBy: Duration,
+    ) : JourneyTrouble
+}
+
+/** The first thing still ahead at [now] that stops this journey working; null when it all holds. */
+fun Itinerary.troubleAt(now: Instant): JourneyTrouble? {
+    var arriving: Leg.Transit? = null
+    var walking = Duration.ZERO
+    for (leg in legs) {
+        if (leg is Leg.Walk) {
+            walking += leg.duration
+        } else if (leg is Leg.Transit) {
+            val ahead = now < leg.end.expected
+            if (ahead && (leg.cancelled || leg.from.cancelled || leg.to.cancelled)) {
+                return JourneyTrouble.Cancelled(leg)
+            }
+            val from = arriving?.takeUnless { leg.staySeated }
+            if (ahead && from != null) {
+                val shortBy = Duration.between(leg.start.expected, from.end.expected) + walking
+                if (shortBy > Duration.ZERO) return JourneyTrouble.MissedChange(from, leg, shortBy)
+            }
+            arriving = leg
+            walking = Duration.ZERO
+        }
+    }
+    return null
+}
+
+/** Where to look for another way from: a [stop] on the journey, and when you'd be there. */
+data class ReplanStart(
+    val stop: StopCall,
+    val at: Instant,
+)
+
+/**
+ * Where you'd be left standing by [trouble]: the stop you'd get off at, from the time you'd get
+ * there, or null when it's still at the start of the journey and that's where to look from.
+ */
+fun Itinerary.replanStart(
+    trouble: JourneyTrouble,
+    now: Instant,
+): ReplanStart? {
+    val (stop, arrival) =
+        when (trouble) {
+            is JourneyTrouble.MissedChange -> {
+                trouble.arriving.to to trouble.arriving.end.expected
+            }
+
+            is JourneyTrouble.Cancelled -> {
+                val before = rides.getOrNull(rides.indexOf(trouble.ride) - 1) ?: return null
+                trouble.ride.from to before.end.expected
+            }
+        }
+    return ReplanStart(stop, maxOf(now, arrival))
 }
 
 /** A page of results, with the cursors for earlier and later ones. */

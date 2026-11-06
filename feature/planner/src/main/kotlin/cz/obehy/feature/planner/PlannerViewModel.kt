@@ -25,6 +25,8 @@ import cz.obehy.core.model.SearchOptions
 import cz.obehy.core.model.Suggestion
 import cz.obehy.core.model.TripDetail
 import cz.obehy.core.model.TripMap
+import cz.obehy.core.model.replanStart
+import cz.obehy.core.model.troubleAt
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.FlowPreview
@@ -224,6 +226,9 @@ sealed interface PlannerAction {
 
     /** Fresh times for the journeys found. */
     data object RefreshResults : PlannerAction
+
+    /** The open journey isn't working out: look for another way on from where it leaves you. */
+    data object Replan : PlannerAction
 
     /** A new, empty search; the remembered options stay. */
     data object Reset : PlannerAction
@@ -428,6 +433,10 @@ class PlannerViewModel
 
                 PlannerAction.RefreshResults -> {
                     refreshResults()
+                }
+
+                PlannerAction.Replan -> {
+                    replan()
                 }
 
                 PlannerAction.Reset -> {
@@ -667,7 +676,32 @@ class PlannerViewModel
             if (local.value.results != Results.Idle) search()
         }
 
-        private fun search() {
+        /**
+         * Searches on from where the open journey leaves you, which clears it and so goes back to
+         * the results. A via may be behind you by now, so they go.
+         */
+        private fun replan() {
+            val itinerary = local.value.open?.itinerary ?: return
+            val at = now()
+            val trouble = itinerary.troubleAt(at) ?: return
+            val start = itinerary.replanStart(trouble, at)
+            val from = start?.stop?.toPlace()
+            local.update { state ->
+                state.copy(
+                    query =
+                        state.query.copy(
+                            from = from ?: state.query.from,
+                            vias = emptyList(),
+                            time = start?.at?.takeIf { from != null },
+                            arriveBy = false,
+                        ),
+                )
+            }
+            search(remembered = false)
+        }
+
+        /** [remembered] puts it in the search history, which a search from halfway along shouldn't be. */
+        private fun search(remembered: Boolean = true) {
             val query = local.value.query
             if (!query.isComplete) return
             searchJob?.cancel()
@@ -694,7 +728,7 @@ class PlannerViewModel
                     }
                     val from = located.from
                     val to = located.to
-                    if (from != null && to != null && !page.getOrNull()?.itineraries.isNullOrEmpty()) {
+                    if (remembered && from != null && to != null && !page.getOrNull()?.itineraries.isNullOrEmpty()) {
                         history.record(from, to, at)
                     }
                 }

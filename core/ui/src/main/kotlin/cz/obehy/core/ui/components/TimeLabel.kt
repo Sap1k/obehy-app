@@ -16,7 +16,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,6 +36,7 @@ import androidx.compose.ui.unit.max
 import cz.obehy.core.model.TimePoint
 import cz.obehy.core.ui.ObehyTheme
 import cz.obehy.core.ui.R
+import kotlinx.coroutines.delay
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -62,6 +65,16 @@ fun Instant.clock(): String {
             ?: ClockFormat(locale, zone).also { clockFormat = it }
     return format.formatter.format(this)
 }
+
+/** The time now, moving on every [everyMillis]. */
+@Composable
+fun rememberNow(everyMillis: Long): State<Instant> =
+    produceState(Instant.now(), everyMillis) {
+        while (true) {
+            value = Instant.now()
+            delay(everyMillis)
+        }
+    }
 
 private val TimePoint.moved: Boolean
     get() = realtime && expected.truncatedTo(ChronoUnit.MINUTES) != scheduled.truncatedTo(ChronoUnit.MINUTES)
@@ -129,15 +142,16 @@ fun rememberScheduleTimeWidth(times: List<TimePoint>): Dp {
     }
 }
 
-/** A time in a schedule, one size for every stop. */
+/** A time in a schedule, one size for every stop; [passed] once the trip is past it. */
 @Composable
 fun ScheduleTime(
     time: TimePoint,
     modifier: Modifier = Modifier,
+    passed: Boolean = false,
 ) {
     val spoken = spokenTime(time)
     Box(modifier.clearAndSetSemantics { contentDescription = spoken }, contentAlignment = Alignment.CenterEnd) {
-        CurrentTime(time, MaterialTheme.typography.bodyMedium, MaterialTheme.colorScheme.onSurfaceVariant)
+        CurrentTime(time, MaterialTheme.typography.bodyMedium, MaterialTheme.colorScheme.onSurfaceVariant, passed)
     }
 }
 
@@ -166,7 +180,7 @@ fun TimetableTime(
 
 /**
  * The time that counts at a stop, right-aligned in a column [width] wide next to the route line.
- * [small] is for a stop passed on the way.
+ * [small] is for a stop passed on the way, [passed] for one the journey has already got past.
  */
 @Composable
 fun TimeColumn(
@@ -174,6 +188,7 @@ fun TimeColumn(
     width: Dp,
     modifier: Modifier = Modifier,
     small: Boolean = false,
+    passed: Boolean = false,
 ) {
     val spoken = spokenTime(time)
     Box(
@@ -184,9 +199,15 @@ fun TimeColumn(
         contentAlignment = Alignment.CenterEnd,
     ) {
         if (small) {
-            CurrentTime(time, MaterialTheme.typography.bodySmall, MaterialTheme.colorScheme.onSurfaceVariant)
+            CurrentTime(time, MaterialTheme.typography.bodySmall, MaterialTheme.colorScheme.onSurfaceVariant, passed)
         } else {
-            CurrentTime(time, MaterialTheme.typography.titleMedium, MaterialTheme.colorScheme.onSurface)
+            val colors = MaterialTheme.colorScheme
+            CurrentTime(
+                time,
+                MaterialTheme.typography.titleMedium,
+                if (passed) colors.onSurfaceVariant else colors.onSurface,
+                passed,
+            )
         }
     }
 }
@@ -219,11 +240,12 @@ private fun CurrentTime(
     time: TimePoint,
     style: TextStyle,
     timetableColour: Color,
+    passed: Boolean = false,
 ) {
     val motion = MaterialTheme.motionScheme
     val colour by animateColorAsState(
         when {
-            !time.realtime -> timetableColour
+            !time.realtime || passed -> timetableColour
             (time.delayMinutes ?: 0) >= 1 -> MaterialTheme.colorScheme.error
             else -> MaterialTheme.colorScheme.primary
         },

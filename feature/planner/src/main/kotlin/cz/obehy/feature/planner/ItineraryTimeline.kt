@@ -22,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material.icons.automirrored.rounded.DirectionsWalk
 import androidx.compose.material.icons.rounded.ExpandMore
+import androidx.compose.material.icons.rounded.WarningAmber
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -29,8 +30,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -45,35 +48,57 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import cz.obehy.core.model.Itinerary
+import cz.obehy.core.model.JourneyStage
+import cz.obehy.core.model.JourneyTrouble
 import cz.obehy.core.model.Leg
 import cz.obehy.core.model.Mode
 import cz.obehy.core.model.StopCall
 import cz.obehy.core.model.TimePoint
+import cz.obehy.core.model.stageAt
+import cz.obehy.core.model.timelineSpans
+import cz.obehy.core.model.troubleAt
 import cz.obehy.core.ui.ObehyTheme
 import cz.obehy.core.ui.SharedBounds
 import cz.obehy.core.ui.components.LineBadge
 import cz.obehy.core.ui.components.LowFloorIcon
+import cz.obehy.core.ui.components.NoticeCard
 import cz.obehy.core.ui.components.PlatformLabel
+import cz.obehy.core.ui.components.RouteHere
+import cz.obehy.core.ui.components.RouteHereBadge
 import cz.obehy.core.ui.components.RouteMark
+import cz.obehy.core.ui.components.RouteProgress
 import cz.obehy.core.ui.components.RouteRow
 import cz.obehy.core.ui.components.RouteStroke
 import cz.obehy.core.ui.components.TimeBasis
 import cz.obehy.core.ui.components.TimeColumn
+import cz.obehy.core.ui.components.clock
+import cz.obehy.core.ui.components.passedLabel
+import cz.obehy.core.ui.components.rememberNow
+import cz.obehy.core.ui.components.rememberPassed
 import cz.obehy.core.ui.components.rememberTimeColumnWidth
+import cz.obehy.core.ui.components.rideHere
 import cz.obehy.core.ui.components.routeLineColor
+import cz.obehy.core.ui.components.walkHere
 import cz.obehy.core.ui.components.walkStroke
 import cz.obehy.core.ui.icon
 import cz.obehy.core.ui.rideMorphKey
 import java.time.Duration
+import java.time.Instant
+
+/** How often the point reached on a journey moves on. */
+private const val PROGRESS_EVERY_MS = 10_000L
 
 /**
  * A journey as one continuous line: each ride in its route's colour between the stops where you
- * board and alight, walks dotted with the time to spare, the stops in between folded away.
- * [fromName] and [toName] name the ends when they are an address rather than a stop.
+ * board and alight, walks dotted with the time to spare, the stops in between folded away. Once
+ * under way, what's gone by is muted and a line above says where you should be, and when it stops
+ * working out it says so, offering [onReplan]. [fromName] and [toName] name the ends when they are
+ * an address rather than a stop.
  */
 @Composable
 internal fun ItineraryTimeline(
@@ -81,33 +106,70 @@ internal fun ItineraryTimeline(
     fromName: String?,
     toName: String?,
     onOpenTrip: (Leg.Transit) -> Unit,
+    onReplan: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val walk = walkStroke()
     val legs = itinerary.legs
     val width = rememberTimeColumnWidth(legs.flatMap { it.times() }, legs.map { it.duration.spoken() })
+    val clock = rememberNow(PROGRESS_EVERY_MS)
+    val now = remember(clock) { { clock.value } }
+    val trouble by remember(itinerary) { derivedStateOf { itinerary.troubleAt(now()) } }
+    var unfolded by rememberSaveable(itinerary.key) { mutableStateOf(listOf<Int>()) }
+    val spans = remember(legs, unfolded) { legs.timelineSpans(unfolded.toSet()) }
     Column(modifier) {
+        trouble?.let { TroubleCard(it, onReplan, Modifier.padding(bottom = ObehyTheme.spacing.s)) }
+        Stage(legs, toName, now, Modifier.padding(bottom = ObehyTheme.spacing.s))
+        // One span for each row, handed out in the order the rows are laid out.
+        val rows = spans.iterator()
+
+        fun progress(here: RouteHere) = RouteProgress(rows.next(), now, here)
+        val onFoot = walkHere()
+        val missed = trouble as? JourneyTrouble.MissedChange
         legs.forEachIndexed { index, leg ->
             val previous = legs.getOrNull(index - 1)
             val next = legs.getOrNull(index + 1)
             when (leg) {
                 is Leg.Walk -> {
                     if (previous == null) {
-                        StopRow(fromName ?: leg.from.name, leg.start, null, RouteMark.Stop, null, walk, width)
+                        StopRow(
+                            fromName ?: leg.from.name,
+                            leg.start,
+                            null,
+                            RouteMark.Stop,
+                            null,
+                            walk,
+                            width,
+                            progress(onFoot),
+                        )
                     }
                     WalkRow(
                         leg,
                         spare = (next as? Leg.Transit)?.let { Duration.between(leg.end.expected, it.start.expected) },
+                        shortBy = missed?.takeIf { it.departing === next }?.shortBy,
                         walk,
                         width,
+                        progress(onFoot),
                     )
                     if (next == null) {
-                        StopRow(toName ?: leg.to.name, leg.end, null, RouteMark.End, walk, null, width)
+                        StopRow(
+                            toName ?: leg.to.name,
+                            leg.end,
+                            null,
+                            RouteMark.End,
+                            walk,
+                            null,
+                            width,
+                            progress(onFoot),
+                        )
                     }
                 }
 
                 is Leg.Transit -> {
                     val ride = RouteStroke(routeLineColor(leg.color))
+                    val riding = rideHere(leg)
+                    // Straight off one ride onto the next: no walk row to say it won't work.
+                    if (previous is Leg.Transit && missed?.departing === leg) ShortNote(missed.shortBy, width)
                     // When the vehicle just goes on as this ride, the previous ride's last stop is this one's first.
                     if (!leg.staySeated) {
                         StopRow(
@@ -118,9 +180,22 @@ internal fun ItineraryTimeline(
                             above = walk.takeIf { previous is Leg.Walk },
                             below = ride,
                             width = width,
+                            progress = progress(riding),
                         )
                     }
-                    RideRow(leg, ride, width, onOpenTrip)
+                    val open = index in unfolded
+                    val card = progress(riding)
+                    val stops = List(if (open) leg.intermediateStops.size else 0) { progress(riding) }
+                    RideRow(
+                        leg,
+                        ride,
+                        width,
+                        open,
+                        card,
+                        stops,
+                        onOpenTrip,
+                        onToggle = { unfolded = if (open) unfolded - index else unfolded + index },
+                    )
                     val continues = (next as? Leg.Transit)?.takeIf { it.staySeated }
                     StopRow(
                         leg.to.name,
@@ -139,10 +214,133 @@ internal fun ItineraryTimeline(
                                 )
                             } ?: walk.takeIf { next is Leg.Walk },
                         width = width,
+                        progress = progress(riding),
                     )
                 }
             }
         }
+    }
+}
+
+/** What has gone wrong with the journey, and the way out of it. */
+@Composable
+private fun TroubleCard(
+    trouble: JourneyTrouble,
+    onReplan: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    NoticeCard(
+        when (trouble) {
+            is JourneyTrouble.Cancelled -> {
+                stringResource(R.string.trouble_cancelled, trouble.ride.shortName)
+            }
+
+            is JourneyTrouble.MissedChange -> {
+                stringResource(
+                    R.string.trouble_missed,
+                    trouble.departing.shortName,
+                    trouble.arriving.to.name,
+                    trouble.shortBy.roundedUp().spoken(),
+                )
+            }
+        },
+        modifier,
+        action = stringResource(R.string.find_another_way),
+        onAction = onReplan,
+    )
+}
+
+private val Leg.Transit.shortName: String get() = line ?: name
+
+/** Times are told in whole minutes, and a part of one is still a minute to wait or to find. */
+private fun Duration.roundedUp(): Duration = plusSeconds(SECONDS_TO_ROUND_UP)
+
+private const val SECONDS_TO_ROUND_UP = 59L
+
+/** Where you should be by now, in words: the line says the same to those who can't see it. */
+@Composable
+private fun Stage(
+    legs: List<Leg>,
+    toName: String?,
+    now: () -> Instant,
+    modifier: Modifier = Modifier,
+) {
+    val time = now()
+    val stage = legs.stageAt(time) ?: return
+    val here =
+        when (stage) {
+            is JourneyStage.Walking -> walkHere()
+            is JourneyStage.Waiting -> rideHere(stage.ride)
+            is JourneyStage.Riding -> rideHere(stage.ride)
+        }
+    val text =
+        when (stage) {
+            is JourneyStage.Walking -> {
+                val left = Duration.between(time, stage.walk.end.expected).roundedUp().spoken()
+                val to = if (stage.walk === legs.last()) toName ?: stage.walk.to.name else stage.walk.to.name
+                stringResource(R.string.stage_walking, to, left)
+            }
+
+            is JourneyStage.Waiting -> {
+                val ride = stage.ride
+                val wait = Duration.between(time, ride.start.expected).roundedUp().spoken()
+                stringResource(R.string.stage_waiting, ride.shortName, wait, ride.from.name)
+            }
+
+            is JourneyStage.Riding -> {
+                val ride = stage.ride
+                stringResource(R.string.stage_riding, ride.shortName, ride.to.name, ride.end.expected.clock())
+            }
+        }
+    Row(
+        modifier
+            .fillMaxWidth()
+            .clip(MaterialTheme.shapes.large)
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .padding(horizontal = ObehyTheme.spacing.m, vertical = ObehyTheme.spacing.s),
+        horizontalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.s),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        RouteHereBadge(here)
+        Text(text, style = MaterialTheme.typography.titleSmall)
+    }
+}
+
+/** Says by how much a change can't be made, in place of the time to spare. */
+@Composable
+private fun ShortBy(
+    shortBy: Duration,
+    modifier: Modifier = Modifier,
+) {
+    val color = MaterialTheme.colorScheme.error
+    Row(
+        modifier,
+        horizontalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.xs),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            Icons.Rounded.WarningAmber,
+            contentDescription = null,
+            modifier = Modifier.size(ObehyTheme.sizes.iconSmall),
+            tint = color,
+        )
+        Text(
+            stringResource(R.string.short_by, shortBy.roundedUp().spoken()),
+            style = MaterialTheme.typography.bodySmall,
+            color = color,
+        )
+    }
+}
+
+/** [ShortBy] between two rides with no walk to show it on. */
+@Composable
+private fun ShortNote(
+    shortBy: Duration,
+    width: Dp,
+    modifier: Modifier = Modifier,
+) {
+    RouteRow(RouteMark.None, modifier, leading = { Spacer(Modifier.width(width)) }) {
+        ShortBy(shortBy, Modifier.padding(start = ObehyTheme.spacing.m, top = ObehyTheme.spacing.xs))
     }
 }
 
@@ -203,19 +401,27 @@ private fun StopRow(
     above: RouteStroke?,
     below: RouteStroke?,
     width: Dp,
+    progress: RouteProgress,
     modifier: Modifier = Modifier,
 ) {
-    val style = MaterialTheme.typography.titleMediumEmphasized
+    val style = MaterialTheme.typography.titleMedium
     val gap = ObehyTheme.spacing.xs
-    RouteRow(mark, modifier, above = above, below = below, markAt = firstLine(style), leading = {
-        TimeColumn(time, width, Modifier.padding(top = gap))
+    val passed = rememberPassed(progress)
+    val spoken = passedLabel()
+    RouteRow(mark, modifier, above = above, below = below, markAt = firstLine(style), progress = progress, leading = {
+        TimeColumn(time, width, Modifier.padding(top = gap), passed = passed)
     }) {
         Row(
             Modifier.weight(1f).padding(start = ObehyTheme.spacing.m, top = gap, bottom = gap),
             horizontalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.s),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(name, Modifier.weight(1f), style = style)
+            Text(
+                name,
+                Modifier.weight(1f).semantics { if (passed) stateDescription = spoken },
+                style = style,
+                color = if (passed) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface,
+            )
             TimeBasis(time)
             call?.track?.let { PlatformLabel(it, call.trackChanged) }
         }
@@ -227,12 +433,15 @@ private fun RideRow(
     ride: Leg.Transit,
     stroke: RouteStroke,
     width: Dp,
+    open: Boolean,
+    progress: RouteProgress,
+    stops: List<RouteProgress>,
     onOpenTrip: (Leg.Transit) -> Unit,
+    onToggle: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var open by rememberSaveable(ride.tripId) { mutableStateOf(false) }
     val motion = MaterialTheme.motionScheme
-    RouteRow(RouteMark.None, modifier, above = stroke, below = stroke, leading = {
+    RouteRow(RouteMark.None, modifier, above = stroke, below = stroke, progress = progress, leading = {
         val duration = ride.duration.spoken()
         DurationNote(duration, duration, width)
     }) {
@@ -245,14 +454,18 @@ private fun RideRow(
                 bottom = ObehyTheme.spacing.xs,
             ),
             inPlace = true,
-        ) { RideCard(ride, open, onOpenTrip, onToggle = { open = !open }) }
+        ) { RideCard(ride, open, onOpenTrip, onToggle) }
     }
     AnimatedVisibility(
         visible = open,
         enter = expandVertically(motion.defaultSpatialSpec()) + fadeIn(motion.defaultEffectsSpec()),
         exit = shrinkVertically(motion.defaultSpatialSpec()) + fadeOut(motion.defaultEffectsSpec()),
     ) {
-        Column { ride.intermediateStops.forEach { PassedStop(it, stroke, width) } }
+        Column {
+            ride.intermediateStops.forEachIndexed { index, stop ->
+                PassedStop(stop, stroke, width, stops.getOrNull(index))
+            }
+        }
     }
 }
 
@@ -294,6 +507,13 @@ private fun RideCard(
             ) {
                 LineBadge(ride, Modifier.weight(1f, fill = false))
                 if (ride.accessible == true) LowFloorIcon()
+            }
+            if (ride.cancelled) {
+                Text(
+                    stringResource(R.string.ride_cancelled),
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.error,
+                )
             }
             // On its own line, so a long train name can never squeeze it.
             ride.headsign?.let { Headsign(it) }
@@ -364,7 +584,7 @@ private fun SameVehicle(
             modifier = Modifier.size(ObehyTheme.sizes.iconSmall),
             tint = color,
         )
-        Text(stringResource(mode.sameVehicle), style = MaterialTheme.typography.labelLarge, color = color)
+        Text(stringResource(mode.sameVehicle), style = MaterialTheme.typography.labelMedium, color = color)
     }
 }
 
@@ -402,27 +622,36 @@ private fun PassedStop(
     stop: StopCall,
     stroke: RouteStroke,
     width: Dp,
+    progress: RouteProgress?,
     modifier: Modifier = Modifier,
 ) {
     val style = MaterialTheme.typography.bodySmall
     val gap = ObehyTheme.spacing.xs
     val time = stop.departure ?: stop.arrival
-    RouteRow(RouteMark.Pass, modifier, above = stroke, below = stroke, markAt = firstLine(style), leading = {
-        if (time !=
-            null
-        ) {
-            TimeColumn(time, width, Modifier.padding(top = gap), small = true)
-        } else {
-            Spacer(Modifier.width(width))
-        }
-    }) {
+    val passed = rememberPassed(progress)
+    val spoken = passedLabel()
+    RouteRow(
+        RouteMark.Pass,
+        modifier,
+        above = stroke,
+        below = stroke,
+        markAt = firstLine(style),
+        progress = progress,
+        leading = {
+            if (time != null) {
+                TimeColumn(time, width, Modifier.padding(top = gap), small = true, passed = passed)
+            } else {
+                Spacer(Modifier.width(width))
+            }
+        },
+    ) {
         Row(
             Modifier.weight(1f).padding(start = ObehyTheme.spacing.m, top = gap, bottom = gap),
             horizontalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.s),
         ) {
             Text(
                 stop.name,
-                Modifier.weight(1f),
+                Modifier.weight(1f).semantics { if (passed) stateDescription = spoken },
                 style = style,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -449,7 +678,7 @@ private fun Headsign(
             modifier = Modifier.padding(top = ObehyTheme.spacing.xs / 2).size(ObehyTheme.sizes.iconSmall),
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        Text(destination, style = MaterialTheme.typography.titleSmallEmphasized)
+        Text(destination, style = MaterialTheme.typography.bodyMedium)
     }
 }
 
@@ -457,11 +686,13 @@ private fun Headsign(
 private fun WalkRow(
     walk: Leg.Walk,
     spare: Duration?,
+    shortBy: Duration?,
     stroke: RouteStroke,
     width: Dp,
+    progress: RouteProgress,
     modifier: Modifier = Modifier,
 ) {
-    RouteRow(RouteMark.None, modifier, above = stroke, below = stroke, leading = {
+    RouteRow(RouteMark.None, modifier, above = stroke, below = stroke, progress = progress, leading = {
         val duration = walk.duration.spoken()
         DurationNote(
             duration,
@@ -471,13 +702,17 @@ private fun WalkRow(
             icon = Icons.AutoMirrored.Rounded.DirectionsWalk,
         )
     }) {
-        spare?.takeIf { it.toMinutes() > 0 }?.let {
-            Text(
-                stringResource(R.string.spare, it.spoken()),
-                Modifier.padding(start = ObehyTheme.spacing.m),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+        if (shortBy != null) {
+            ShortBy(shortBy, Modifier.padding(start = ObehyTheme.spacing.m))
+        } else {
+            spare?.takeIf { it.toMinutes() > 0 }?.let {
+                Text(
+                    stringResource(R.string.spare, it.spoken()),
+                    Modifier.padding(start = ObehyTheme.spacing.m),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
         }
     }
 }

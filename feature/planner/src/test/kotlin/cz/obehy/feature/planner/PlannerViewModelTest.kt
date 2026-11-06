@@ -17,10 +17,14 @@ import cz.obehy.core.model.AppMode
 import cz.obehy.core.model.Itinerary
 import cz.obehy.core.model.JourneyQuery
 import cz.obehy.core.model.LatLon
+import cz.obehy.core.model.Leg
+import cz.obehy.core.model.Mode
 import cz.obehy.core.model.Place
 import cz.obehy.core.model.PlaceKind
 import cz.obehy.core.model.SearchOptions
+import cz.obehy.core.model.StopCall
 import cz.obehy.core.model.Suggestion
+import cz.obehy.core.model.TimePoint
 import cz.obehy.core.model.TransportType
 import cz.obehy.core.network.MotisJson
 import cz.obehy.core.network.ObehyJson
@@ -418,6 +422,89 @@ class PlannerViewModelTest {
             vm.act(PlannerAction.Search)
             advanceUntilIdle()
             assertEquals(listOf("A>D"), store.rows.value.map { "${it.from.id}>${it.to.id}" })
+        }
+
+    /** Two rides at 09:00: the first gets in at 09:30, [late] minutes late; the second leaves at 09:40. */
+    private fun twoRides(late: Long): Itinerary {
+        fun time(
+            minute: Long,
+            delay: Long = 0,
+        ): TimePoint {
+            val planned = Instant.parse("2026-11-03T09:00:00Z").plus(Duration.ofMinutes(minute))
+            return TimePoint(planned, planned.plus(Duration.ofMinutes(delay)), realtime = delay != 0L)
+        }
+
+        fun call(name: String) = StopCall(name, "stop-$name", null, null, null, null, position = LatLon(1.0, 2.0))
+
+        fun ride(
+            from: String,
+            to: String,
+            start: TimePoint,
+            end: TimePoint,
+        ) = Leg.Transit(
+            Mode.Tram,
+            call(from),
+            call(to),
+            start,
+            end,
+            name = "22",
+            line = null,
+            headsign = null,
+            agency = null,
+            color = null,
+            textColor = null,
+            accessible = null,
+            cancelled = false,
+            tripId = "trip-$from",
+        )
+        return Itinerary(
+            listOf(ride("A", "B", time(0), time(30, late)), ride("B", "D", time(40), time(70))),
+            transfers = 1,
+        )
+    }
+
+    @Test
+    fun `replanning a missed change searches on from that stop, leaving the history alone`() =
+        runTest(dispatcher) {
+            val (vm, _) = viewModel()
+            vm.fill("C")
+            vm.act(PlannerAction.Search)
+            advanceUntilIdle()
+            vm.act(PlannerAction.Select(twoRides(late = 15)))
+            advanceUntilIdle()
+
+            vm.act(PlannerAction.Replan)
+            advanceUntilIdle()
+
+            val state = vm.state.value
+            assertEquals(null, state.open)
+            assertEquals("stop-B", state.query.from?.routingRef)
+            assertEquals("D", state.query.to?.id)
+            assertEquals(Instant.parse("2026-11-03T09:45:00Z"), state.query.time)
+            assertTrue(state.query.vias.isEmpty())
+            assertEquals("stop-B", requests.last { it.url.encodedPath.endsWith("plan") }.url.parameters["fromPlace"])
+            assertEquals(1, store.rows.value.size)
+        }
+
+    @Test
+    fun `a journey that still works has nothing to replan`() =
+        runTest(dispatcher) {
+            val (vm, _) = viewModel()
+            vm.fill()
+            vm.act(PlannerAction.Search)
+            advanceUntilIdle()
+            val fine = twoRides(late = 0)
+            vm.act(PlannerAction.Select(fine))
+            advanceUntilIdle()
+
+            vm.act(PlannerAction.Replan)
+            advanceUntilIdle()
+
+            assertEquals(
+                fine,
+                vm.state.value.open
+                    ?.itinerary,
+            )
         }
 
     @Test

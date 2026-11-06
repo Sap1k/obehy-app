@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
+import androidx.compose.material.icons.rounded.WarningAmber
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
@@ -21,13 +22,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextMeasurer
 import cz.obehy.core.model.Itinerary
+import cz.obehy.core.model.JourneyTrouble
+import cz.obehy.core.model.troubleAt
 import cz.obehy.core.ui.ObehyTheme
 import cz.obehy.core.ui.components.DelayLabel
 import cz.obehy.core.ui.components.JourneyBar
 import cz.obehy.core.ui.components.LowFloorIcon
 import cz.obehy.core.ui.components.TimeLabel
+import java.time.Instant
 
 /** How far a connection sinks in while it is pressed. */
 private const val PRESSED_SCALE = 0.97f
@@ -93,8 +98,41 @@ internal fun ResultCard(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 DelayLabel(itinerary.worstDelayMinutes)
+                TroubleLabel(itinerary)
                 if (itinerary.accessible == true) LowFloorIcon()
             }
         }
+    }
+}
+
+/** Says so, briefly, when a journey in the list no longer works: its times may have changed since it was found. */
+@Composable
+private fun TroubleLabel(
+    itinerary: Itinerary,
+    modifier: Modifier = Modifier,
+) {
+    val trouble = remember(itinerary) { itinerary.troubleAt(Instant.now()) } ?: return
+    val color = MaterialTheme.colorScheme.error
+    Row(
+        modifier,
+        horizontalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.xs / 2),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            Icons.Rounded.WarningAmber,
+            contentDescription = null,
+            modifier = Modifier.size(ObehyTheme.sizes.iconSmall),
+            tint = color,
+        )
+        Text(
+            stringResource(
+                when (trouble) {
+                    is JourneyTrouble.Cancelled -> R.string.ride_cancelled
+                    is JourneyTrouble.MissedChange -> R.string.change_missed
+                },
+            ),
+            color = color,
+            style = MaterialTheme.typography.labelMedium,
+        )
     }
 }

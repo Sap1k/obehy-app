@@ -27,6 +27,9 @@
     <string name="low_floor">Low-floor</string>
     <string name="back">Back</string>
     <string name="live">live</string>
+    <string name="passed">passed</string>
+    <string name="notice_more">Show more</string>
+    <string name="notice_less">Show less</string>
     <string name="time_moved">%1$s, live, planned for %2$s</string>
     <string name="time_live">%s, live</string>
     <string name="unit_locomotive">Locomotive</string>

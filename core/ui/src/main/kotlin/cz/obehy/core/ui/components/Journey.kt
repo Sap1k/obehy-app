@@ -39,6 +39,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -112,7 +113,10 @@ private fun parseHex(hex: String?): Color? =
         ?.toLongOrNull(16)
         ?.let { Color(0xFF000000 or it) }
 
-/** A line's name on its colour, with the mode's icon so the colour never has to say it alone. */
+/**
+ * A line's name on its colour, with the mode's icon so the colour never has to say it alone; struck
+ * through when the ride is cancelled.
+ */
 @Composable
 fun LineBadge(
     ride: Leg.Transit,
@@ -134,7 +138,13 @@ fun LineBadge(
             modifier = Modifier.size(ObehyTheme.sizes.iconSmall),
             tint = colors.content,
         )
-        Text(ride.name, color = colors.content, style = MaterialTheme.typography.labelLarge, maxLines = 1)
+        Text(
+            ride.name,
+            color = colors.content,
+            style = MaterialTheme.typography.labelLarge,
+            maxLines = 1,
+            textDecoration = if (ride.cancelled) TextDecoration.LineThrough else null,
+        )
     }
 }
 

@@ -47,6 +47,8 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -61,6 +63,7 @@ import cz.obehy.core.model.TripDetail
 import cz.obehy.core.model.TripNotes
 import cz.obehy.core.model.TripStop
 import cz.obehy.core.model.TripVehicleInfo
+import cz.obehy.core.model.rowSpans
 import cz.obehy.core.model.runsPartOf
 import cz.obehy.core.ui.ObehyTheme
 import cz.obehy.core.ui.components.CompositionStrip
@@ -68,6 +71,7 @@ import cz.obehy.core.ui.components.InfoChip
 import cz.obehy.core.ui.components.InfoRow
 import cz.obehy.core.ui.components.PlatformLabel
 import cz.obehy.core.ui.components.RouteMark
+import cz.obehy.core.ui.components.RouteProgress
 import cz.obehy.core.ui.components.RouteRow
 import cz.obehy.core.ui.components.RouteStroke
 import cz.obehy.core.ui.components.ScheduleTime
@@ -76,13 +80,20 @@ import cz.obehy.core.ui.components.SegmentedRows
 import cz.obehy.core.ui.components.TimetableTime
 import cz.obehy.core.ui.components.VehicleId
 import cz.obehy.core.ui.components.featureIcon
+import cz.obehy.core.ui.components.passedLabel
 import cz.obehy.core.ui.components.quietStroke
+import cz.obehy.core.ui.components.rememberNow
+import cz.obehy.core.ui.components.rememberPassed
 import cz.obehy.core.ui.components.rememberPlatformWidth
 import cz.obehy.core.ui.components.rememberScheduleTimeWidth
 import cz.obehy.core.ui.components.rememberTimetableTimeWidth
+import cz.obehy.core.ui.components.rideHere
 import cz.obehy.core.ui.components.routeLineColor
 import cz.obehy.core.ui.components.unitName
 import java.time.Instant
+
+/** How often the point reached on a schedule moves on. */
+private const val PROGRESS_EVERY_MS = 10_000L
 
 @Composable
 private fun Section(
@@ -128,6 +139,19 @@ internal fun Schedule(
     val span = trip.boarded ?: trip.stops.indices
 
     fun stroke(index: Int) = if (index in span && index + 1 in span) ride else quiet
+
+    val clock = rememberNow(PROGRESS_EVERY_MS)
+    val now = remember(clock) { { clock.value } }
+    val here = rideHere(trip.ride)
+    // Nothing to follow on a trip that isn't running.
+    val spans =
+        if (trip.cancelled) {
+            emptyList()
+        } else {
+            trip.stops.indices
+                .map { trip.timeAt(it)?.expected }
+                .rowSpans()
+        }
     Section(stringResource(R.string.trip_schedule), modifier) {
         Column {
             trip.stops.forEachIndexed { index, stop ->
@@ -145,6 +169,7 @@ internal fun Schedule(
                     below = if (index < trip.stops.lastIndex) stroke(index) else null,
                     markStroke = if (index in span) ride else quiet,
                     columns = columns,
+                    progress = spans.getOrNull(index)?.let { RouteProgress(it, now, here) },
                 )
             }
         }
@@ -215,18 +240,31 @@ private fun ScheduleRow(
     markStroke: RouteStroke,
     columns: ScheduleColumns,
     modifier: Modifier = Modifier,
+    progress: RouteProgress? = null,
 ) {
+    val passed = rememberPassed(progress)
+    val spoken = passedLabel()
     // One size down the whole schedule: what's ridden stands out by weight and colour alone.
     val style = if (ridden) MaterialTheme.typography.titleSmall else MaterialTheme.typography.bodyMedium
-    val color = if (ridden) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant
+    val color =
+        if (ridden && !passed) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant
     val gap = ObehyTheme.spacing.xs
     val call = stop.call
     val firstLine = gap + with(LocalDensity.current) { style.lineHeight.toDp() } / 2
-    RouteRow(mark, modifier, above = above, below = below, markColor = markStroke.color, markAt = firstLine, leading = {
-        Box(Modifier.width(columns.time).padding(top = gap), Alignment.CenterEnd) {
-            if (time != null) ScheduleTime(time)
-        }
-    }) {
+    RouteRow(
+        mark,
+        modifier,
+        above = above,
+        below = below,
+        markColor = markStroke.color,
+        markAt = firstLine,
+        progress = progress,
+        leading = {
+            Box(Modifier.width(columns.time).padding(top = gap), Alignment.CenterEnd) {
+                if (time != null) ScheduleTime(time, passed = passed)
+            }
+        },
+    ) {
         Row(
             Modifier.weight(1f).padding(start = ObehyTheme.spacing.s, top = gap, bottom = gap),
             horizontalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.s),
@@ -238,7 +276,7 @@ private fun ScheduleRow(
             ) {
                 Text(
                     call.name,
-                    Modifier.weight(1f, fill = false),
+                    Modifier.weight(1f, fill = false).semantics { if (passed) stateDescription = spoken },
                     style = style,
                     color = if (call.cancelled) MaterialTheme.colorScheme.error else color,
                     textDecoration = if (call.cancelled) TextDecoration.LineThrough else null,

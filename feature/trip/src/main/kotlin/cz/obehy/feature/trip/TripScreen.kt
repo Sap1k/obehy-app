@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.MoreVert
-import androidx.compose.material.icons.rounded.WarningAmber
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilledTonalIconButton
@@ -58,7 +57,6 @@ import cz.obehy.core.map.followZoom
 import cz.obehy.core.map.mapVehicles
 import cz.obehy.core.model.MarkedNote
 import cz.obehy.core.model.Mode
-import cz.obehy.core.model.TripAlert
 import cz.obehy.core.model.TripDetail
 import cz.obehy.core.model.TripLinks
 import cz.obehy.core.ui.ObehyHeroScreen
@@ -66,7 +64,9 @@ import cz.obehy.core.ui.ObehyTheme
 import cz.obehy.core.ui.SharedBounds
 import cz.obehy.core.ui.components.DelayLabel
 import cz.obehy.core.ui.components.LineBadge
+import cz.obehy.core.ui.components.NoticeCard
 import cz.obehy.core.ui.components.featureIcon
+import cz.obehy.core.ui.components.rememberNow
 import cz.obehy.core.ui.icon
 import cz.obehy.core.ui.rideMorphKey
 import kotlinx.coroutines.delay
@@ -126,13 +126,7 @@ private fun tripView(
     trip: TripDetail?,
     following: Boolean,
 ): State<TripView> {
-    val now =
-        produceState(Instant.now()) {
-            while (true) {
-                delay(ESTIMATE_EVERY_MS)
-                value = Instant.now()
-            }
-        }
+    val now = rememberNow(ESTIMATE_EVERY_MS)
     return remember(trip, following) {
         derivedStateOf {
             val vehicles = trip?.mapVehicles(now.value).orEmpty()
@@ -276,7 +270,7 @@ private fun TripContent(
     Column(modifier.fillMaxWidth()) {
         Arriving(trip.alerts.isNotEmpty()) {
             Column(verticalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.s)) {
-                trip.alerts.forEach { AlertCard(it) }
+                trip.alerts.forEach { NoticeCard(it.title, text = it.text, severe = it.severe) }
             }
         }
         Schedule(trip, Modifier.padding(top = ObehyTheme.spacing.s))
@@ -411,35 +405,6 @@ private fun MarkedNote.fallbackText(): String =
             else -> R.string.vehicle_low_floor
         },
     )
-
-@Composable
-private fun AlertCard(
-    alert: TripAlert,
-    modifier: Modifier = Modifier,
-) {
-    val colors = MaterialTheme.colorScheme
-    val background = if (alert.severe) colors.errorContainer else colors.secondaryContainer
-    val content = if (alert.severe) colors.onErrorContainer else colors.onSecondaryContainer
-    Row(
-        modifier
-            .fillMaxWidth()
-            .clip(MaterialTheme.shapes.large)
-            .background(background)
-            .padding(ObehyTheme.spacing.m),
-        horizontalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.s),
-    ) {
-        Icon(
-            Icons.Rounded.WarningAmber,
-            contentDescription = null,
-            modifier = Modifier.size(ObehyTheme.sizes.iconSmall),
-            tint = content,
-        )
-        Column(verticalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.xs)) {
-            Text(alert.title, style = MaterialTheme.typography.titleSmall, color = content)
-            alert.text?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = content) }
-        }
-    }
-}
 
 @Composable
 private fun Failed(

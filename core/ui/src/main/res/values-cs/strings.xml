@@ -26,6 +26,9 @@
     <string name="low_floor">Nízkopodlažní</string>
     <string name="back">Zpět</string>
     <string name="live">podle polohy</string>
+    <string name="passed">projeto</string>
+    <string name="notice_more">Zobrazit více</string>
+    <string name="notice_less">Zobrazit méně</string>
     <string name="time_moved">%1$s podle polohy, podle jízdního řádu %2$s</string>
     <string name="time_live">%s podle polohy</string>
     <string name="unit_locomotive">Lokomotiva</string>
