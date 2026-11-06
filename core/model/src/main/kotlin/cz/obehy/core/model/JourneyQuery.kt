@@ -1,5 +1,6 @@
 package cz.obehy.core.model
 
+import kotlinx.serialization.Serializable
 import java.time.Instant
 
 /** The user's search options, remembered between searches. */
@@ -25,11 +26,12 @@ data class SearchOptions(
 }
 
 /** Where and when to travel. [time] null means now. */
+@Serializable
 data class JourneyQuery(
     val from: Place? = null,
     val to: Place? = null,
     val vias: List<Place> = emptyList(),
-    val time: Instant? = null,
+    @Serializable(InstantSerializer::class) val time: Instant? = null,
     val arriveBy: Boolean = false,
 ) {
     val isComplete: Boolean get() = from != null && to != null

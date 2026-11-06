@@ -1,5 +1,6 @@
 package cz.obehy.core.model
 
+import kotlinx.serialization.Serializable
 import java.time.Duration
 import java.time.Instant
 
@@ -202,6 +203,7 @@ data class TripConnection(
 )
 
 /** A disruption or notice. */
+@Serializable
 data class TripAlert(
     val title: String,
     val text: String?,

@@ -7,6 +7,7 @@ import cz.obehy.core.model.AppMode
 import cz.obehy.core.model.Place
 import cz.obehy.core.model.PlaceKind
 import cz.obehy.core.model.Suggestion
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,14 +15,20 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TemporaryFolder
 import java.time.Duration
 import java.time.Instant
 
 class SearchHistoryRepositoryTest {
+    @get:Rule
+    val folder = TemporaryFolder()
+
     private val store = FakeStore()
     private val settings = SettingsRepository(MemoryPreferences())
-    private val history = SearchHistoryRepository(store, settings)
+    private val session by lazy { SessionStore(folder.root, settings, Dispatchers.Unconfined, Dispatchers.Unconfined) }
+    private val history by lazy { SearchHistoryRepository(store, settings, session) }
     private val at = Instant.parse("2026-11-04T08:00:00Z")
     private val a = Place("a", "A", null, PlaceKind.Stop, 50.0, 14.0)
     private val b = Place("b", "B", null, PlaceKind.Stop, 50.1, 14.1)

@@ -61,7 +61,9 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.core.app.ActivityCompat
 import cz.obehy.core.model.Place
 import cz.obehy.core.model.PlaceKind
@@ -93,6 +95,9 @@ internal fun PlaceSearchScreen(
     // A list keeps its place by item, so it would stay on an old result as new ones come in above.
     LaunchedEffect(search.text, search.results) { list.requestScrollToItem(0) }
     val location = rememberLocationAsk(onAnswer = onLocationAnswer, onAllow = { onChoose(Place.myLocation()) })
+    // Text that's already there, back from the app being killed, is carried on from its end.
+    var typing by remember { mutableStateOf(TextFieldValue()) }
+    val field = typing.takeIf { it.text == search.text } ?: TextFieldValue(search.text, TextRange(search.text.length))
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -104,8 +109,12 @@ internal fun PlaceSearchScreen(
                 },
                 title = {
                     TextField(
-                        value = search.text,
-                        onValueChange = onType,
+                        value = field,
+                        onValueChange = {
+                            typing = it
+                            // The cursor moving alone is no new search.
+                            if (it.text != search.text) onType(it.text)
+                        },
                         modifier = Modifier.fillMaxWidth().focusRequester(focus),
                         placeholder = {
                             Text(

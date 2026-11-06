@@ -1,5 +1,6 @@
 package cz.obehy.feature.planner
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cz.obehy.core.data.JourneyEnd
@@ -8,8 +9,10 @@ import cz.obehy.core.data.JourneySuggester
 import cz.obehy.core.data.LocationRepository
 import cz.obehy.core.data.PlaceRepository
 import cz.obehy.core.data.SearchHistoryRepository
+import cz.obehy.core.data.SessionStore
 import cz.obehy.core.data.SettingsRepository
 import cz.obehy.core.data.TripRepository
+import cz.obehy.core.model.InstantSerializer
 import cz.obehy.core.model.Itinerary
 import cz.obehy.core.model.JourneyQuery
 import cz.obehy.core.model.LatLon
@@ -33,12 +36,14 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.Serializable
 import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
@@ -46,12 +51,16 @@ import javax.inject.Inject
 import javax.inject.Named
 
 /** Which place of the search is being picked. */
+@Serializable
 sealed interface PlaceTarget {
+    @Serializable
     data object From : PlaceTarget
 
+    @Serializable
     data object To : PlaceTarget
 
     /** The via at [index], or a new one at the end. */
+    @Serializable
     data class Via(
         val index: Int,
     ) : PlaceTarget
@@ -92,12 +101,13 @@ sealed interface Results {
     /** The search starts or ends at "My location", and the phone can't tell where that is. */
     data object NoLocation : Results
 
+    @Serializable
     data class Loaded(
         val itineraries: List<Itinerary>,
         val earlierCursor: String?,
         val laterCursor: String?,
         /** When these journeys were asked for: how old their times are. */
-        val fetchedAt: Instant,
+        @Serializable(InstantSerializer::class) val fetchedAt: Instant,
         val loadingMore: Boolean = false,
         val refreshing: Boolean = false,
         /** The last refresh didn't work; the times are as of [fetchedAt]. */
@@ -106,9 +116,10 @@ sealed interface Results {
 }
 
 /** The journey being looked at, and how fresh its times are. */
+@Serializable
 data class OpenJourney(
     val itinerary: Itinerary,
-    val fetchedAt: Instant,
+    @Serializable(InstantSerializer::class) val fetchedAt: Instant,
     val refreshing: Boolean = false,
     /** The last refresh didn't work; the times are as of [fetchedAt]. */
     val failed: Boolean = false,
@@ -125,6 +136,8 @@ data class PlannerState(
     val tripMaps: List<TripMap> = emptyList(),
     /** Journeys to offer before a search. */
     val suggestions: List<Suggestion> = emptyList(),
+    /** The app was killed and is reading back where the user was: nothing to show or act on yet. */
+    val restoring: Boolean = false,
 ) {
     /** Whether there is anything to clear with a new search. */
     val canReset: Boolean
@@ -208,6 +221,8 @@ sealed interface PlannerAction {
 class PlannerViewModel
     @Inject
     constructor(
+        saved: SavedStateHandle,
+        private val session: SessionStore,
         private val settings: SettingsRepository,
         private val places: PlaceRepository,
         private val journeys: JourneyRepository,
@@ -216,7 +231,9 @@ class PlannerViewModel
         private val history: SearchHistoryRepository,
         @param:Named("computation") private val computation: CoroutineDispatcher,
     ) : ViewModel() {
-        private val local = MutableStateFlow(PlannerState())
+        /** Android kept this screen for us, so the app was killed rather than closed: see [PlannerSnapshot]. */
+        private val returning = saved.contains(SESSION)
+        private val local = MutableStateFlow(PlannerState(restoring = returning))
         private var searchJob: Job? = null
         private var refreshJob: Job? = null
         private var nearbyJob: Job? = null
@@ -240,9 +257,14 @@ class PlannerViewModel
         val state: StateFlow<PlannerState> =
             combine(local, settings.searchOptions, suggestions) { state, options, suggested ->
                 state.copy(options = options, suggestions = suggested)
-            }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PlannerState())
+            }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PlannerState(restoring = returning))
 
         init {
+            saved[SESSION] = true
+            viewModelScope.launch {
+                if (returning) restore() else session.clear()
+                keepSession()
+            }
             viewModelScope.launch { location.allowed.collect { startFromHere() } }
             viewModelScope.launch {
                 // Stop IDs mean nothing to another server.
@@ -390,6 +412,41 @@ class PlannerViewModel
                     startFromHere()
                 }
             }
+        }
+
+        /** Back to where the user was when the app was killed, or to a new search if that's gone. */
+        private suspend fun restore() {
+            val snapshot = session.load(SESSION, PlannerSnapshot.serializer())
+            local.update { state ->
+                if (snapshot == null) {
+                    state.copy(restoring = false)
+                } else {
+                    state.copy(
+                        query = snapshot.query,
+                        results = snapshot.loaded ?: Results.Idle,
+                        open = snapshot.open,
+                        restoring = false,
+                    )
+                }
+            }
+            startFromHere()
+            if (snapshot == null) return
+            snapshot.open?.let { fetchTripsAhead(it.itinerary) }
+            if (snapshot.searchAgain) search()
+            snapshot.picking?.let { target ->
+                act(PlannerAction.Pick(target))
+                if (snapshot.pickingText.isNotEmpty()) act(PlannerAction.Type(snapshot.pickingText))
+            }
+        }
+
+        /** Saves as things change: nothing gets to run when the app is killed. */
+        private suspend fun keepSession() {
+            local
+                .map { it.toSnapshot() }
+                .distinctUntilChanged()
+                .flowOn(computation)
+                .debounce(SAVE_DELAY_MS)
+                .collectLatest { session.save(SESSION, PlannerSnapshot.serializer(), it) }
         }
 
         /** A search with no start begins here, once the user has let the app know where that is. */
@@ -661,6 +718,8 @@ class PlannerViewModel
         }
 
         private companion object {
+            const val SESSION = "planner"
+            const val SAVE_DELAY_MS = 1_000L
             const val PLACE_SEARCH_DELAY_MS = 250L
             const val MIN_PLACE_TEXT = 2
             val STOPS_STAY_FRESH: Duration = Duration.ofMinutes(2)

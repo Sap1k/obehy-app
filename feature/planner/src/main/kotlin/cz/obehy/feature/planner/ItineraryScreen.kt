@@ -44,9 +44,10 @@ internal fun ItineraryDestination(
     onOpenTrip: (Leg.Transit) -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    if (state.restoring) return
     val open = state.open
     if (open == null) {
-        // The search was cleared (or the app restarted): nothing left to show.
+        // The search was cleared, or the app was killed and its journey is gone: nothing left to show.
         val back by rememberUpdatedState(onBack)
         LaunchedEffect(Unit) { back() }
         return
@@ -120,7 +121,13 @@ internal fun JourneyMapDestination(
     onBack: () -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val open = state.open ?: return
+    if (state.restoring) return
+    val open = state.open
+    if (open == null) {
+        val back by rememberUpdatedState(onBack)
+        LaunchedEffect(Unit) { back() }
+        return
+    }
     // Edge to edge, so it leaves ObehyScreen's frame: only the back button floats over the map.
     SharedBounds(mapKey(open), Modifier.fillMaxSize()) {
         RouteMap(open.itinerary.legs, Modifier.fillMaxSize(), interactive = true, fullscreen = true)

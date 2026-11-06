@@ -1,9 +1,12 @@
 package cz.obehy.core.model
 
+import kotlinx.serialization.Serializable
+
 /** What a found place is: a stop routes by its ID, anything else by its coordinates. */
 enum class PlaceKind { Stop, Address, Poi, MyLocation }
 
 /** A place to travel from, to or through, as the place search found it. */
+@Serializable
 data class Place(
     val id: String,
     val name: String,

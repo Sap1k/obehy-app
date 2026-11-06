@@ -123,6 +123,8 @@ Refresh/replanning uses MOTIS (re-plan / `trip` endpoint) and never runs in-hous
 - **Trip detail:** tapping a ride opens its whole trip: MOTIS `trip` for the schedule and path in every mode, and
   in the modes with Oběhy, `journeys/enrich` then `/trips/{id}/{date}` and `/composition` for live stops, notes,
   vehicle and train order. Circulation and delay history are still to come.
+- **Surviving being killed:** the planner saves its search, results and open journey to a file outside backups as they
+  change, and reads them back when Android restores the app, so it works offline. Closing the app still starts clean.
 
 ## Later milestones
 

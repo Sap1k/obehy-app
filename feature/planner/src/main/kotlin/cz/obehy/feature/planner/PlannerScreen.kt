@@ -76,6 +76,8 @@ internal fun PlannerDestination(
     onOpenTrip: (Leg.Transit) -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    // The list comes back to its place only if it first appears with its results.
+    if (state.restoring) return
     val wide = isWideWindow()
     val search = state.placeSearch
     BackHandler(enabled = search != null) { viewModel.act(PlannerAction.ClosePlaceSearch) }

@@ -3,15 +3,18 @@ package cz.obehy.feature.planner
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.emptyPreferences
+import androidx.lifecycle.SavedStateHandle
 import cz.obehy.core.data.JourneyRepository
 import cz.obehy.core.data.LocationRepository
 import cz.obehy.core.data.PastSearch
 import cz.obehy.core.data.PlaceRepository
 import cz.obehy.core.data.SearchHistoryRepository
 import cz.obehy.core.data.SearchHistoryStore
+import cz.obehy.core.data.SessionStore
 import cz.obehy.core.data.SettingsRepository
 import cz.obehy.core.data.TripRepository
 import cz.obehy.core.model.AppMode
+import cz.obehy.core.model.Itinerary
 import cz.obehy.core.model.JourneyQuery
 import cz.obehy.core.model.LatLon
 import cz.obehy.core.model.Place
@@ -53,7 +56,9 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TemporaryFolder
 import java.time.Duration
 import java.time.Instant
 
@@ -69,13 +74,18 @@ class PlannerViewModelTest {
     private val location = FakeLocation()
     private val store = FakeHistoryStore()
 
+    @get:Rule
+    val folder = TemporaryFolder()
+
     @Before
     fun setUp() = Dispatchers.setMain(dispatcher)
 
     @After
     fun tearDown() = Dispatchers.resetMain()
 
-    private fun TestScope.viewModel(): Pair<PlannerViewModel, SettingsRepository> {
+    private fun TestScope.viewModel(
+        saved: SavedStateHandle = SavedStateHandle(),
+    ): Pair<PlannerViewModel, SettingsRepository> {
         // The engine runs on the test's clock, so advanceUntilIdle() waits for answers too.
         val engine =
             MockEngine(
@@ -112,14 +122,17 @@ class PlannerViewModelTest {
             )
         val motis = MotisApi(apiClient(engine, MotisJson, "test")) { "https://motis.test/" }
         val settings = SettingsRepository(MemoryStore())
+        val session = SessionStore(folder.root, settings, dispatcher, dispatcher)
         val viewModel =
             PlannerViewModel(
+                saved,
+                session,
                 settings,
                 PlaceRepository(motis, dispatcher),
                 JourneyRepository(motis, dispatcher),
                 TripRepository(motis, ObehyApi(apiClient(engine, ObehyJson, "test")), settings, dispatcher),
                 location,
-                SearchHistoryRepository(store, settings),
+                SearchHistoryRepository(store, settings, session),
                 dispatcher,
             )
         viewModel.now = { clock }
@@ -657,6 +670,125 @@ class PlannerViewModelTest {
                     .last()
                     .url.encodedPath
                     .endsWith("refresh-itinerary"),
+            )
+        }
+
+    @Test
+    fun `coming back after being killed finds the journey as it was, without asking the network`() =
+        runTest(dispatcher) {
+            val saved = SavedStateHandle()
+            val (vm, _) = viewModel(saved)
+            vm.fill()
+            vm.act(PlannerAction.Search)
+            advanceUntilIdle()
+            val loaded = vm.state.value.results as Results.Loaded
+            vm.act(PlannerAction.Select(loaded.itineraries.single()))
+            advanceUntilIdle()
+            val before = vm.state.value
+            clock = clock.plusSeconds(180)
+            requests.clear()
+
+            failing = true
+            val (back, _) = viewModel(saved)
+            assertTrue(back.state.value.restoring)
+            advanceUntilIdle()
+
+            val after = back.state.value
+            assertFalse(after.restoring)
+            assertEquals(before.query, after.query)
+            assertEquals(before.results, after.results)
+            assertEquals(before.open, after.open)
+            assertEquals(
+                loaded.fetchedAt,
+                after.open?.fetchedAt,
+            )
+            assertTrue(requests.none { it.url.encodedPath.endsWith("plan") })
+        }
+
+    @Test
+    fun `starting afresh forgets the last session`() =
+        runTest(dispatcher) {
+            val (vm, _) = viewModel()
+            vm.fill()
+            vm.act(PlannerAction.Search)
+            advanceUntilIdle()
+
+            val fresh = SavedStateHandle()
+            viewModel(fresh)
+            advanceUntilIdle()
+            val (back, _) = viewModel(fresh)
+            advanceUntilIdle()
+
+            assertEquals(Results.Idle, back.state.value.results)
+            assertEquals(JourneyQuery(), back.state.value.query)
+        }
+
+    @Test
+    fun `coming back with nothing saved is a new search`() =
+        runTest(dispatcher) {
+            val (vm, _) = viewModel(SavedStateHandle(mapOf("planner" to true)))
+            assertTrue(vm.state.value.restoring)
+            advanceUntilIdle()
+
+            assertFalse(vm.state.value.restoring)
+            assertEquals(Results.Idle, vm.state.value.results)
+        }
+
+    @Test
+    fun `a search cut short by being killed runs again`() =
+        runTest(dispatcher) {
+            val saved = SavedStateHandle()
+            val (vm, _) = viewModel(saved)
+            failing = true
+            vm.fill()
+            vm.act(PlannerAction.Search)
+            advanceUntilIdle()
+            assertEquals(Results.Failed, vm.state.value.results)
+
+            failing = false
+            val (back, _) = viewModel(saved)
+            advanceUntilIdle()
+
+            assertTrue(back.state.value.results is Results.Loaded)
+        }
+
+    @Test
+    fun `what was under way is not under way when coming back`() {
+        val itinerary = Itinerary(emptyList(), 0)
+        val state =
+            PlannerState(
+                results = Results.Loaded(listOf(itinerary), null, null, clock, loadingMore = true, refreshing = true),
+                open = OpenJourney(itinerary, clock, refreshing = true),
+            )
+
+        val snapshot = state.toSnapshot()
+
+        assertFalse(snapshot.loaded!!.refreshing)
+        assertFalse(snapshot.loaded!!.loadingMore)
+        assertFalse(snapshot.open!!.refreshing)
+    }
+
+    @Test
+    fun `the place being picked comes back with what was typed`() =
+        runTest(dispatcher) {
+            val saved = SavedStateHandle()
+            val (vm, _) = viewModel(saved)
+            vm.act(PlannerAction.Pick(PlaceTarget.Via(0)))
+            vm.act(PlannerAction.Type("Mus"))
+            advanceUntilIdle()
+
+            val (back, _) = viewModel(saved)
+            advanceUntilIdle()
+
+            assertEquals(
+                PlaceTarget.Via(0),
+                back.state.value.placeSearch
+                    ?.target,
+            )
+            assertEquals(
+                "Mus",
+                back.state.value.placeSearch
+                    ?.text,
             )
         }
 

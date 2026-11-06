@@ -1,14 +1,19 @@
 package cz.obehy.core.model
 
+import kotlinx.serialization.Serializable
+
 /**
  * What Oběhy adds to one transit leg of a MOTIS itinerary. A leg is always usable from MOTIS
  * data alone; enrichment only ever adds to it.
  */
+@Serializable
 sealed interface LegEnrichment {
     /** Asked, not answered yet. */
+    @Serializable
     data object Pending : LegEnrichment
 
     /** Oběhy knows the trip: `/api/v1/trips/{tripId}/{serviceDate}`. */
+    @Serializable
     data class Resolved(
         val tripId: String,
         val serviceDate: String,
@@ -18,6 +23,7 @@ sealed interface LegEnrichment {
      * Oběhy has nothing for this leg (a foreign trip, a feed without keys, or no answer): the
      * leg shows MOTIS data with a quiet note.
      */
+    @Serializable
     data class Unavailable(
         val reason: Reason,
     ) : LegEnrichment

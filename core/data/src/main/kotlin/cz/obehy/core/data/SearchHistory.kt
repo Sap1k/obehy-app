@@ -53,6 +53,7 @@ class SearchHistoryRepository
     constructor(
         private val store: SearchHistoryStore,
         private val settings: SettingsRepository,
+        private val session: SessionStore,
     ) {
         val searches: Flow<List<PastSearch>> =
             settings.settings
@@ -81,7 +82,11 @@ class SearchHistoryRepository
             store.delete(ids.mapTo(mutableSetOf()) { it.id })
         }
 
-        suspend fun clear() = store.clear()
+        /** Forgets every search, and the journey the app would come back to. */
+        suspend fun clear() {
+            store.clear()
+            session.clear()
+        }
 
         private companion object {
             val SAME_SEARCH: Duration = Duration.ofMinutes(10)

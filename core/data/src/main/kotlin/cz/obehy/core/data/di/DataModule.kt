@@ -29,6 +29,7 @@ import dagger.hilt.components.SingletonComponent
 import io.ktor.client.engine.okhttp.OkHttp
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import java.io.File
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -55,6 +56,18 @@ object DataModule {
     @Provides
     @Named("computation")
     fun computation(): CoroutineDispatcher = Dispatchers.Default
+
+    /** Where files are read and written. */
+    @Provides
+    @Named("io")
+    fun io(): CoroutineDispatcher = Dispatchers.IO
+
+    /** Left out of backups by being here: where someone travels stays on their phone. */
+    @Provides
+    @Named("session")
+    fun sessionDirectory(
+        @ApplicationContext context: Context,
+    ): File = File(context.noBackupFilesDir, "session")
 
     @Provides
     @Singleton

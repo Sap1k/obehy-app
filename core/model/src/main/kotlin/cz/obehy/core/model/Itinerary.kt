@@ -1,5 +1,7 @@
 package cz.obehy.core.model
 
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import java.time.Duration
 import java.time.Instant
 import kotlin.math.cos
@@ -7,9 +9,10 @@ import kotlin.math.round
 import kotlin.math.sqrt
 
 /** A planned time and, once realtime data says otherwise, the expected one. */
+@Serializable
 data class TimePoint(
-    val scheduled: Instant,
-    val expected: Instant = scheduled,
+    @Serializable(InstantSerializer::class) val scheduled: Instant,
+    @Serializable(InstantSerializer::class) val expected: Instant = scheduled,
     val realtime: Boolean = false,
 ) {
     /** Whole minutes late (negative: early); null without realtime data. */
@@ -17,6 +20,7 @@ data class TimePoint(
 }
 
 /** A point on the map. */
+@Serializable
 data class LatLon(
     val lat: Double,
     val lon: Double,
@@ -37,6 +41,7 @@ data class LatLon(
 }
 
 /** Where the feed points to for more about a ride. */
+@Serializable
 data class TripLinks(
     val tickets: String? = null,
     val line: String? = null,
@@ -49,6 +54,7 @@ data class TripLinks(
 enum class Reservation { Possible, Required }
 
 /** A stop on a journey and its times there. */
+@Serializable
 data class StopCall(
     val name: String,
     val stopId: String?,
@@ -67,6 +73,7 @@ data class StopCall(
 }
 
 /** One part of a journey. */
+@Serializable
 sealed interface Leg {
     val from: StopCall
     val to: StopCall
@@ -80,6 +87,7 @@ sealed interface Leg {
     val duration: Duration get() = Duration.between(start.expected, end.expected)
 
     /** A walk: to the first stop, between two, or from the last. */
+    @Serializable
     data class Walk(
         override val from: StopCall,
         override val to: StopCall,
@@ -92,6 +100,7 @@ sealed interface Leg {
     }
 
     /** A ride on one trip. */
+    @Serializable
     data class Transit(
         override val mode: Mode,
         override val from: StopCall,
@@ -128,6 +137,7 @@ sealed interface Leg {
 }
 
 /** One way to make the journey. */
+@Serializable
 data class Itinerary(
     val legs: List<Leg>,
     val transfers: Int,
@@ -138,6 +148,7 @@ data class Itinerary(
      * Tells this journey apart from the others, and finds it again in a later search: the trips it
      * rides, which stay the same when their times change.
      */
+    @Transient
     val key: String =
         legs.filterIsInstance<Leg.Transit>().let { rides ->
             rides.mapNotNull { it.tripId }.joinToString("|").ifEmpty {

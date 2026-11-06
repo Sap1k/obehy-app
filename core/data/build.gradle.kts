@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.obehy.android.library)
     alias(libs.plugins.obehy.hilt)
     alias(libs.plugins.obehy.room)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
