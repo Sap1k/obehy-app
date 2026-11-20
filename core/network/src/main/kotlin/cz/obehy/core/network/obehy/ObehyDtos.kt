@@ -161,39 +161,31 @@ data class ObehyTrip(
     val vehicles: List<TripVehicle> = emptyList(),
     val composition: Boolean = false,
     val calls: List<TripCall> = emptyList(),
-    val features: List<Feature> = emptyList(),
+    val notes: NoteGroups = NoteGroups(),
     val connections: List<Connection> = emptyList(),
     val alerts: List<Alert> = emptyList(),
+)
+
+/** A trip's notes as the API groups them: when it runs, the marked codes in print order, the longer texts. */
+@Serializable
+data class NoteGroups(
+    val operates: List<ObehyMarkedNote> = emptyList(),
+    val marked: List<ObehyMarkedNote> = emptyList(),
+    val long: List<String> = emptyList(),
+)
+
+@Serializable
+data class ObehyMarkedNote(
+    /** `system:code`. */
+    val key: String,
+    val text: String,
+    val icon: String,
 )
 
 @Serializable
 data class Label(
     val cs: String,
     val en: String,
-)
-
-@Serializable
-data class SourceCode(
-    val system: String,
-    val code: String,
-)
-
-@Serializable
-data class Note(
-    val kind: String,
-    val code: String? = null,
-    val label: String? = null,
-    val text: String? = null,
-)
-
-@Serializable
-data class Feature(
-    val kinds: List<String> = emptyList(),
-    val icon: String,
-    val label: Label,
-    val scope: String,
-    val note: Note? = null,
-    val sourceCode: SourceCode? = null,
 )
 
 @Serializable

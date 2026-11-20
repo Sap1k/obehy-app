@@ -10,16 +10,17 @@ import cz.obehy.core.model.CompositionStatus
 import cz.obehy.core.model.CompositionStretch
 import cz.obehy.core.model.CompositionUnit
 import cz.obehy.core.model.LatLon
+import cz.obehy.core.model.MarkedNote
 import cz.obehy.core.model.SegmentVehicle
 import cz.obehy.core.model.TripAlert
 import cz.obehy.core.model.TripConnection
-import cz.obehy.core.model.TripFeature
 import cz.obehy.core.model.TripInfo
+import cz.obehy.core.model.TripNotes
 import cz.obehy.core.model.TripStop
 import cz.obehy.core.model.TripVehicleInfo
 import cz.obehy.core.model.UnitKind
 import cz.obehy.core.model.VehiclePosition
-import cz.obehy.core.model.tripNotes
+import cz.obehy.core.model.signIcon
 import java.time.OffsetDateTime
 
 // Oběhy answers → domain types. Nothing Oběhy-shaped leaves this file's callers.
@@ -55,7 +56,12 @@ fun ObehyTrip.toTripInfo(
         serviceDate = serviceDate,
         cancelled = realtime?.lifecycle == "cancelled",
         vehicles = vehicles.filter { it.physical }.map { it.traits.toVehicleInfo() },
-        notes = tripNotes(features.map { it.toFeature(language) }),
+        notes =
+            TripNotes(
+                operates = notes.operates.map { it.toMarkedNote() },
+                marked = notes.marked.map { it.toMarkedNote() },
+                long = notes.long,
+            ),
         connections = connections.map { connection -> connection.toConnection(callName(connection.atSequence)) },
         alerts = alerts.map { it.toAlert(language) },
         hasComposition = composition,
@@ -86,18 +92,7 @@ private fun VehicleTraits.toVehicleInfo() =
         airConditioning = airConditioning,
     )
 
-private fun Feature.toFeature(language: String) =
-    TripFeature(
-        kinds = kinds.toSet(),
-        icon = icon,
-        text = label.of(language),
-        scope = scope,
-        system = sourceCode?.system,
-        code = sourceCode?.code,
-        noteKind = note?.kind,
-        noteCode = note?.code,
-        noteText = note?.text ?: note?.label,
-    )
+private fun ObehyMarkedNote.toMarkedNote() = MarkedNote(text, signIcon(key, icon))
 
 private fun Label.of(language: String) = if (language == "cs") cs else en
 

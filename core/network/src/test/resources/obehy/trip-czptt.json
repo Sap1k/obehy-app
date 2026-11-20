@@ -610,110 +610,98 @@
    "source_code": null
   }
  ],
- "notes": [
-  {
-   "kind": "czptt_central_note",
-   "code": "29",
-   "label": "kolo rezervace nutná",
-   "text": "přeprava spoluzavazadel s povinnou rezervací místa pro jízdní kolo a cestujícího, v některých vlacích pouze pro jízdní kolo"
-  },
-  {
-   "kind": "czptt_central_note",
-   "code": "34",
-   "label": "invalida s plošinou",
-   "text": "vůz vhodný pro přepravu cestujících na vozíku, je nutné objednání přepravy"
-  },
-  {
-   "kind": "czptt_central_note",
-   "code": "30",
-   "label": "zásuvka",
-   "text": "ve vlaku je řazen vůz s přípojkou 230 V"
-  },
-  {
-   "kind": "czptt_central_note",
-   "code": "29",
-   "label": "kolo rezervace nutná",
-   "text": "přeprava spoluzavazadel s povinnou rezervací místa pro jízdní kolo a cestujícího, v některých vlacích pouze pro jízdní kolo"
-  },
-  {
-   "kind": "czptt_central_note",
-   "code": "39",
-   "label": "tichý oddíl",
-   "text": "tichý oddíl"
-  },
-  {
-   "kind": "czptt_central_note",
-   "code": "34",
-   "label": "invalida s plošinou",
-   "text": "vůz vhodný pro přepravu cestujících na vozíku, je nutné objednání přepravy"
-  },
-  {
-   "kind": "czptt_central_note",
-   "code": "42",
-   "label": "kino",
-   "text": "dětské kino"
-  },
-  {
-   "kind": "czptt_central_note",
-   "code": "18",
-   "label": "hospoda",
-   "text": "restaurační vůz"
-  },
-  {
-   "kind": "czptt_central_note",
-   "code": "19",
-   "label": "místenka",
-   "text": "do označených vozů možno zakoupit místenku"
-  },
-  {
-   "kind": "czptt_central_note",
-   "code": "33",
-   "label": "dítě",
-   "text": "vůz nebo oddíly vyhrazené pro cestující s dětmi do 10 let"
-  },
-  {
-   "kind": "czptt_central_note",
-   "code": "14",
-   "label": "lehátko",
-   "text": "lehátkový vůz"
-  },
-  {
-   "kind": "czptt_central_note",
-   "code": "41",
-   "label": "palubní portál ČD",
-   "text": "palubní portál"
-  },
-  {
-   "kind": "czptt_central_note",
-   "code": "13",
-   "label": "lůžko",
-   "text": "lůžkový vůz"
-  },
-  {
-   "kind": "czptt_central_note",
-   "code": "40",
-   "label": "WiFi",
-   "text": "ve vlaku je řazen vůz s bezdrátovým připojením k internetu"
-  },
-  {
-   "kind": "czptt_central_note",
-   "code": "15",
-   "label": "vagon",
-   "text": "přímý vůz"
-  },
-  {
-   "kind": "czptt_local_note",
-   "code": null,
-   "label": "v oddílech 1. vozové třídy Business povinná rezervace místa",
-   "text": "CZ58376||CZ33425||v oddílech 1. vozové třídy Business povinná rezervace místa|2|3|1|0|"
-  },
-  {
-   "kind": "czptt_central_note",
-   "code": "44",
-   "label": "IDS",
-   "text": "vlak zařazený v integrovaném dopravním systému"
-  }
- ],
+ "notes": {
+  "operates": [],
+  "marked": [
+   {
+    "key": "czptt_note:13",
+    "text": "lůžkový vůz",
+    "icon": "note",
+    "tier": "plain"
+   },
+   {
+    "key": "czptt_note:14",
+    "text": "lehátkový vůz",
+    "icon": "note",
+    "tier": "plain"
+   },
+   {
+    "key": "czptt_note:15",
+    "text": "přímý vůz",
+    "icon": "note",
+    "tier": "detail"
+   },
+   {
+    "key": "czptt_note:34",
+    "text": "vůz vhodný pro přepravu cestujících na vozíku, je nutné objednání přepravy",
+    "icon": "wheelchair_booking",
+    "tier": "plain"
+   },
+   {
+    "key": "czptt_note:18",
+    "text": "restaurační vůz",
+    "icon": "note",
+    "tier": "plain"
+   },
+   {
+    "key": "czptt_note:19",
+    "text": "do označených vozů možno zakoupit místenku",
+    "icon": "note",
+    "tier": "detail"
+   },
+   {
+    "key": "czptt_note:33",
+    "text": "vůz nebo oddíly vyhrazené pro cestující s dětmi do 10 let",
+    "icon": "note",
+    "tier": "detail"
+   },
+   {
+    "key": "czptt_note:29",
+    "text": "přeprava spoluzavazadel s povinnou rezervací místa pro jízdní kolo a cestujícího, v některých vlacích pouze pro jízdní kolo",
+    "icon": "bicycle_reservation",
+    "tier": "stated"
+   },
+   {
+    "key": "czptt_note:30",
+    "text": "ve vlaku je řazen vůz s přípojkou 230 V",
+    "icon": "note",
+    "tier": "plain"
+   },
+   {
+    "key": "czptt_note:39",
+    "text": "tichý oddíl",
+    "icon": "note",
+    "tier": "plain"
+   },
+   {
+    "key": "czptt_note:40",
+    "text": "ve vlaku je řazen vůz s bezdrátovým připojením k internetu",
+    "icon": "note",
+    "tier": "plain"
+   },
+   {
+    "key": "czptt_note:41",
+    "text": "palubní portál",
+    "icon": "note",
+    "tier": "detail"
+   },
+   {
+    "key": "czptt_note:42",
+    "text": "dětské kino",
+    "icon": "note",
+    "tier": "detail"
+   },
+   {
+    "key": "czptt_note:44",
+    "text": "vlak zařazený v integrovaném dopravním systému",
+    "icon": "note",
+    "tier": "detail"
+   }
+  ],
+  "long": [
+   "CZ58376||CZ33425||v oddílech 1. vozové třídy Business povinná rezervace místa|2|3|1|0|"
+  ]
+ },
  "connections": [],
  "links": [],
  "alerts": [],

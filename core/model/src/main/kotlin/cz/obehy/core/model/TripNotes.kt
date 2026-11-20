@@ -1,19 +1,5 @@
 package cz.obehy.core.model
 
-/** One code or note as the timetable states it for a trip. */
-data class TripFeature(
-    val kinds: Set<String>,
-    val icon: String,
-    val text: String,
-    val scope: String,
-    /** The code's system (`jdf`, `czptt_note`, `czptt_activity`) and the code, when it is one. */
-    val system: String? = null,
-    val code: String? = null,
-    val noteKind: String? = null,
-    val noteCode: String? = null,
-    val noteText: String? = null,
-)
-
 /** A note with its [icon], one of the API's names. */
 data class MarkedNote(
     val text: String,
@@ -28,8 +14,6 @@ data class TripNotes(
 ) {
     val isEmpty: Boolean get() = operates.isEmpty() && marked.isEmpty() && long.isEmpty()
 }
-
-private val MARKED_SYSTEMS = setOf("jdf", "czptt_note")
 
 /** The icon of a timetable sign, for the codes the API has no icon of its own for. */
 private val SIGN_ICONS =
@@ -84,56 +68,8 @@ private val SIGN_ICONS =
         sign("jdf", "ticket", "s")
     }
 
-/** The API's own icon, unless it's the catch-all and the sign says more. */
-private fun TripFeature.iconFor(key: String): String = if (icon == "note") SIGN_ICONS[key] ?: icon else icon
-
-/** What a stop's own row already shows. */
-private val CALL_FLAGS =
-    setOf(
-        "request_stop",
-        "exit_only",
-        "boarding_only",
-        "not_stopping",
-        "border_control_only",
-        "on_request",
-        "conditional",
-    )
-
-/**
- * [features] grouped as the web's `noteGroups` does. Codes repeat per range of stops and as plain
- * notes, so each is listed once.
- */
-fun tripNotes(features: List<TripFeature>): TripNotes {
-    val operates = linkedMapOf<String, MarkedNote>()
-    val marked = linkedMapOf<String, MarkedNote>()
-    val long = linkedSetOf<String>()
-    for (feature in features) {
-        val key = feature.system?.let { "$it:${feature.code}" }
-        val atCalls = feature.scope == "call" || feature.scope == "call_range"
-        when {
-            key != null && "calendar_designation" in feature.kinds -> {
-                operates.getOrPut(key) { MarkedNote(feature.text, feature.icon) }
-            }
-
-            key != null && feature.system in MARKED_SYSTEMS -> {
-                // A stopping code of single stops is that stop's flag, not a note.
-                if (!atCalls || !CALL_FLAGS.containsAll(feature.kinds)) {
-                    marked.getOrPut(key) { MarkedNote(feature.text, feature.iconFor(key)) }
-                }
-            }
-
-            feature.noteKind == "czptt_central_note" && feature.noteCode != null -> {
-                // A central note of some stops comes as the note alone: its code is the key.
-                val code = "czptt_note:${feature.noteCode}"
-                feature.noteText?.let { text -> marked.getOrPut(code) { MarkedNote(text, feature.iconFor(code)) } }
-            }
-
-            key == null -> {
-                feature.noteText?.let { long += it }
-            }
-        }
-    }
-    val days = operates.values.toList()
-    val dayTexts = days.mapTo(mutableSetOf()) { it.text }
-    return TripNotes(days, marked.values.toList(), long.filterNot { it in dayTexts })
-}
+/** The icon of a timetable sign: the API's [icon], unless it's the catch-all and the sign says more. */
+fun signIcon(
+    key: String,
+    icon: String,
+): String = if (icon == "note") SIGN_ICONS[key] ?: icon else icon
