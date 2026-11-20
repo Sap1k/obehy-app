@@ -680,18 +680,107 @@
     "location_id": "czptt:stop:CZ:33425",
     "name": "Břeclav"
    },
-   "units": [
-    0,
-    1,
-    2,
-    3,
-    4,
-    5,
-    6,
-    7,
-    8,
-    9
+   "vehicles": [
+    {
+     "unit": 0,
+     "cab": {
+      "front": true,
+      "rear": false
+     },
+     "partial": false
+    },
+    {
+     "unit": 1,
+     "cab": {
+      "front": false,
+      "rear": false
+     },
+     "partial": false
+    },
+    {
+     "unit": 2,
+     "cab": {
+      "front": false,
+      "rear": false
+     },
+     "partial": false
+    },
+    {
+     "unit": 3,
+     "cab": {
+      "front": false,
+      "rear": false
+     },
+     "partial": false
+    },
+    {
+     "unit": 4,
+     "cab": {
+      "front": false,
+      "rear": false
+     },
+     "partial": false
+    },
+    {
+     "unit": 5,
+     "cab": {
+      "front": false,
+      "rear": false
+     },
+     "partial": false
+    },
+    {
+     "unit": 6,
+     "cab": {
+      "front": false,
+      "rear": false
+     },
+     "partial": false
+    },
+    {
+     "unit": 7,
+     "cab": {
+      "front": false,
+      "rear": false
+     },
+     "partial": false
+    },
+    {
+     "unit": 8,
+     "cab": {
+      "front": false,
+      "rear": false
+     },
+     "partial": false
+    },
+    {
+     "unit": 9,
+     "cab": {
+      "front": false,
+      "rear": true
+     },
+     "partial": false
+    }
    ]
   }
- ]
+ ],
+ "stretches": [
+  {
+   "from_call": {
+    "sequence": 5,
+    "location_id": "czptt:stop:CZ:57076",
+    "name": "Praha hlavní nádraží"
+   },
+   "to_call": {
+    "sequence": 115,
+    "location_id": "czptt:stop:CZ:33425",
+    "name": "Břeclav"
+   },
+   "segments": [
+    0
+   ]
+  }
+ ],
+ "here_segment": 0,
+ "here_stretch": 0
 }

@@ -1,5 +1,6 @@
 package cz.obehy.core.network
 
+import cz.obehy.core.model.CabEnds
 import cz.obehy.core.model.CompositionStatus
 import cz.obehy.core.model.TripDetail
 import cz.obehy.core.model.UnitKind
@@ -105,7 +106,16 @@ class TripApiTest {
             assertEquals("Budapest-Nyugati pu", sleeper.destination)
             assertEquals("Couchette car", sleeper.features.first().text)
             assertEquals(listOf("České dráhy"), composition.sources)
-            assertEquals(1, composition.stretches().size)
+            assertEquals(1, composition.stretches.size)
+            assertEquals(0, composition.hereStretch)
+            assertEquals(
+                CabEnds(front = true, rear = false),
+                composition.segments
+                    .single()
+                    .vehicles
+                    .first()
+                    .cab,
+            )
         }
 
     @Test

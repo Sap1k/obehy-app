@@ -69,7 +69,6 @@ import androidx.compose.ui.unit.dp
 import cz.obehy.core.model.CabEnds
 import cz.obehy.core.model.CompositionUnit
 import cz.obehy.core.model.UnitKind
-import cz.obehy.core.model.cabEnds
 import cz.obehy.core.ui.ObehyTheme
 import cz.obehy.core.ui.R
 
@@ -90,16 +89,17 @@ private val ON_COACH =
 private const val MOST_ON_COACH = 3
 
 /**
- * A train's vehicles in order, the head of the train on the left, scrolling sideways when they
- * don't fit. [onUnit] is told the position of the one tapped.
+ * A train's vehicles in order, the head of the train on the left, with their cab [ends] as the
+ * Oběhy API places them, scrolling sideways when they don't fit. [onUnit] is told the position
+ * of the one tapped.
  */
 @Composable
 fun CompositionStrip(
     units: List<CompositionUnit>,
+    ends: List<CabEnds>,
     onUnit: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val ends = cabEnds(units)
     Row(
         modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.xs / 2),

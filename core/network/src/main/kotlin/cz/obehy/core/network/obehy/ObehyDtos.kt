@@ -214,6 +214,9 @@ data class ObehyComposition(
     val retryAfterS: Int? = null,
     val units: List<ObehyCompositionUnit> = emptyList(),
     val segments: List<ObehyCompositionSegment> = emptyList(),
+    val stretches: List<ObehyCompositionStretch> = emptyList(),
+    val hereSegment: Int? = null,
+    val hereStretch: Int? = null,
 )
 
 @Serializable
@@ -247,8 +250,28 @@ data class ObehyCompositionUnit(
 )
 
 @Serializable
+data class ObehyCabEnds(
+    val front: Boolean,
+    val rear: Boolean,
+)
+
+@Serializable
+data class ObehySegmentVehicle(
+    val unit: Int,
+    val cab: ObehyCabEnds,
+    val partial: Boolean,
+)
+
+@Serializable
 data class ObehyCompositionSegment(
     val fromCall: ObehyCompositionCall,
     val toCall: ObehyCompositionCall,
-    val units: List<Int>,
+    val vehicles: List<ObehySegmentVehicle>,
+)
+
+@Serializable
+data class ObehyCompositionStretch(
+    val fromCall: ObehyCompositionCall,
+    val toCall: ObehyCompositionCall,
+    val segments: List<Int>,
 )

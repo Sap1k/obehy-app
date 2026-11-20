@@ -1,13 +1,16 @@
 package cz.obehy.core.network.obehy
 
+import cz.obehy.core.model.CabEnds
 import cz.obehy.core.model.CallFlag
 import cz.obehy.core.model.CoachFeature
 import cz.obehy.core.model.Composition
 import cz.obehy.core.model.CompositionCall
 import cz.obehy.core.model.CompositionSegment
 import cz.obehy.core.model.CompositionStatus
+import cz.obehy.core.model.CompositionStretch
 import cz.obehy.core.model.CompositionUnit
 import cz.obehy.core.model.LatLon
+import cz.obehy.core.model.SegmentVehicle
 import cz.obehy.core.model.TripAlert
 import cz.obehy.core.model.TripConnection
 import cz.obehy.core.model.TripFeature
@@ -130,7 +133,17 @@ fun ObehyComposition.toDomain(language: String): Composition =
             },
         retryAfterSeconds = retryAfterS,
         units = units.map { it.toUnit(language) },
-        segments = segments.map { CompositionSegment(it.fromCall.toCall(), it.toCall.toCall(), it.units) },
+        segments =
+            segments.map { segment ->
+                CompositionSegment(
+                    segment.fromCall.toCall(),
+                    segment.toCall.toCall(),
+                    segment.vehicles.map { SegmentVehicle(it.unit, CabEnds(it.cab.front, it.cab.rear), it.partial) },
+                )
+            },
+        stretches = stretches.map { CompositionStretch(it.fromCall.toCall(), it.toCall.toCall(), it.segments) },
+        hereSegment = hereSegment,
+        hereStretch = hereStretch,
         sources = units.map { it.label?.of(language) ?: it.source }.distinct(),
     )
 
@@ -155,7 +168,6 @@ private fun ObehyCompositionUnit.toUnit(language: String) =
         notes = details["notes"],
         leavesAt = details["direct_coach_leaves_at"],
         continuesAs = details["direct_coach_train"],
-        cab = details["cab"],
     )
 
 private fun ObehyUnitFeature.toCoachFeature(language: String) =

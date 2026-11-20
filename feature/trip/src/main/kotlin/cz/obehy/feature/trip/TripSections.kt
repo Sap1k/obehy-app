@@ -65,7 +65,6 @@ import cz.obehy.core.model.TripNotes
 import cz.obehy.core.model.TripStop
 import cz.obehy.core.model.TripVehicleInfo
 import cz.obehy.core.model.rowSpans
-import cz.obehy.core.model.runsPartOf
 import cz.obehy.core.ui.ObehyTheme
 import cz.obehy.core.ui.components.CompositionStrip
 import cz.obehy.core.ui.components.InfoChip
@@ -351,19 +350,6 @@ private fun VehicleRow(
     }
 }
 
-/** A stop a unit or segment reaches, as a rider knows it: a span can run on past the trip's last public stop. */
-private fun TripDetail.nameOf(call: CompositionCall): String {
-    val first = stops.firstOrNull()
-    val last = stops.lastOrNull()
-    val after = last?.sequence?.let { call.sequence > it } == true
-    val before = first?.sequence?.let { call.sequence < it } == true
-    return when {
-        after -> last!!.call.name
-        before -> first!!.call.name
-        else -> call.name
-    }
-}
-
 @Composable
 private fun CompositionRow(
     trip: TripDetail,
@@ -380,23 +366,22 @@ private fun CompositionRow(
             Caption(stringResource(R.string.trip_finding_order))
             return@Column
         }
-        // Where the journey boards, else where the train is heading next.
-        val at =
-            remember(composition, trip.info?.boardingSequence) {
-                val now = Instant.now()
-                trip.info?.boardingSequence
-                    ?: trip.stops.indices.firstOrNull { trip.timeAt(it)?.expected?.isAfter(now) == true }?.let {
-                        trip.stops[it].sequence
-                    }
-            }
-        val stretches = remember(composition) { composition.stretches() }
-        val here = composition.segmentAt(at)
+        // The API's stretches, and where the rider is (where the journey boards, else the trip's next stop).
+        val stretches = composition.stretches
         var chosen by rememberSaveable { mutableStateOf<Int?>(null) }
-        val index =
-            (chosen ?: stretches.indexOfFirst { here in it.segments }.coerceAtLeast(0))
-                .coerceAtMost(stretches.lastIndex)
+        val index = (chosen ?: composition.hereStretch ?: 0).coerceIn(0, stretches.lastIndex.coerceAtLeast(0))
         val stretch = stretches[index]
-        val segment = composition.segments[if (here in stretch.segments) here else stretch.segments.first()]
+        val here = composition.hereSegment
+        val segment =
+            composition.segments[
+                if (here != null &&
+                    here in stretch.segments
+                ) {
+                    here
+                } else {
+                    stretch.segments.first()
+                },
+            ]
         val units = composition.unitsOf(segment)
         var opened by remember(composition, index) { mutableStateOf<Int?>(null) }
 
@@ -416,20 +401,20 @@ private fun CompositionRow(
                         selected = n == index,
                         onClick = { chosen = n },
                         label = {
-                            Text(stringResource(R.string.trip_span, trip.nameOf(it.fromCall), trip.nameOf(it.toCall)))
+                            Text(stringResource(R.string.trip_span, it.fromCall.name, it.toCall.name))
                         },
                     )
                 }
             }
         } else {
-            Caption(stringResource(R.string.trip_span, trip.nameOf(stretch.fromCall), trip.nameOf(stretch.toCall)))
+            Caption(stringResource(R.string.trip_span, stretch.fromCall.name, stretch.toCall.name))
         }
-        CompositionStrip(units, onUnit = { opened = it })
+        CompositionStrip(units, segment.vehicles.map { it.cab }, onUnit = { opened = it })
         val sources = composition.sources.joinToString(", ")
         Caption(if (composition.checking) stringResource(R.string.trip_checking, sources) else sources)
         opened?.let { n ->
             units.getOrNull(n)?.let { unit ->
-                UnitSheet(trip, unit, partial = runsPartOf(unit, segment), onDismiss = { opened = null })
+                UnitSheet(trip, unit, partial = segment.vehicles[n].partial, onDismiss = { opened = null })
             }
         }
     }
@@ -479,7 +464,7 @@ private fun UnitSheet(
             unit.notes?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }
             if (partial) {
                 Caption(
-                    stringResource(R.string.unit_only_between, trip.nameOf(unit.fromCall), trip.nameOf(unit.toCall)),
+                    stringResource(R.string.unit_only_between, unit.fromCall.name, unit.toCall.name),
                 )
             }
             if (unit.features.isNotEmpty()) {
