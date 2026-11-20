@@ -112,7 +112,8 @@ class TripRepository
                     val fresh = info?.let { runCatching { obehy.trip(it.tripId, it.serviceDate) }.getOrNull() }
                     trip.copy(
                         ride = trip.ride.copy(cancelled = ride.cancelled, alerts = ride.alerts),
-                        stops = fresh?.addedTo(stops) ?: stops.map { it.keepingFrom(trip) },
+                        // Which Oběhy call each stop is was settled when the trip opened.
+                        stops = stops.map { it.keepingFrom(trip) },
                         info =
                             fresh?.toTripInfo(appLanguage())?.copy(
                                 boardingLocationId = info.boardingLocationId,
@@ -156,18 +157,29 @@ class TripRepository
             plain: TripDetail,
             request: TripRequest,
         ): TripDetail? {
-            val leg = resolved(request) ?: return null
+            val leg = resolved(request, plain.stops) ?: return null
             val ref = leg.trip ?: return null
             val trip = obehy.trip(ref.tripId, ref.serviceDate)
-            val stops = trip.addedTo(plain.stops)
+            val stops = trip.addedTo(plain.stops, leg.stopSequences)
             val boarding = leg.calls.firstOrNull()?.takeIf { leg.legCalls }
             return plain.copy(stops = stops, info = trip.toTripInfo(appLanguage(), boarding))
         }
 
-        private suspend fun resolved(request: TripRequest): EnrichedLeg? =
+        private suspend fun resolved(
+            request: TripRequest,
+            stops: List<TripStop>,
+        ): EnrichedLeg? =
             obehy
-                .enrich(listOf(EnrichLegRequest(request.motisTripId, request.fromStopId, request.toStopId)))
-                .legs
+                .enrich(
+                    listOf(
+                        EnrichLegRequest(
+                            request.motisTripId,
+                            request.fromStopId,
+                            request.toStopId,
+                            stopIds = stops.map { it.call.stopId.orEmpty() },
+                        ),
+                    ),
+                ).legs
                 .firstOrNull()
                 ?.takeIf { it.outcome == EnrichOutcome.Resolved }
 

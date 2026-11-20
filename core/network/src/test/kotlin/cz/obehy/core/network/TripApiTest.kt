@@ -66,11 +66,14 @@ class TripApiTest {
             val ride = motis().trip(motisTripId, "cs").toTrip(motisTripId)!!
             val stops = TripDetail.stopsOf(ride)
 
-            val added = obehy("obehy/trip-czptt.json").trip(tripId, "2026-11-04").addedTo(stops)
+            // The API's answer of which call each stop is: the first and the last, the rest unknown.
+            val sequences = listOf(5) + List(stops.size - 2) { null } + listOf(115)
+            val added = obehy("obehy/trip-czptt.json").trip(tripId, "2026-11-04").addedTo(stops, sequences)
 
             assertEquals(stops.map { it.call }, added.map { it.call })
             assertEquals(5, added.first().sequence)
             assertEquals(115, added.last().sequence)
+            assertEquals(stops[1].sequence, added[1].sequence)
         }
 
     @Test

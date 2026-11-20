@@ -27,22 +27,18 @@ import java.time.OffsetDateTime
 
 /**
  * [stops] with what only Oběhy knows about each: its place in Oběhy's timetable, for the train's
- * composition, and the request stops MOTIS can't say. Stops are matched in order by name, so ones
- * either side leaves out don't shift the rest.
+ * composition, and the request stops MOTIS can't say. [sequences] are the Oběhy API's answer of
+ * which call each stop is (by stop key, `EnrichedLeg.stopSequences`); a stop without one stays as it is.
  */
-fun ObehyTrip.addedTo(stops: List<TripStop>): List<TripStop> {
-    val passenger = calls.filterNot { "not_stopping" in it.flags }
-    var next = 0
-    return stops.map { stop ->
-        val at = (next..passenger.lastIndex).firstOrNull { passenger[it].name == stop.call.name }
-        if (at == null) {
-            stop
-        } else {
-            next = at + 1
-            val call = passenger[at]
-            val request = if ("request_stop" in call.flags) setOf(CallFlag.RequestStop) else emptySet()
-            stop.copy(sequence = call.sequence, flags = stop.flags + request)
-        }
+fun ObehyTrip.addedTo(
+    stops: List<TripStop>,
+    sequences: List<Int?>,
+): List<TripStop> {
+    val bySequence = calls.associateBy { it.sequence }
+    return stops.mapIndexed { n, stop ->
+        val call = sequences.getOrNull(n)?.let(bySequence::get) ?: return@mapIndexed stop
+        val request = if ("request_stop" in call.flags) setOf(CallFlag.RequestStop) else emptySet()
+        stop.copy(sequence = call.sequence, flags = stop.flags + request)
     }
 }
 

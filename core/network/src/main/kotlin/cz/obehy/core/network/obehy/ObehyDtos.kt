@@ -12,6 +12,8 @@ data class EnrichLegRequest(
     val tripId: String,
     val fromStopId: String? = null,
     val toStopId: String? = null,
+    /** The MOTIS trip's stop IDs in order: the answer says which Oběhy call each is. */
+    val stopIds: List<String> = emptyList(),
 )
 
 @Serializable
@@ -64,6 +66,8 @@ data class EnrichedLeg(
     val calls: List<TripCall> = emptyList(),
     /** Whether [calls] are the leg's span (boarding to alighting), not the whole trip. */
     val legCalls: Boolean = false,
+    /** Per asked stop ID, the sequence of the Oběhy call it is (by stop key, in order); null: none. */
+    val stopSequences: List<Int?> = emptyList(),
     val alerts: List<Alert> = emptyList(),
 )
 

@@ -46,7 +46,7 @@ private fun call(
 private val ENRICHED =
     """{"release_id":"r","generated_at":"2026-11-04T21:00:00+01:00","legs":[{"motis_trip_id":"m",
     "outcome":"resolved","trip":{"trip_id":"o","service_date":"2026-11-04"},"leg_calls":true,
-    "calls":[${call(20, "b")},${call(30, "c")}]}]}"""
+    "calls":[${call(20, "b")},${call(30, "c")}],"stop_sequences":[10,20,30,40]}]}"""
 
 private val OBEHY_TRIP =
     """{"trip_id":"o","service_date":"2026-11-04","composition":true,
