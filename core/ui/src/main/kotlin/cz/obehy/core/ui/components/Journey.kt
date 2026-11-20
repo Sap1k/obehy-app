@@ -44,6 +44,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import cz.obehy.core.model.Leg
+import cz.obehy.core.model.Punctuality
 import cz.obehy.core.ui.ObehyTheme
 import cz.obehy.core.ui.R
 import cz.obehy.core.ui.icon
@@ -292,7 +293,7 @@ fun DelayLabel(
     minutes: Long?,
     modifier: Modifier = Modifier,
 ) {
-    if (minutes == null || minutes < 1) return
+    if (minutes == null || !Punctuality.isLate(minutes)) return
     val spoken = stringResource(R.string.delay_late, minutes)
     Row(
         modifier.clearAndSetSemantics { contentDescription = spoken },

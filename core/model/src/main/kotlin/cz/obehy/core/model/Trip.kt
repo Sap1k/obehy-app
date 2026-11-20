@@ -31,14 +31,13 @@ data class TripDetail(
 ) {
     val cancelled: Boolean get() = ride.cancelled || info?.cancelled == true
 
-    /** Whole minutes late now, null when nothing live says so. */
+    /** Minutes late now, from the first live stop's time; null when nothing live says so. */
     val delayMinutes: Long?
         get() =
-            info?.delayMinutes
-                ?: stops
-                    .asSequence()
-                    .mapNotNull { it.call.departure ?: it.call.arrival }
-                    .firstNotNullOfOrNull { it.delayMinutes }
+            stops
+                .asSequence()
+                .mapNotNull { it.call.departure ?: it.call.arrival }
+                .firstNotNullOfOrNull { it.delayMinutes }
 
     /**
      * Where the vehicle should be at [now], going by the expected times along the path: a stand-in
@@ -211,7 +210,6 @@ data class TripInfo(
     val tripId: String,
     val serviceDate: String,
     val cancelled: Boolean,
-    val delayMinutes: Long?,
     /** Those a source names as physical vehicles, unlike a train known only by its number. */
     val vehicles: List<TripVehicleInfo>,
     val notes: TripNotes,

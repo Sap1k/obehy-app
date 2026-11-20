@@ -91,9 +91,8 @@ data class Line(
 
 @Serializable
 data class TripRealtime(
-    /** pre_trip, running, finished or cancelled. */
+    /** forecast, pre_trip, running, finished or cancelled. */
     val lifecycle: String,
-    val delayS: Int? = null,
     val offRoute: Boolean = false,
     val stale: Boolean = false,
     val updatedAt: String,

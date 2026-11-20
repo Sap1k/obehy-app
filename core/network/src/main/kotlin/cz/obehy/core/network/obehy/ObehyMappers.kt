@@ -51,7 +51,6 @@ fun ObehyTrip.toTripInfo(
         tripId = tripId,
         serviceDate = serviceDate,
         cancelled = realtime?.lifecycle == "cancelled",
-        delayMinutes = realtime?.takeUnless { it.stale }?.delayS?.let { it / SECONDS_PER_MINUTE },
         vehicles = vehicles.filter { it.physical }.map { it.traits.toVehicleInfo() },
         notes = tripNotes(features.map { it.toFeature(language) }),
         connections = connections.map { connection -> connection.toConnection(callName(connection.atSequence)) },
@@ -71,8 +70,6 @@ fun ObehyTrip.toTripInfo(
                 }
             },
     )
-
-private const val SECONDS_PER_MINUTE = 60L
 
 private fun ObehyTrip.callName(sequence: Int?) = calls.firstOrNull { it.sequence == sequence }?.name
 

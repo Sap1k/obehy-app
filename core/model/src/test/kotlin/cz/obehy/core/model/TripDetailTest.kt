@@ -95,7 +95,7 @@ class TripDetailTest {
         val booked = ride.copy(reservation = Reservation.Required)
         val plain = TripDetail(booked, TripDetail.stopsOf(ride), null)
         val notes = TripNotes(marked = listOf(MarkedNote("Seats can be booked", "reservation")))
-        val info = TripInfo("t", "2026-11-04", false, null, emptyList(), notes, emptyList(), emptyList(), false)
+        val info = TripInfo("t", "2026-11-04", false, emptyList(), notes, emptyList(), emptyList(), false)
 
         assertEquals(listOf("reservation_required"), plain.attributes.map { it.icon })
         assertEquals(listOf("reservation"), plain.copy(info = info).attributes.map { it.icon })
@@ -145,13 +145,10 @@ class TripDetailTest {
     }
 
     @Test
-    fun `the delay is the live trip's, else the first live stop's`() {
+    fun `the delay is the first live stop's`() {
         val stops = listOf(TripStop(stop("A", a)), TripStop(stop("B", b, delay = 4)))
-        val plain = TripDetail(ride, stops, null)
-        val info = TripInfo("t", "2026-11-04", false, 7, emptyList(), TripNotes(), emptyList(), emptyList(), false)
 
-        assertEquals(4L, plain.delayMinutes)
-        assertEquals(7L, plain.copy(info = info).delayMinutes)
+        assertEquals(4L, TripDetail(ride, stops, null).delayMinutes)
         assertNull(TripDetail(ride, listOf(TripStop(stop("A", a))), null).delayMinutes)
     }
 
@@ -186,7 +183,6 @@ class TripDetailTest {
                 "t",
                 "2026-11-04",
                 false,
-                null,
                 emptyList(),
                 TripNotes(),
                 emptyList(),

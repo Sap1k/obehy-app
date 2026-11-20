@@ -12,7 +12,7 @@
       "agency": "České dráhy, a.s.",
       "trip_short_name": "R 696",
       "headsign": "Děčín hlavní nádraží",
-      "realtime": {"lifecycle": "running", "delay_s": 120, "off_route": false, "stale": false, "updated_at": "2026-11-03T07:57:50+01:00", "sources": []},
+      "realtime": {"lifecycle": "running", "delay_min": 2, "punctuality": "on_time", "off_route": false, "stale": false, "updated_at": "2026-11-03T07:57:50+01:00", "sources": []},
       "vehicles": [
         {"vehicle_id": "cd:91547162014", "state": "running", "last_seen": "2026-11-03T07:57:40+01:00", "position_at": null, "latitude": 50.62, "longitude": 14.08, "bearing": 330.0,
          "traits": {"low_floor": true, "air_conditioning": true, "wheelchair_accessible": null, "manufacturer": "Škoda", "model": "Elefant", "operator": "ČD", "licence_plate": null, "fleet_number": "471 016"},

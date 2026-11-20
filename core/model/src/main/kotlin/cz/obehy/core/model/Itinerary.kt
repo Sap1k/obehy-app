@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import java.time.Duration
 import java.time.Instant
+import java.time.temporal.ChronoUnit
 import kotlin.math.cos
 import kotlin.math.round
 import kotlin.math.sqrt
@@ -15,8 +16,19 @@ data class TimePoint(
     @Serializable(InstantSerializer::class) val expected: Instant = scheduled,
     val realtime: Boolean = false,
 ) {
-    /** Whole minutes late (negative: early); null without realtime data. */
-    val delayMinutes: Long? get() = if (realtime) Duration.between(scheduled, expected).toMinutes() else null
+    /**
+     * Minutes late as shown (negative: early): the two times each cut to the minute, as the Oběhy
+     * API counts them; null without realtime data.
+     */
+    val delayMinutes: Long?
+        get() =
+            if (realtime) {
+                Duration
+                    .between(scheduled.truncatedTo(ChronoUnit.MINUTES), expected.truncatedTo(ChronoUnit.MINUTES))
+                    .toMinutes()
+            } else {
+                null
+            }
 }
 
 /** A point on the map. */

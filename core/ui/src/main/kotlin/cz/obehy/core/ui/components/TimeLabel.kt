@@ -34,6 +34,7 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.max
+import cz.obehy.core.model.Punctuality
 import cz.obehy.core.model.TimePoint
 import cz.obehy.core.ui.ObehyTheme
 import cz.obehy.core.ui.R
@@ -262,7 +263,7 @@ private fun CurrentTime(
     val colour by animateColorAsState(
         when {
             !time.realtime || passed -> timetableColour
-            (time.delayMinutes ?: 0) >= 1 -> MaterialTheme.colorScheme.error
+            Punctuality.isLate(time.delayMinutes) -> MaterialTheme.colorScheme.error
             else -> MaterialTheme.colorScheme.primary
         },
         motion.defaultEffectsSpec(),

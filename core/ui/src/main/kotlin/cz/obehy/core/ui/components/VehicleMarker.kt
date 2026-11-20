@@ -20,6 +20,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
+import cz.obehy.core.model.Punctuality
 import cz.obehy.core.ui.ObehyTheme
 import cz.obehy.core.ui.R
 import kotlin.math.abs
@@ -80,7 +81,7 @@ fun rememberVehicleMarker(
     val rim = if (estimated) scheme.outline else scheme.surface
     val alpha = if (certainty == VehicleCertainty.Stale) STALE_ALPHA else 1f
     val lineStyle = MaterialTheme.typography.labelSmall.copy(color = ink)
-    val delay = delayMinutes?.takeIf { it >= 1 }?.let { stringResource(R.string.delay_marker, it) }
+    val delay = delayMinutes?.takeIf { Punctuality.isLate(it) }?.let { stringResource(R.string.delay_marker, it) }
     val delayStyle = MaterialTheme.typography.labelSmall.copy(color = scheme.onErrorContainer)
     val delayFill = scheme.errorContainer
     val turned = heading?.let { (it / HEADING_STEP).roundToInt() * HEADING_STEP }

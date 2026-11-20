@@ -58,7 +58,7 @@ class ObehyApiTest {
 
             assertEquals(EnrichOutcome.Resolved, rail.outcome)
             assertEquals("2026-11-03", rail.trip!!.serviceDate)
-            assertEquals(120, rail.realtime!!.delayS)
+            assertEquals("running", rail.realtime!!.lifecycle)
             assertEquals(
                 "471 016",
                 rail.vehicles
