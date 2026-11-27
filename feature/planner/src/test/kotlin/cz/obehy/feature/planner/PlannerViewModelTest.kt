@@ -50,6 +50,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runCurrent
@@ -105,6 +106,11 @@ class PlannerViewModelTest {
 
                             request.url.encodedPath.endsWith("map/stops") -> {
                                 respond(MAP_STOPS, HttpStatusCode.OK, json)
+                            }
+
+                            request.url.encodedPath.endsWith("v6/trip") -> {
+                                val tripId = request.url.parameters["tripId"]!!
+                                respond(itinerary(tripId, minute = 10), HttpStatusCode.OK, json)
                             }
 
                             request.url.encodedPath.endsWith("refresh-itinerary") -> {
@@ -707,6 +713,39 @@ class PlannerViewModelTest {
             assertEquals(picked.refreshId, requests.last().url.parameters["itineraryId"])
             val card = (vm.state.value.results as Results.Loaded).itineraries.first()
             assertEquals(2L, card.start.delayMinutes)
+        }
+
+    @Test
+    fun `the ride being watched asks for its times again at once, then every half minute`() =
+        runTest(dispatcher) {
+            val (vm, _) = viewModel()
+            vm.fill()
+            vm.act(PlannerAction.Search)
+            advanceUntilIdle()
+            val picked = (vm.state.value.results as Results.Loaded).itineraries.first()
+            vm.act(PlannerAction.Select(picked))
+            advanceUntilIdle()
+            val ride = picked.legs.filterIsInstance<Leg.Transit>().single()
+            val asked = { requests.count { it.url.encodedPath.endsWith("v6/trip") } }
+            // Fetched ahead when the journey opened.
+            assertEquals(1, asked())
+
+            backgroundScope.launch(dispatcher) { vm.watchRide(ride) }
+            runCurrent()
+            assertEquals(2, asked())
+            assertEquals(
+                ride.tripId,
+                vm.state.value.watched
+                    ?.ride
+                    ?.tripId,
+            )
+
+            advanceTimeBy(29_000)
+            runCurrent()
+            assertEquals(2, asked())
+            advanceTimeBy(2_000)
+            runCurrent()
+            assertEquals(3, asked())
         }
 
     @Test

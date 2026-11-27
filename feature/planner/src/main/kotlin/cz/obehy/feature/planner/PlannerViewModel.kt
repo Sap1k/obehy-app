@@ -77,8 +77,11 @@ sealed interface PlaceTarget {
 /** Whether nearby stops can be shown, and if not, what would make them appear. */
 enum class NearbyStatus { Unknown, Loading, Ready, NeedsPermission, Off }
 
-/** How often the ride that matters on an open journey asks where its vehicle is. */
-private const val WATCH_EVERY_MS = 30_000L
+/** How often the ride that matters on an open journey asks where its vehicle is, as a map following one does. */
+private const val POSITIONS_EVERY_MS = 10_000L
+
+/** Every how many of those it asks for fresh times too: every half minute, as an open trip does. */
+private const val TIMES_EVERY_ROUNDS = 3
 
 /** Nearby stops fetched ahead of the picker opening. */
 private class PreloadedStops(
@@ -612,15 +615,27 @@ class PlannerViewModel
                 }
         }
 
-        /** Keeps [PlannerState.watched] on [ride], its trip and where its vehicle is, until cancelled. */
+        /**
+         * Keeps [PlannerState.watched] on [ride], its trip and where its vehicle is, until cancelled.
+         * Where its vehicle is gets asked for often; its times less often, and at once when the trip was
+         * fetched ahead, as that may be minutes old, and where the vehicle should be is worked out from them.
+         */
         suspend fun watchRide(ride: Leg.Transit) {
             val request = ride.tripRequest ?: return
+            val ahead = trips.fetchedAhead(request)
             val plain = trips.plain(request).getOrNull() ?: return
             var trip = trips.withDetails(plain, request)
+            local.update { it.copy(watched = trip) }
+            var round = if (plain === ahead) 0 else 1
             while (true) {
+                if (round > 0) delay(POSITIONS_EVERY_MS)
+                trip =
+                    if (round++ % TIMES_EVERY_ROUNDS == 0) {
+                        trips.refresh(trip, request.motisTripId).getOrNull() ?: trips.positions(trip)
+                    } else {
+                        trips.positions(trip)
+                    }
                 local.update { it.copy(watched = trip) }
-                delay(WATCH_EVERY_MS)
-                trip = trips.positions(trip)
             }
         }
 
