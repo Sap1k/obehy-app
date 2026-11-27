@@ -5,4 +5,5 @@
     <string name="map_vehicle_estimated">Where the vehicle should be now, going by its times</string>
     <string name="map_follow">Follow the vehicle</string>
     <string name="map_whole_journey">Show the whole journey</string>
+    <string name="map_north_up">Turn the map north up</string>
 </resources>

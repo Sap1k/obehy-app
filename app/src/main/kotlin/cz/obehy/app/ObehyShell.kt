@@ -37,11 +37,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import cz.obehy.core.model.AppMode
+import cz.obehy.core.model.LiveMapSource
 import cz.obehy.core.ui.BACK_MS
 import cz.obehy.core.ui.BackEasing
 import cz.obehy.core.ui.ComingSoon
 import cz.obehy.core.ui.HoldDuringMorph
 import cz.obehy.core.ui.SharedMotion
+import cz.obehy.feature.map.MapRoute
+import cz.obehy.feature.map.mapScreen
 import cz.obehy.feature.onboarding.SettingsRoute
 import cz.obehy.feature.onboarding.settingsScreen
 import cz.obehy.feature.planner.JourneyMapRoute
@@ -57,9 +60,6 @@ import kotlin.reflect.KClass
 @Serializable
 data object DeparturesRoute
 
-@Serializable
-data object MapRoute
-
 private data class TopLevel(
     val route: Any,
     val routeClass: KClass<*>,
@@ -68,8 +68,11 @@ private data class TopLevel(
     val selectedIcon: ImageVector,
 )
 
-/** The top-level destinations per mode: the live map comes from Oběhy. */
-private fun destinations(mode: AppMode): List<TopLevel> =
+/** The top-level destinations per mode: the map wherever there's one to show (Oběhy's, or the server's railviz). */
+private fun destinations(
+    mode: AppMode,
+    liveMap: LiveMapSource,
+): List<TopLevel> =
     buildList {
         add(
             TopLevel(
@@ -89,7 +92,7 @@ private fun destinations(mode: AppMode): List<TopLevel> =
                 Icons.Rounded.DepartureBoard,
             ),
         )
-        if (mode.usesObehy) {
+        if (liveMap != LiveMapSource.None) {
             add(TopLevel(MapRoute, MapRoute::class, R.string.nav_map, Icons.Outlined.Map, Icons.Rounded.Map))
         }
         add(
@@ -118,6 +121,7 @@ private val NavDestination.isFullMap: Boolean
 @Composable
 fun ObehyShell(
     mode: AppMode,
+    liveMap: LiveMapSource,
     modifier: Modifier = Modifier,
 ) {
     val nav = rememberNavController()
@@ -139,7 +143,7 @@ fun ObehyShell(
         modifier = modifier,
         state = bar,
         navigationItems = {
-            destinations(mode).forEach { top ->
+            destinations(mode, liveMap).forEach { top ->
                 // A trip is opened from a journey, so the journeys tab stays lit under it.
                 val selected =
                     current?.hierarchy?.any { it.hasRoute(top.routeClass) } == true ||
@@ -197,12 +201,12 @@ fun ObehyShell(
                 tripScreen(nav)
                 settingsScreen()
                 composable<DeparturesRoute> { ComingSoon(stringResource(R.string.nav_departures)) }
-                composable<MapRoute> { ComingSoon(stringResource(R.string.nav_map)) }
+                mapScreen()
             }
             // Tabs are peers, with nothing to morph into: leaving one back to the start is the
             // same fade as switching tabs, once the gesture is done, with no preview to drag.
             val inOtherTab =
-                destinations(mode).any { top ->
+                destinations(mode, liveMap).any { top ->
                     top.routeClass != PlannerRoute::class && current?.hasRoute(top.routeClass) == true
                 }
             BackHandler(enabled = inOtherTab) { nav.popBackStack() }

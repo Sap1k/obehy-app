@@ -45,6 +45,7 @@ dependencies {
     implementation(projects.feature.onboarding)
     implementation(projects.feature.planner)
     implementation(projects.feature.trip)
+    implementation(projects.feature.map)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)

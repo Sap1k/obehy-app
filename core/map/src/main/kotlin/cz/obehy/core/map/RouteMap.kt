@@ -398,7 +398,7 @@ internal fun mapLook(): MapLook =
 
 /** A small (i) that opens the map data's [credits], readable on any map. */
 @Composable
-private fun MapCredits(
+internal fun MapCredits(
     credits: () -> List<String>,
     modifier: Modifier = Modifier,
 ) {
@@ -436,7 +436,7 @@ private fun MapCredits(
 /** The points a leg is drawn through: its path, or a straight line between its stops. */
 internal fun Leg.shape(): List<LatLon> = path.ifEmpty { listOfNotNull(from.position, to.position) }
 
-private fun Color.hex(): String = "#%06X".format(toArgb() and 0xFFFFFF)
+internal fun Color.hex(): String = "#%06X".format(toArgb() and 0xFFFFFF)
 
 /**
  * The web's map style (exported to the assets by `tools/export-style.mjs`) with the journey in

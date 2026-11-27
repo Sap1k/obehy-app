@@ -50,7 +50,7 @@ class MainActivity : ComponentActivity() {
                         // Onboarding finishes by saving the settings; the state then turns Ready by itself.
                         AppState.NeedsOnboarding -> OnboardingScreen()
 
-                        is AppState.Ready -> ObehyShell(s.mode)
+                        is AppState.Ready -> ObehyShell(s.mode, s.liveMap)
                     }
                 }
             }

@@ -126,11 +126,24 @@ Refresh/replanning uses MOTIS (re-plan / `trip` endpoint) and never runs in-hous
 - **Surviving being killed:** the planner saves its search, results and open journey to a file outside backups as they
   change, and reads them back when Android restores the app, so it works offline. Closing the app still starts clean.
 
+## Live map (M3)
+
+- **Sources by mode.** The modes with Oběhy show Oběhy's vehicles (`/api/v1/vehicles` by the web's fixed
+  grid cells, refreshed on the worker's 10 s tick), stops (`/stops`) and boards (`/stop-places/{id}/departures`).
+  The mode without Oběhy shows MOTIS railviz (`/api/v1/map/trips`) where the server answers it: each vehicle is
+  placed by its times between two stops, says so ("From the timetable", hollow route-coloured markers, "should
+  be near"), and stops and boards come from MOTIS (`map/stops`, `/api/v6/stoptimes`). Railviz is never mixed
+  into the Oběhy modes. `LiveMapAvailability` tries each MOTIS server for railviz and remembers the answer.
+- **On the map, never off it.** A vehicle or a board row opens its whole trip in a sheet (trip first, as the web
+  panel), with Follow; Oběhy trips come from Oběhy alone (`include=shape,run`), MOTIS ones from MOTIS.
+- **Railviz is heavy:** a city at zoom 10 for three minutes is about 0.8 MB gzipped (2026-11-20), so the app asks
+  for the view with a margin and three minutes ahead, and again only when either runs out.
+
 ## Later milestones
 
 - **M2 Boards:** MOTIS `stoptimes` (both modes, enriched via the same endpoint), plus the
   Oběhy `/stop-places/{id}/departures` board in the modes with Oběhy. Grouped nearby boards come later.
-- **M3 Live map (modes with Oběhy):** `/api/v1/vehicles` viewport polling, vehicle detail, composition.
+- **M3 Live map:** built, see "Live map (M3)" above.
 - **M4:** saved journeys with MOTIS refresh, disruption notifications, Play release.
 
 ## Verified against live services (2026-11-02)

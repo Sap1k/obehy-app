@@ -14,9 +14,10 @@ delays, vehicles, compositions, alerts). See [PLAN.md](PLAN.md) for the architec
 | `core:data` | Repositories, DataStore settings, Hilt bindings |
 | `core:ui` | The design system: Material 3 Expressive theme in the Oběhy brand, spacing/size tokens, `ObehyScreen`, shared components |
 | `feature:onboarding` | First-start choice of mode; Settings |
-| `feature:planner` | Journey search (placeholder) |
-| `feature:trip` | Trip detail (placeholder) |
-| `core:map` | The MapLibre route map, drawn in the web app's map style |
+| `feature:planner` | Journey search, results and the journey under way |
+| `feature:trip` | Trip detail |
+| `feature:map` | The live map: Oběhy's vehicles, or MOTIS railviz where the server has it |
+| `core:map` | The MapLibre maps (route and live), drawn in the web app's map style |
 | `lint-rules` | Android Lint checks that keep colours, type, sizes, shapes and text out of everything but `core:ui` |
 
 Build configuration lives in the convention plugins under `build-logic/`; versions in
