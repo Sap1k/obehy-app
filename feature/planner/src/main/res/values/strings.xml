@@ -84,6 +84,23 @@
     <string name="trouble_cancelled">The %s is cancelled</string>
     <string name="trouble_missed">You\'d miss the %1$s at %2$s by %3$s</string>
     <string name="find_another_way">Find another way</string>
+    <string name="alternatives_title">Alternatives</string>
+    <string name="alternatives_from">From %s</string>
+    <string name="alternatives_yours">Original arrival %s</string>
+    <string name="alternatives_later">+%d min</string>
+    <string name="alternatives_sooner">%d min sooner</string>
+    <string name="alternatives_same">Same time</string>
+    <plurals name="alternatives_later_spoken">
+        <item quantity="one">%d minute later than your journey</item>
+        <item quantity="other">%d minutes later than your journey</item>
+    </plurals>
+    <plurals name="alternatives_sooner_spoken">
+        <item quantity="one">%d minute sooner than your journey</item>
+        <item quantity="other">%d minutes sooner than your journey</item>
+    </plurals>
+    <string name="alternatives_same_spoken">Gets there when your journey would</string>
+    <string name="alternatives_none">Nothing else gets you there.</string>
+    <string name="alternatives_failed">Couldn’t look for other ways.</string>
     <string name="stage_walking_to">on foot to %s</string>
     <string name="stage_riding_to">to</string>
     <string name="stage_walking">On foot to %1$s, %2$s left</string>

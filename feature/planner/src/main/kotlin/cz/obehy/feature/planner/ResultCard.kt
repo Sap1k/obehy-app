@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -50,6 +51,7 @@ internal fun ResultCard(
     measurer: TextMeasurer,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    badge: (@Composable () -> Unit)? = null,
 ) {
     val press = remember { MutableInteractionSource() }
     val scale = pressScale(press)
@@ -67,6 +69,7 @@ internal fun ResultCard(
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.s)) {
             Row(
+                Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.s),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -78,6 +81,10 @@ internal fun ResultCard(
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 TimeLabel(itinerary.end)
+                if (badge != null) {
+                    Spacer(Modifier.weight(1f))
+                    badge()
+                }
             }
             JourneyBar(itinerary.legs, measurer = measurer)
             FlowRow(

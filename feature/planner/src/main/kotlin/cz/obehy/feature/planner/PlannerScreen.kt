@@ -211,6 +211,15 @@ internal fun PlannerScreen(
                     Modifier.weight(1f),
                 )
             }
+            // Beside the journey on a wide screen; on a narrow one, the journey's own screen shows them.
+            state.alternatives?.let { alternatives ->
+                AlternativesSheet(
+                    alternatives,
+                    onTake = { onAction(PlannerAction.TakeAlternative(it)) },
+                    onRetry = { onAction(PlannerAction.Replan) },
+                    onDismiss = { onAction(PlannerAction.CloseAlternatives) },
+                )
+            }
         } else {
             results(Modifier.fillMaxSize())
         }

@@ -13,6 +13,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -60,6 +61,7 @@ import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -128,7 +130,8 @@ internal fun ItineraryTimeline(
 ) {
     val walk = walkStroke()
     val legs = itinerary.legs
-    val width = rememberTimeColumnWidth(legs.flatMap { it.times() }, legs.map { it.duration.spoken() })
+    // Wide enough for every time, and for how long each ride and walk takes, which go under them.
+    val width = maxOf(rememberTimeColumnWidth(legs.flatMap { it.times() }), rememberDurationWidth(legs))
     val clock = rememberSmoothNow()
     val now = remember(clock) { { clock.value } }
     val checkedAt = rememberNow(PROGRESS_EVERY_MS)
@@ -500,24 +503,17 @@ private fun Leg.times(): List<TimePoint> =
         }
     }
 
-/**
- * What fills the time column on a row without a stop: how long this part takes. It is read out
- * as [spoken].
- */
+/** How long a part of the journey takes, small and quiet; read out as [spoken]. */
 @Composable
 private fun DurationNote(
     text: String,
     spoken: String,
-    width: Dp,
     modifier: Modifier = Modifier,
     icon: ImageVector? = null,
 ) {
     Row(
-        modifier
-            .width(width)
-            .clearAndSetSemantics { contentDescription = spoken }
-            .padding(end = ObehyTheme.spacing.xs),
-        horizontalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.xs, Alignment.End),
+        modifier.clearAndSetSemantics { contentDescription = spoken },
+        horizontalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.xs),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         icon?.let {
@@ -529,6 +525,42 @@ private fun DurationNote(
             )
         }
         Text(text, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
+/** A [DurationNote] in the time column, [width] wide, right-aligned under the times. */
+@Composable
+private fun DurationColumn(
+    text: String,
+    spoken: String,
+    width: Dp,
+    modifier: Modifier = Modifier,
+    icon: ImageVector? = null,
+) {
+    Box(modifier.width(width).padding(end = ObehyTheme.spacing.xs), Alignment.CenterEnd) {
+        DurationNote(text, spoken, icon = icon)
+    }
+}
+
+/** How wide the time column must be for the [DurationColumn]s of [legs]: walks have their icon in front. */
+@Composable
+private fun rememberDurationWidth(legs: List<Leg>): Dp {
+    val measurer = rememberTextMeasurer()
+    val density = LocalDensity.current
+    val style = MaterialTheme.typography.bodySmall
+    val gap = ObehyTheme.spacing.xs
+    val icon = ObehyTheme.sizes.iconSmall
+    val texts = legs.map { it.duration.spoken() to (it is Leg.Walk) }
+    return remember(texts, density, style, gap, icon) {
+        texts
+            .maxOfOrNull { (text, walking) ->
+                with(density) {
+                    measurer
+                        .measure(text, style)
+                        .size.width
+                        .toDp()
+                } + if (walking) icon + gap else 0.dp
+            }?.plus(gap) ?: 0.dp
     }
 }
 
@@ -588,7 +620,7 @@ private fun RideRow(
     val motion = MaterialTheme.motionScheme
     RouteRow(RouteMark.None, modifier, above = stroke, below = stroke, progress = progress, leading = {
         val duration = ride.duration.spoken()
-        DurationNote(duration, duration, width)
+        DurationColumn(duration, duration, width)
     }) {
         // The whole ride opens the trip, growing into it; the stops have their own row to fold out on.
         SharedBounds(
@@ -853,26 +885,32 @@ private fun WalkRow(
     progress: RouteProgress,
     modifier: Modifier = Modifier,
 ) {
+    val duration = walk.duration.spoken()
     RouteRow(RouteMark.None, modifier, above = stroke, below = stroke, progress = progress, leading = {
-        val duration = walk.duration.spoken()
-        DurationNote(
+        DurationColumn(
             duration,
             stringResource(R.string.walk, duration),
             width,
-            Modifier.padding(vertical = ObehyTheme.spacing.xs),
             icon = Icons.AutoMirrored.Rounded.DirectionsWalk,
         )
     }) {
-        if (shortBy != null) {
-            ShortBy(shortBy, Modifier.padding(start = ObehyTheme.spacing.m))
-        } else {
-            spare?.takeIf { it.toMinutes() > 0 }?.let {
-                Text(
-                    stringResource(R.string.spare, it.spoken()),
-                    Modifier.padding(start = ObehyTheme.spacing.m),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+        // How the walk fits: short of time, or with some to spare.
+        Box(
+            Modifier
+                .heightIn(min = ObehyTheme.sizes.iconSmall)
+                .padding(start = ObehyTheme.spacing.m, top = ObehyTheme.spacing.xs, bottom = ObehyTheme.spacing.xs),
+            Alignment.CenterStart,
+        ) {
+            if (shortBy != null) {
+                ShortBy(shortBy)
+            } else {
+                spare?.takeIf { it.toMinutes() > 0 }?.let {
+                    Text(
+                        stringResource(R.string.spare, it.spoken()),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
         }
     }

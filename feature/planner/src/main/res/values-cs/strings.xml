@@ -88,6 +88,27 @@
     <string name="trouble_cancelled">Spoj %s je zrušený</string>
     <string name="trouble_missed">Na %1$s v zastávce %2$s nestihnete přestoupit, chybí %3$s</string>
     <string name="find_another_way">Najít jinou cestu</string>
+    <string name="alternatives_title">Alternativní spoje</string>
+    <string name="alternatives_from">Z %s</string>
+    <string name="alternatives_yours">Původní čas příjezdu %s</string>
+    <string name="alternatives_later">+%d min</string>
+    <string name="alternatives_sooner">o %d min dřív</string>
+    <string name="alternatives_same">Stejně</string>
+    <plurals name="alternatives_later_spoken">
+        <item quantity="one">O %d minutu později než vaše cesta</item>
+        <item quantity="few">O %d minuty později než vaše cesta</item>
+        <item quantity="many">O %d minuty později než vaše cesta</item>
+        <item quantity="other">O %d minut později než vaše cesta</item>
+    </plurals>
+    <plurals name="alternatives_sooner_spoken">
+        <item quantity="one">O %d minutu dřív než vaše cesta</item>
+        <item quantity="few">O %d minuty dřív než vaše cesta</item>
+        <item quantity="many">O %d minuty dřív než vaše cesta</item>
+        <item quantity="other">O %d minut dřív než vaše cesta</item>
+    </plurals>
+    <string name="alternatives_same_spoken">Dorazí stejně jako vaše cesta</string>
+    <string name="alternatives_none">Jinak se tam nedostanete.</string>
+    <string name="alternatives_failed">Jiné cesty se nepodařilo najít.</string>
     <string name="stage_walking_to">pěšky: %s</string>
     <string name="stage_riding_to">výstup</string>
     <string name="stage_walking">Pěšky: %1$s, zbývá %2$s</string>

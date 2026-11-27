@@ -99,6 +99,14 @@ internal fun ItineraryDestination(
         onOpenTrip = onOpenTrip,
         onReplan = { viewModel.act(PlannerAction.Replan) },
     )
+    state.alternatives?.let { alternatives ->
+        AlternativesSheet(
+            alternatives,
+            onTake = { viewModel.act(PlannerAction.TakeAlternative(it)) },
+            onRetry = { viewModel.act(PlannerAction.Replan) },
+            onDismiss = { viewModel.act(PlannerAction.CloseAlternatives) },
+        )
+    }
 }
 
 /** How a journey's maps look right now: where they frame, and what's on its way to you. */

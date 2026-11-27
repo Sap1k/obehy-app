@@ -15,6 +15,7 @@ import cz.obehy.core.data.TripRepository
 import cz.obehy.core.data.tripRequest
 import cz.obehy.core.model.InstantSerializer
 import cz.obehy.core.model.Itinerary
+import cz.obehy.core.model.JourneyPage
 import cz.obehy.core.model.JourneyQuery
 import cz.obehy.core.model.LatLon
 import cz.obehy.core.model.Leg
@@ -133,6 +134,20 @@ data class OpenJourney(
     val failed: Boolean = false,
 )
 
+/**
+ * Other ways on, for when the open journey isn't working out: from where it would leave you
+ * ([from], a stop of it, or null for its start) after [after], each to be set against when the
+ * journey would have got there ([arriving]). [found] is null while they're being looked for.
+ */
+data class Alternatives(
+    val from: String?,
+    val after: Instant?,
+    val arriving: Instant,
+    val query: JourneyQuery,
+    val found: JourneyPage? = null,
+    val failed: Boolean = false,
+)
+
 data class PlannerState(
     val query: JourneyQuery = JourneyQuery(),
     val options: SearchOptions = SearchOptions(),
@@ -148,6 +163,8 @@ data class PlannerState(
     val wholeJourney: Boolean = false,
     /** Journeys to offer before a search. */
     val suggestions: List<Suggestion> = emptyList(),
+    /** Other ways on, offered over the [open] journey that isn't working out. */
+    val alternatives: Alternatives? = null,
     /** The app was killed and is reading back where the user was: nothing to show or act on yet. */
     val restoring: Boolean = false,
 ) {
@@ -227,8 +244,16 @@ sealed interface PlannerAction {
     /** Fresh times for the journeys found. */
     data object RefreshResults : PlannerAction
 
-    /** The open journey isn't working out: look for another way on from where it leaves you. */
+    /** The open journey isn't working out: look for other ways on from where it leaves you. */
     data object Replan : PlannerAction
+
+    /** Go on with this of the [PlannerState.alternatives] instead. */
+    data class TakeAlternative(
+        val itinerary: Itinerary,
+    ) : PlannerAction
+
+    /** Keep the journey as it is after all. */
+    data object CloseAlternatives : PlannerAction
 
     /** A new, empty search; the remembered options stay. */
     data object Reset : PlannerAction
@@ -259,6 +284,7 @@ class PlannerViewModel
         private var preloadJob: Job? = null
         private var preloaded: PreloadedStops? = null
         private var tripsJob: Job? = null
+        private var alternativesJob: Job? = null
 
         /** The clock; tests set their own. */
         internal var now: () -> Instant = Instant::now
@@ -437,6 +463,15 @@ class PlannerViewModel
 
                 PlannerAction.Replan -> {
                     replan()
+                }
+
+                is PlannerAction.TakeAlternative -> {
+                    takeAlternative(action.itinerary)
+                }
+
+                PlannerAction.CloseAlternatives -> {
+                    alternativesJob?.cancel()
+                    local.update { it.copy(alternatives = null) }
                 }
 
                 PlannerAction.Reset -> {
@@ -677,8 +712,9 @@ class PlannerViewModel
         }
 
         /**
-         * Searches on from where the open journey leaves you, which clears it and so goes back to
-         * the results. A via may be behind you by now, so they go.
+         * Looks for other ways on from where the open journey would leave you, to show over it, each
+         * set against when it would have got there: the journey stays open, and the search as it was,
+         * until one is taken. A via may be behind you by now, so they go.
          */
         private fun replan() {
             val itinerary = local.value.open?.itinerary ?: return
@@ -686,18 +722,57 @@ class PlannerViewModel
             val trouble = itinerary.troubleAt(at) ?: return
             val start = itinerary.replanStart(trouble, at)
             val from = start?.stop?.toPlace()
-            local.update { state ->
-                state.copy(
-                    query =
-                        state.query.copy(
-                            from = from ?: state.query.from,
-                            vias = emptyList(),
-                            time = start?.at?.takeIf { from != null },
-                            arriveBy = false,
-                        ),
+            val query =
+                local.value.query.copy(
+                    from = from ?: local.value.query.from,
+                    vias = emptyList(),
+                    time = start?.at?.takeIf { from != null },
+                    arriveBy = false,
+                )
+            val asked =
+                Alternatives(
+                    from = start?.stop?.name?.takeIf { from != null },
+                    after = start?.at?.takeIf { from != null },
+                    arriving = itinerary.end.expected,
+                    query = query,
+                )
+            local.update { it.copy(alternatives = asked) }
+            alternativesJob?.cancel()
+            alternativesJob =
+                viewModelScope.launch {
+                    val located = locate(query)
+                    val page = located?.let { journeys.search(it, settings.searchOptions.first()).getOrNull() }
+                    local.update { state ->
+                        val still = state.alternatives?.takeIf { it.query == query } ?: return@update state
+                        state.copy(
+                            alternatives =
+                                if (page != null && located != null) {
+                                    still.copy(query = located, found = page)
+                                } else {
+                                    still.copy(failed = true)
+                                },
+                        )
+                    }
+                }
+        }
+
+        /** Goes on with [itinerary], one of the alternatives: it opens, among the rest of them as results. */
+        private fun takeAlternative(itinerary: Itinerary) {
+            val alternatives = local.value.alternatives ?: return
+            val page = alternatives.found ?: return
+            val at = now()
+            local.update {
+                it.copy(
+                    query = alternatives.query,
+                    results = Results.Loaded(page.itineraries, page.earlierCursor, page.laterCursor, at),
+                    open = OpenJourney(itinerary, at),
+                    alternatives = null,
+                    tripMaps = emptyList(),
+                    watched = null,
+                    wholeJourney = false,
                 )
             }
-            search(remembered = false)
+            fetchTripsAhead(itinerary)
         }
 
         /** [remembered] puts it in the search history, which a search from halfway along shouldn't be. */

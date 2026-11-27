@@ -464,25 +464,42 @@ class PlannerViewModelTest {
     }
 
     @Test
-    fun `replanning a missed change searches on from that stop, leaving the history alone`() =
+    fun `replanning a missed change offers ways on from that stop over the journey, leaving the history alone`() =
         runTest(dispatcher) {
             val (vm, _) = viewModel()
             vm.fill("C")
             vm.act(PlannerAction.Search)
             advanceUntilIdle()
-            vm.act(PlannerAction.Select(twoRides(late = 15)))
+            val missed = twoRides(late = 15)
+            vm.act(PlannerAction.Select(missed))
             advanceUntilIdle()
+            val searched = vm.state.value.query
 
             vm.act(PlannerAction.Replan)
             advanceUntilIdle()
 
+            // The journey and the search stay as they were; the ways on come beside them.
             val state = vm.state.value
-            assertEquals(null, state.open)
-            assertEquals("stop-B", state.query.from?.routingRef)
-            assertEquals("D", state.query.to?.id)
-            assertEquals(Instant.parse("2026-11-03T09:45:00Z"), state.query.time)
-            assertTrue(state.query.vias.isEmpty())
+            assertEquals(missed, state.open?.itinerary)
+            assertEquals(searched, state.query)
+            val alternatives = requireNotNull(state.alternatives)
+            assertEquals("B", alternatives.from)
+            assertEquals(Instant.parse("2026-11-03T09:45:00Z"), alternatives.after)
+            assertEquals(Instant.parse("2026-11-03T10:10:00Z"), alternatives.arriving)
+            assertEquals("stop-B", alternatives.query.from?.routingRef)
+            assertEquals("D", alternatives.query.to?.id)
+            assertTrue(alternatives.query.vias.isEmpty())
             assertEquals("stop-B", requests.last { it.url.encodedPath.endsWith("plan") }.url.parameters["fromPlace"])
+            assertEquals(1, store.rows.value.size)
+
+            // Taking one makes it the journey, from that stop on.
+            val way = requireNotNull(alternatives.found).itineraries.first()
+            vm.act(PlannerAction.TakeAlternative(way))
+            advanceUntilIdle()
+            val taken = vm.state.value
+            assertEquals(way, taken.open?.itinerary)
+            assertEquals(null, taken.alternatives)
+            assertEquals("stop-B", taken.query.from?.routingRef)
             assertEquals(1, store.rows.value.size)
         }
 
