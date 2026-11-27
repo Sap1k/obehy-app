@@ -73,6 +73,31 @@ data class Sizes(
     /** How tall a vehicle's pill stands on a map, and how far its tip reaches beyond the pill. */
     val mapVehicle: Dp = 22.dp,
     val mapVehicleTip: Dp = 8.dp,
+    /** A vehicle as a dot on a live map zoomed out, and its rim. */
+    val mapVehicleDot: Dp = 4.dp,
+    val mapVehicleDotRim: Dp = 1.dp,
+    /** A stop of the open trip on a live map, and its rim. */
+    val mapStop: Dp = 4.dp,
+    val mapStopRim: Dp = 2.dp,
+    /** Any other stop: a small sign with its mode's glyph. */
+    val mapStopSign: Dp = 16.dp,
+    val mapStopGlyph: Dp = 11.dp,
+    /** How far round a small mark on a live map a tap still finds it. */
+    val mapTapSlop: Dp = 16.dp,
+    /** The selected trip's path on a live map, and the casing round it. */
+    val mapPath: Dp = 4.dp,
+    val mapPathCasing: Dp = 7.dp,
+    /** How far a vehicle's heading arrow sits from its middle, and how big it is. */
+    val mapHeading: Dp = 40.dp,
+    /** Where you are on a live map: a dot, its rim, and the soft halo round it. */
+    val mapMe: Dp = 7.dp,
+    val mapMeRim: Dp = 3.dp,
+    val mapMeHalo: Dp = 18.dp,
+    /** A sheet's grip on a live map. */
+    val mapGripWidth: Dp = 32.dp,
+    val mapGripHeight: Dp = 4.dp,
+    /** How much of a live map the vehicle sheet covers when it only peeks: its head and the stops around the vehicle. */
+    val mapSheetPeek: Dp = 340.dp,
 )
 
 private const val HALF_LIGHT = 0.5f

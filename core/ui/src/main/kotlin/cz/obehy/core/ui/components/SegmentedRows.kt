@@ -10,11 +10,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -50,6 +52,27 @@ fun InfoRow(
     text: String,
     modifier: Modifier = Modifier,
     supporting: String? = null,
+) = InfoRow(
+    sign = {
+        Icon(
+            icon,
+            contentDescription = null,
+            modifier = Modifier.size(ObehyTheme.sizes.iconSmall),
+            tint = MaterialTheme.colorScheme.onSecondaryContainer,
+        )
+    },
+    text = text,
+    modifier = modifier,
+    supporting = supporting,
+)
+
+/** A line of information with its own [sign] in the cookie at its start. */
+@Composable
+fun InfoRow(
+    sign: @Composable () -> Unit,
+    text: String,
+    modifier: Modifier = Modifier,
+    supporting: String? = null,
 ) {
     Row(
         modifier
@@ -65,12 +88,9 @@ fun InfoRow(
                 .background(MaterialTheme.colorScheme.secondaryContainer),
             Alignment.Center,
         ) {
-            Icon(
-                icon,
-                contentDescription = null,
-                modifier = Modifier.size(ObehyTheme.sizes.iconSmall),
-                tint = MaterialTheme.colorScheme.onSecondaryContainer,
-            )
+            CompositionLocalProvider(
+                LocalContentColor provides MaterialTheme.colorScheme.onSecondaryContainer,
+            ) { sign() }
         }
         Column(Modifier.weight(1f)) {
             Text(text, style = MaterialTheme.typography.bodyMedium)

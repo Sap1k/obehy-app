@@ -1,18 +1,25 @@
-package cz.obehy.feature.trip
+package cz.obehy.core.ui.components.trip
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -24,10 +31,14 @@ import androidx.compose.material.icons.automirrored.rounded.Logout
 import androidx.compose.material.icons.rounded.AcUnit
 import androidx.compose.material.icons.rounded.Accessible
 import androidx.compose.material.icons.rounded.Business
+import androidx.compose.material.icons.rounded.CalendarMonth
+import androidx.compose.material.icons.rounded.Construction
 import androidx.compose.material.icons.rounded.ExpandMore
 import androidx.compose.material.icons.rounded.HourglassTop
 import androidx.compose.material.icons.rounded.Info
-import androidx.compose.material.icons.rounded.PanTool
+import androidx.compose.material.icons.rounded.NearMe
+import androidx.compose.material.icons.rounded.Notifications
+import androidx.compose.material.icons.rounded.SubdirectoryArrowRight
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
@@ -37,13 +48,18 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
@@ -53,6 +69,7 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import cz.obehy.core.model.CallFlag
 import cz.obehy.core.model.Composition
 import cz.obehy.core.model.CompositionCall
@@ -66,6 +83,7 @@ import cz.obehy.core.model.TripStop
 import cz.obehy.core.model.TripVehicleInfo
 import cz.obehy.core.model.rowSpans
 import cz.obehy.core.ui.ObehyTheme
+import cz.obehy.core.ui.R
 import cz.obehy.core.ui.components.CompositionStrip
 import cz.obehy.core.ui.components.InfoChip
 import cz.obehy.core.ui.components.InfoRow
@@ -77,7 +95,6 @@ import cz.obehy.core.ui.components.RouteStroke
 import cz.obehy.core.ui.components.ScheduleTime
 import cz.obehy.core.ui.components.ScrollingChipRow
 import cz.obehy.core.ui.components.SegmentedRows
-import cz.obehy.core.ui.components.TimetableTime
 import cz.obehy.core.ui.components.VehicleId
 import cz.obehy.core.ui.components.featureIcon
 import cz.obehy.core.ui.components.passedLabel
@@ -86,20 +103,20 @@ import cz.obehy.core.ui.components.rememberPassed
 import cz.obehy.core.ui.components.rememberPlatformWidth
 import cz.obehy.core.ui.components.rememberScheduleTimeWidth
 import cz.obehy.core.ui.components.rememberSmoothNow
-import cz.obehy.core.ui.components.rememberTimetableTimeWidth
 import cz.obehy.core.ui.components.rideHere
 import cz.obehy.core.ui.components.routeLineColor
 import cz.obehy.core.ui.components.unitName
+import kotlinx.coroutines.delay
 import java.time.Instant
 
 @Composable
 private fun Section(
-    title: String,
+    title: String?,
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.s)) {
-        Text(title, style = MaterialTheme.typography.titleMediumEmphasized)
+        title?.let { Text(it, style = MaterialTheme.typography.titleMediumEmphasized) }
         content()
     }
 }
@@ -115,14 +132,23 @@ private fun TripDetail.timeAt(index: Int): TimePoint? {
 private class ScheduleColumns(
     val time: Dp,
     val platform: Dp,
-    val shift: Dp,
 )
 
-/** Every stop of the trip on one grid, the stretch the journey rides on in its colour and the rest quiet. */
+/**
+ * Every stop of the trip on one grid, the stretch the journey rides on in its colour and the rest
+ * quiet. [titled] heads it as a section; only the stops in [shown] are drawn, the line running on
+ * past the first and last of them to say there are more. The stops in [cycling], after [shown],
+ * take turns in one more row, reached by a dotted stretch of line for the stops between. Each
+ * stop's row also takes [rowModifier] of its index.
+ */
 @Composable
-internal fun Schedule(
+fun Schedule(
     trip: TripDetail,
     modifier: Modifier = Modifier,
+    titled: Boolean = true,
+    shown: IntRange = trip.stops.indices,
+    cycling: IntRange = IntRange.EMPTY,
+    rowModifier: (Int) -> Modifier = { Modifier },
 ) {
     val ride = RouteStroke(routeLineColor(trip.ride.color))
     val quiet = quietStroke()
@@ -130,8 +156,12 @@ internal fun Schedule(
     val columns =
         ScheduleColumns(
             time = rememberScheduleTimeWidth(times),
-            platform = rememberPlatformWidth(trip.stops.mapNotNull { it.call.track }),
-            shift = rememberTimetableTimeWidth(times),
+            // Eased open when platforms arrive later than the rest, rather than every name jumping aside.
+            platform =
+                animateDpAsState(
+                    rememberPlatformWidth(trip.stops.mapNotNull { it.call.track }),
+                    MaterialTheme.motionScheme.defaultSpatialSpec(),
+                ).value,
         )
     val span = trip.boarded ?: trip.stops.indices
 
@@ -149,35 +179,162 @@ internal fun Schedule(
                 .map { trip.timeAt(it)?.expected }
                 .rowSpans()
         }
-    Section(stringResource(R.string.trip_schedule), modifier) {
+
+    fun mark(index: Int) =
+        when {
+            index == span.first -> RouteMark.Stop
+            index == span.last -> if (index == trip.stops.lastIndex) RouteMark.End else RouteMark.Stop
+            else -> RouteMark.Pass
+        }
+
+    Section(if (titled) stringResource(R.string.trip_schedule) else null, modifier) {
         Column {
+            val motion = MaterialTheme.motionScheme
+            val unfold = expandVertically(motion.defaultSpatialSpec()) + fadeIn(motion.defaultEffectsSpec())
+            val fold = shrinkVertically(motion.defaultSpatialSpec()) + fadeOut(motion.fastEffectsSpec())
             trip.stops.forEachIndexed { index, stop ->
-                ScheduleRow(
-                    stop,
-                    trip.timeAt(index),
-                    mark =
-                        when {
-                            index == span.first -> RouteMark.Stop
-                            index == span.last -> if (index == trip.stops.lastIndex) RouteMark.End else RouteMark.Stop
-                            else -> RouteMark.Pass
-                        },
-                    ridden = index in span,
-                    above = if (index > 0) stroke(index - 1) else null,
-                    below = if (index < trip.stops.lastIndex) stroke(index) else null,
-                    markStroke = if (index in span) ride else quiet,
-                    columns = columns,
-                    progress = spans.getOrNull(index)?.let { RouteProgress(it, now, here) },
-                )
+                // The row the vehicle is in draws above the next, whose line would cross its badge.
+                val holding by remember(spans, index) {
+                    derivedStateOf { spans.getOrNull(index)?.holds(now()) == true }
+                }
+                // Stops coming into the window unfold, those leaving it fold away.
+                AnimatedVisibility(
+                    index in shown,
+                    Modifier.zIndex(if (holding) 1f else 0f).then(rowModifier(index)),
+                    enter = unfold,
+                    exit = fold,
+                ) {
+                    ScheduleRow(
+                        stop,
+                        trip.timeAt(index),
+                        mark = mark(index),
+                        ridden = index in span,
+                        above = if (index > 0) stroke(index - 1) else null,
+                        below = if (index < trip.stops.lastIndex) stroke(index) else null,
+                        markStroke = if (index in span) ride else quiet,
+                        columns = columns,
+                        progress = spans.getOrNull(index)?.let { RouteProgress(it, now, here) },
+                    )
+                }
+            }
+            // Kept while it folds away, so it has something to fold.
+            var lastCycling by remember { mutableStateOf(cycling) }
+            if (!cycling.isEmpty()) lastCycling = cycling
+            AnimatedVisibility(!cycling.isEmpty() && !lastCycling.isEmpty(), enter = unfold, exit = fold) {
+                // One under the other: an AnimatedVisibility stacks what it holds.
+                Column {
+                    val turning = lastCycling
+                    val into = stroke(turning.first - 1)
+                    // The one dotted stretch, for the stops it goes on through: no dots meet dots, so
+                    // the line stays even.
+                    RouteRow(
+                        RouteMark.None,
+                        below = into.copy(dotted = true),
+                        // Drawn as one stretch from top to bottom, so its dots run evenly.
+                        markAt = 0.dp,
+                        leading = { Spacer(Modifier.width(columns.time)) },
+                    ) {
+                        Row(
+                            Modifier.padding(
+                                start = ObehyTheme.spacing.s,
+                                top = ObehyTheme.spacing.s,
+                                bottom = ObehyTheme.spacing.s,
+                            ),
+                            horizontalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.xs),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(
+                                stringResource(R.string.trip_further_stops),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            Icon(
+                                Icons.Rounded.SubdirectoryArrowRight,
+                                contentDescription = null,
+                                Modifier.size(ObehyTheme.sizes.iconSmall),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    }
+                    val picks = remember(turning) { turning.picks() }
+                    val turn by rememberCycle(picks.size)
+                    val style =
+                        if (turning.first in span) {
+                            MaterialTheme.typography.titleSmall
+                        } else {
+                            MaterialTheme.typography.bodyMedium
+                        }
+                    val markAt = ObehyTheme.spacing.xs + with(LocalDensity.current) { style.lineHeight.toDp() } / 2
+                    Box(Modifier.clipToBounds()) {
+                        // The line stays put; only the stop on it changes, coming down from above as the
+                        // last goes on down: later and later stops.
+                        RouteRow(
+                            RouteMark.None,
+                            Modifier.matchParentSize(),
+                            above = into,
+                            markAt = markAt,
+                            leading = { Spacer(Modifier.width(columns.time)) },
+                        ) {}
+                        AnimatedContent(
+                            picks[turn.coerceIn(picks.indices)],
+                            transitionSpec = {
+                                (slideInVertically(motion.slowSpatialSpec()) { -it } + fadeIn(motion.slowEffectsSpec()))
+                                    .togetherWith(
+                                        slideOutVertically(motion.slowSpatialSpec()) { it } +
+                                            fadeOut(motion.fastEffectsSpec()),
+                                    )
+                            },
+                            label = "cycling stop",
+                        ) { index ->
+                            ScheduleRow(
+                                trip.stops[index],
+                                trip.timeAt(index),
+                                mark = mark(index),
+                                ridden = index in span,
+                                above = null,
+                                below = null,
+                                markStroke = if (index in span) ride else quiet,
+                                columns = columns,
+                            )
+                        }
+                    }
+                }
             }
         }
-        FlagLegend(trip.stops.flatMapTo(mutableSetOf()) { it.flags })
+        FlagLegend(trip.stops.slice(shown).flatMapTo(mutableSetOf()) { it.flags })
     }
 }
+
+/** Steps round [count] turns, lingering on each. */
+@Composable
+private fun rememberCycle(count: Int): State<Int> {
+    val turn = remember(count) { mutableIntStateOf(0) }
+    LaunchedEffect(count) {
+        while (true) {
+            delay(CYCLE_MS)
+            turn.intValue = (turn.intValue + 1) % count
+        }
+    }
+    return turn
+}
+
+/** Every few of these stops, evenly spread, the last always among them: a cycle that moves along. */
+private fun IntRange.picks(): List<Int> {
+    val size = last - first + 1
+    val stride = (size + CYCLE_PICKS - 1) / CYCLE_PICKS
+    return ((first..last step stride).toList() + last).distinct()
+}
+
+/** About how many stops a cycling row takes in turn. */
+private const val CYCLE_PICKS = 4
+
+/** How long each stop in a cycling row stays. */
+private const val CYCLE_MS = 3_000L
 
 private val CallFlag.icon: ImageVector
     get() =
         when (this) {
-            CallFlag.RequestStop -> Icons.Rounded.PanTool
+            CallFlag.RequestStop -> Icons.Rounded.Notifications
             CallFlag.ExitOnly -> Icons.AutoMirrored.Rounded.Logout
             CallFlag.BoardingOnly -> Icons.AutoMirrored.Rounded.Login
         }
@@ -282,12 +439,7 @@ private fun ScheduleRow(
             }
             if (columns.platform > 0.dp) {
                 Box(Modifier.width(columns.platform), Alignment.TopEnd) {
-                    call.track?.let { PlatformLabel(it, call.trackChanged, compact = true) }
-                }
-            }
-            if (columns.shift > 0.dp) {
-                Box(Modifier.width(columns.shift), Alignment.TopEnd) {
-                    if (time != null) TimetableTime(time)
+                    call.track?.let { PlatformLabel(it, call.trackChanged) }
                 }
             }
         }
@@ -295,10 +447,11 @@ private fun ScheduleRow(
 }
 
 /** Whether [TrainSection] has anything to show. */
-internal fun hasTrainSection(
+fun hasTrainSection(
     trip: TripDetail,
     composition: Composition?,
-): Boolean = trip.info?.vehicles?.isNotEmpty() == true || composition.shown != null
+    positionFrom: String? = null,
+): Boolean = trip.info?.vehicles?.isNotEmpty() == true || composition.shown != null || positionFrom != null
 
 private val Composition?.shown: Composition?
     get() =
@@ -308,15 +461,21 @@ private val Composition?.shown: Composition?
 
 /** The vehicle on the trip and the train's order, when anyone knows. */
 @Composable
-internal fun TrainSection(
+fun TrainSection(
     trip: TripDetail,
     composition: Composition?,
     modifier: Modifier = Modifier,
+    positionFrom: String? = null,
 ) {
     val vehicles = trip.info?.vehicles.orEmpty()
     val rows =
         vehicles.map<TripVehicleInfo, @Composable () -> Unit> { vehicle -> { VehicleRow(vehicle) } } +
-            listOfNotNull<@Composable () -> Unit>(composition.shown?.let { shown -> { CompositionRow(trip, shown) } })
+            listOfNotNull<@Composable () -> Unit>(
+                composition.shown?.let { shown -> { CompositionRow(trip, shown) } },
+                positionFrom?.let { from ->
+                    { InfoRow(Icons.Rounded.NearMe, stringResource(R.string.trip_position_from, from)) }
+                },
+            )
     Section(stringResource(R.string.trip_vehicle), modifier) {
         SegmentedRows(rows) { it() }
     }
@@ -479,14 +638,19 @@ private fun String.sentence(): String = replaceFirstChar { it.titlecase() }
 
 /** When the trip runs and what the timetable marks, with the longer texts folded away. */
 @Composable
-internal fun NotesSection(
+fun NotesSection(
     notes: TripNotes,
     modifier: Modifier = Modifier,
 ) {
     var open by rememberSaveable { mutableStateOf(false) }
     Section(stringResource(R.string.trip_notes), modifier) {
-        SegmentedRows(notes.operates + notes.marked) {
-            InfoRow(featureIcon(it.icon) ?: Icons.Rounded.Info, it.text.sentence())
+        SegmentedRows(notes.operates + notes.marked) { note ->
+            val day = note.icon.removePrefix(CALENDAR_PREFIX).takeIf { note.icon.startsWith(CALENDAR_PREFIX) }
+            if (day != null) {
+                InfoRow(sign = { DaySign(day) }, text = note.text.sentence())
+            } else {
+                InfoRow(featureIcon(note.icon) ?: Icons.Rounded.Info, note.text.sentence())
+            }
         }
         if (notes.long.isNotEmpty()) {
             val motion = MaterialTheme.motionScheme
@@ -519,7 +683,7 @@ internal fun NotesSection(
 private const val FLIPPED = 180f
 
 @Composable
-internal fun ConnectionsSection(
+fun ConnectionsSection(
     connections: List<TripConnection>,
     modifier: Modifier = Modifier,
 ) {
@@ -546,3 +710,26 @@ internal fun ConnectionsSection(
         }
     }
 }
+
+/**
+ * A running day as the printed timetable marks it: crossed tools for working days, the day's
+ * number for a day of the week, a cross for Sundays and holidays.
+ */
+@Composable
+private fun DaySign(
+    code: String,
+    modifier: Modifier = Modifier,
+) {
+    when (code) {
+        "X" -> Icon(Icons.Rounded.Construction, contentDescription = null, modifier.size(ObehyTheme.sizes.iconSmall))
+        "+" -> Text("\u2020", modifier, style = MaterialTheme.typography.titleMedium)
+        in WEEKDAYS -> Text(code, modifier, style = MaterialTheme.typography.labelLarge)
+        else -> Icon(Icons.Rounded.CalendarMonth, contentDescription = null, modifier.size(ObehyTheme.sizes.iconSmall))
+    }
+}
+
+/** The icon name a running day comes with, before its code. */
+private const val CALENDAR_PREFIX = "calendar_"
+
+/** The days of the week, as calendar designations number them. */
+private val WEEKDAYS = ('1'..'7').map(Char::toString)

@@ -33,8 +33,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.max
-import cz.obehy.core.model.Punctuality
 import cz.obehy.core.model.TimePoint
 import cz.obehy.core.ui.ObehyTheme
 import cz.obehy.core.ui.R
@@ -93,16 +91,20 @@ fun rememberSmoothNow(): State<Instant> =
 
 private const val SMOOTH_STEP_MS = 250L
 
+/** Whether [minute] is off the timetable, by the clock as it reads. */
+private fun TimePoint.movedAt(minute: Instant): Boolean =
+    realtime && minute.truncatedTo(ChronoUnit.MINUTES) != scheduled.truncatedTo(ChronoUnit.MINUTES)
+
 private val TimePoint.moved: Boolean
-    get() = realtime && expected.truncatedTo(ChronoUnit.MINUTES) != scheduled.truncatedTo(ChronoUnit.MINUTES)
+    get() = movedAt(expected)
 
 /**
  * A time in a line of text (a result's "14:31 → 17:12"), telling live times from timetable times
  * without relying on colour:
  * - from the timetable only: plain;
- * - live and on time: bold in the primary colour;
- * - live and moved: the new time bold (in the error colour when late) with the timetable time
- *   struck through next to it.
+ * - live: bold, in its punctuality's colour;
+ * - live and moved off the timetable: the timetable time small and struck through in front of it,
+ *   on the same line, so the row keeps its height and the live times stay lined up.
  */
 @Composable
 fun TimeLabel(
@@ -110,56 +112,54 @@ fun TimeLabel(
     modifier: Modifier = Modifier,
 ) {
     val spoken = spokenTime(time)
-    Row(
+    CurrentTime(
+        time,
+        MaterialTheme.typography.headlineSmallEmphasized,
+        MaterialTheme.typography.bodyMedium,
+        MaterialTheme.colorScheme.onSurface,
         modifier.clearAndSetSemantics { contentDescription = spoken },
-        horizontalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.xs),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        CurrentTime(time, MaterialTheme.typography.headlineSmallEmphasized, MaterialTheme.colorScheme.onSurface)
-        if (time.moved) TimetableTime(time, MaterialTheme.typography.bodySmall)
+    )
+}
+
+/** How wide the column in front of a route line must be for all of [times], in the phone's clock style and text size. */
+@Composable
+fun rememberTimeColumnWidth(times: List<TimePoint>): Dp =
+    rememberTimesWidth(times, MaterialTheme.typography.titleMedium, MaterialTheme.typography.labelMedium) +
+        ObehyTheme.spacing.xs
+
+/** How wide the time column of a schedule must be for all of [times]. */
+@Composable
+fun rememberScheduleTimeWidth(times: List<TimePoint>): Dp =
+    rememberTimesWidth(times, MaterialTheme.typography.bodyMedium, MaterialTheme.typography.labelSmall)
+
+/** The widest of [times] as [CurrentTime] draws them in [style], with the timetable's own in [plannedStyle]. */
+@Composable
+private fun rememberTimesWidth(
+    times: List<TimePoint>,
+    style: TextStyle,
+    plannedStyle: TextStyle,
+): Dp {
+    val measurer = rememberTextMeasurer()
+    val density = LocalDensity.current
+    val time = style.tabular.copy(fontWeight = FontWeight.Bold)
+    val planned = plannedStyle.tabular
+    val gap = PlannedGap
+    return remember(times, density, time, planned, gap) {
+        val widest =
+            times.maxOfOrNull { point ->
+                val clock = measurer.measure(point.expected.clock(), time).size.width
+                if (!point.moved) return@maxOfOrNull clock
+                clock + measurer.measure(point.scheduled.clock(), planned).size.width +
+                    with(density) { gap.roundToPx() }
+            } ?: 0
+        with(density) { widest.toDp() }
     }
 }
 
 /**
- * How wide the column in front of a route line must be for all of [times] and for the [notes]
- * beside them (durations, with an icon in front), in the phone's clock style and text size.
+ * A time in a schedule, one size for every stop; [passed] once the trip is past it. Moved off the
+ * timetable, the timetable time is struck through in front of it, small.
  */
-@Composable
-fun rememberTimeColumnWidth(
-    times: List<TimePoint>,
-    notes: List<String>,
-): Dp {
-    val measurer = rememberTextMeasurer()
-    val density = LocalDensity.current
-    val time =
-        MaterialTheme.typography.titleMedium.tabular
-            .copy(fontWeight = FontWeight.Bold)
-    val note = MaterialTheme.typography.bodySmall
-    val icon = ObehyTheme.sizes.iconSmall
-    val gap = ObehyTheme.spacing.xs
-    return remember(times, notes, density, time, note, icon, gap) {
-        fun widest(
-            texts: List<String>,
-            style: TextStyle,
-        ): Dp = with(density) { (texts.maxOfOrNull { measurer.measure(it, style).size.width } ?: 0).toDp() }
-        max(widest(times.map { it.expected.clock() }, time), widest(notes, note) + icon + gap) + gap
-    }
-}
-
-/** How wide the time column of a schedule must be for all of [times]. */
-@Composable
-fun rememberScheduleTimeWidth(times: List<TimePoint>): Dp {
-    val measurer = rememberTextMeasurer()
-    val density = LocalDensity.current
-    val style =
-        MaterialTheme.typography.bodyMedium.tabular
-            .copy(fontWeight = FontWeight.Bold)
-    return remember(times, density, style) {
-        with(density) { (times.maxOfOrNull { measurer.measure(it.expected.clock(), style).size.width } ?: 0).toDp() }
-    }
-}
-
-/** A time in a schedule, one size for every stop; [passed] once the trip is past it. */
 @Composable
 fun ScheduleTime(
     time: TimePoint,
@@ -167,37 +167,20 @@ fun ScheduleTime(
     passed: Boolean = false,
 ) {
     val spoken = spokenTime(time)
-    Box(modifier.clearAndSetSemantics { contentDescription = spoken }, contentAlignment = Alignment.CenterEnd) {
-        CurrentTime(time, MaterialTheme.typography.bodyMedium, MaterialTheme.colorScheme.onSurfaceVariant, passed)
-    }
-}
-
-/** How wide a column of [TimetableTime]s must be for all of [times]; zero when none has moved. */
-@Composable
-fun rememberTimetableTimeWidth(times: List<TimePoint>): Dp {
-    val measurer = rememberTextMeasurer()
-    val density = LocalDensity.current
-    val style = MaterialTheme.typography.bodySmall.tabular
-    return remember(times, density, style) {
-        val widest = times.filter { it.moved }.maxOfOrNull { measurer.measure(it.scheduled.clock(), style).size.width }
-        with(density) { (widest ?: 0).toDp() }
-    }
-}
-
-/** The timetable time, struck through, beside a [ScheduleTime] that has moved off it; that one speaks for both. */
-@Composable
-fun TimetableTime(
-    time: TimePoint,
-    modifier: Modifier = Modifier,
-) {
-    if (time.moved) {
-        Box(modifier.clearAndSetSemantics {}) { TimetableTime(time, MaterialTheme.typography.bodySmall) }
-    }
+    CurrentTime(
+        time,
+        MaterialTheme.typography.bodyMedium,
+        MaterialTheme.typography.labelSmall,
+        MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier.clearAndSetSemantics { contentDescription = spoken },
+        passed,
+    )
 }
 
 /**
- * The time that counts at a stop, right-aligned in a column [width] wide next to the route line.
- * [small] is for a stop passed on the way, [passed] for one the journey has already got past.
+ * The time that counts at a stop, right-aligned in a column [width] wide next to the route line,
+ * the timetable time small and struck through in front of it when it has moved. [small] is for a
+ * stop passed on the way, [passed] for one the journey has already got past.
  */
 @Composable
 fun TimeColumn(
@@ -213,27 +196,34 @@ fun TimeColumn(
             .width(width)
             .clearAndSetSemantics { contentDescription = spoken }
             .padding(end = ObehyTheme.spacing.xs),
-        contentAlignment = Alignment.CenterEnd,
+        Alignment.TopEnd,
     ) {
+        val colors = MaterialTheme.colorScheme
         if (small) {
-            CurrentTime(time, MaterialTheme.typography.bodySmall, MaterialTheme.colorScheme.onSurfaceVariant, passed)
+            CurrentTime(
+                time,
+                MaterialTheme.typography.bodySmall,
+                MaterialTheme.typography.labelSmall,
+                colors.onSurfaceVariant,
+                passed = passed,
+            )
         } else {
-            val colors = MaterialTheme.colorScheme
             CurrentTime(
                 time,
                 MaterialTheme.typography.titleMedium,
+                MaterialTheme.typography.labelMedium,
                 if (passed) colors.onSurfaceVariant else colors.onSurface,
-                passed,
+                passed = passed,
             )
         }
     }
 }
 
 /**
- * What a [TimeColumn]'s time is based on, for the end of the stop's row: the timetable time,
- * struck through, when the live one differs, or the live mark when it is live and on time.
- * [small] is for a stop passed on the way, which leaves the mark out. [TimeColumn] already speaks
- * all of this.
+ * What a [TimeColumn]'s time is based on, for the end of the stop's row: the live mark when it's
+ * live and on time (a moved time says it's live by its colour and the struck timetable time).
+ * [small] is for a stop passed on the way, which leaves it out. [TimeColumn] already speaks all of
+ * this.
  */
 @Composable
 fun TimeBasis(
@@ -241,36 +231,54 @@ fun TimeBasis(
     modifier: Modifier = Modifier,
     small: Boolean = false,
 ) {
-    Box(modifier.clearAndSetSemantics {}) {
-        when {
-            time.moved -> TimetableTime(time, MaterialTheme.typography.bodySmall)
-            time.realtime && !small -> LiveMark()
-        }
-    }
+    if (time.realtime && !time.moved && !small) Box(modifier.clearAndSetSemantics {}) { LiveMark() }
+}
+
+/**
+ * The timetable time of a live [time] that has moved off it, small, quiet and struck through, to
+ * go in front of what gives the time now (a countdown); nothing when it hasn't moved.
+ */
+@Composable
+fun PlannedTime(
+    time: TimePoint,
+    modifier: Modifier = Modifier,
+) {
+    if (time.moved) Planned(time, MaterialTheme.typography.labelMedium, modifier)
 }
 
 /** Digits of one width, so times line up down a column. */
 private val TextStyle.tabular: TextStyle get() = copy(fontFeatureSettings = "tnum")
 
+/** Between the struck timetable time and the time now. */
+private val PlannedGap: Dp
+    @Composable get() = ObehyTheme.spacing.xs
+
+/**
+ * The time that counts in [style], and when it's live and off the timetable, the timetable time
+ * struck through in [plannedStyle] in front of it, on its baseline.
+ */
 @Composable
 private fun CurrentTime(
     time: TimePoint,
     style: TextStyle,
+    plannedStyle: TextStyle,
     timetableColour: Color,
+    modifier: Modifier = Modifier,
     passed: Boolean = false,
 ) {
     val motion = MaterialTheme.motionScheme
     val colour by animateColorAsState(
         when {
             !time.realtime || passed -> timetableColour
-            Punctuality.isLate(time.delayMinutes) -> MaterialTheme.colorScheme.error
-            else -> MaterialTheme.colorScheme.primary
+            else -> PunctualityTone.of(time.delayMinutes).text
         },
         motion.defaultEffectsSpec(),
     )
+    val gap = PlannedGap
     // Rolls up to a later time and down to an earlier one, so a refresh's change gets noticed.
     AnimatedContent(
         time.expected.truncatedTo(ChronoUnit.MINUTES),
+        modifier,
         transitionSpec = {
             val direction = if (targetState > initialState) 1 else -1
             val entering =
@@ -281,24 +289,31 @@ private fun CurrentTime(
         },
         contentAlignment = Alignment.CenterEnd,
     ) { minute ->
-        Text(
-            minute.clock(),
-            style = style.tabular,
-            color = colour,
-            fontWeight = if (time.realtime) FontWeight.Bold else null,
-            maxLines = 1,
-            softWrap = false,
-        )
+        Row(horizontalArrangement = Arrangement.spacedBy(gap)) {
+            if (time.movedAt(minute)) Planned(time, plannedStyle, Modifier.alignByBaseline())
+            Text(
+                minute.clock(),
+                Modifier.alignByBaseline(),
+                style = style.tabular,
+                color = colour,
+                fontWeight = if (time.realtime) FontWeight.Bold else null,
+                maxLines = 1,
+                softWrap = false,
+            )
+        }
     }
 }
 
+/** The timetable time a live time has moved off: small, quiet and struck through. */
 @Composable
-private fun TimetableTime(
+private fun Planned(
     time: TimePoint,
     style: TextStyle,
+    modifier: Modifier = Modifier,
 ) {
     Text(
         time.scheduled.clock(),
+        modifier,
         style = style.tabular,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         textDecoration = TextDecoration.LineThrough,

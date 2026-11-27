@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Accessible
 import androidx.compose.material.icons.rounded.Schedule
 import androidx.compose.material.icons.rounded.Sensors
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -44,6 +45,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import cz.obehy.core.model.Leg
+import cz.obehy.core.model.Mode
 import cz.obehy.core.model.Punctuality
 import cz.obehy.core.ui.ObehyTheme
 import cz.obehy.core.ui.R
@@ -68,15 +70,17 @@ data class RouteColors(
 fun routeColors(
     hex: String?,
     textHex: String? = null,
+): RouteColors = routeColorsIn(MaterialTheme.colorScheme, hex, textHex)
+
+/** [routeColors] for [scheme], outside composition. */
+fun routeColorsIn(
+    scheme: ColorScheme,
+    hex: String?,
+    textHex: String? = null,
 ): RouteColors {
-    val container =
-        parseHex(hex)
-            ?: return RouteColors(
-                MaterialTheme.colorScheme.secondaryContainer,
-                MaterialTheme.colorScheme.onSecondaryContainer,
-            )
+    val container = parseHex(hex) ?: return RouteColors(scheme.secondaryContainer, scheme.onSecondaryContainer)
     val content = parseHex(textHex) ?: if (container.luminance() > 0.5f) DarkLettering else Color.White
-    val outline = MaterialTheme.colorScheme.outline.takeIf { container.blendsInto(MaterialTheme.colorScheme.surface) }
+    val outline = scheme.outline.takeIf { container.blendsInto(scheme.surface) }
     return RouteColors(container, content, outline)
 }
 
@@ -122,8 +126,19 @@ private fun parseHex(hex: String?): Color? =
 fun LineBadge(
     ride: Leg.Transit,
     modifier: Modifier = Modifier,
+) = LineBadge(ride.mode, ride.name, ride.color, ride.textColor, modifier, ride.cancelled)
+
+/** A line's [name] on its [color], with its [mode]'s icon; for a vehicle or a departure rather than a ride. */
+@Composable
+fun LineBadge(
+    mode: Mode,
+    name: String,
+    color: String?,
+    textColor: String?,
+    modifier: Modifier = Modifier,
+    cancelled: Boolean = false,
 ) {
-    val colors = routeColors(ride.color, ride.textColor)
+    val colors = routeColors(color, textColor)
     Row(
         modifier
             .clip(MaterialTheme.shapes.small)
@@ -134,18 +149,32 @@ fun LineBadge(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
-            ride.mode.icon,
-            contentDescription = stringResource(ride.mode.label),
+            mode.icon,
+            contentDescription = stringResource(mode.label),
             modifier = Modifier.size(ObehyTheme.sizes.iconSmall),
             tint = colors.content,
         )
         Text(
-            ride.name,
+            name,
             color = colors.content,
             style = MaterialTheme.typography.labelLarge,
             maxLines = 1,
-            textDecoration = if (ride.cancelled) TextDecoration.LineThrough else null,
+            textDecoration = if (cancelled) TextDecoration.LineThrough else null,
         )
+    }
+}
+
+/** How wide a column of [LineBadge]s must be for all of [names], so what follows them lines up. */
+@Composable
+fun rememberLineBadgeWidth(names: List<String>): Dp {
+    val measurer = rememberTextMeasurer()
+    val density = LocalDensity.current
+    val style = MaterialTheme.typography.labelLarge
+    val spacing = ObehyTheme.spacing
+    val icon = ObehyTheme.sizes.iconSmall
+    return remember(names, density, style, spacing, icon) {
+        val widest = names.maxOfOrNull { measurer.measure(it, style, maxLines = 1).size.width } ?: 0
+        with(density) { widest.toDp() } + icon + spacing.xs + spacing.s * 2
     }
 }
 
@@ -295,6 +324,8 @@ fun DelayLabel(
 ) {
     if (minutes == null || !Punctuality.isLate(minutes)) return
     val spoken = stringResource(R.string.delay_late, minutes)
+    // Amber when late, orange when very late, as on the web.
+    val tone = PunctualityTone.of(minutes).text
     Row(
         modifier.clearAndSetSemantics { contentDescription = spoken },
         horizontalArrangement = Arrangement.spacedBy(ObehyTheme.spacing.xs / 2),
@@ -304,17 +335,17 @@ fun DelayLabel(
             Icons.Rounded.Schedule,
             null,
             Modifier.size(ObehyTheme.sizes.iconSmall),
-            tint = MaterialTheme.colorScheme.error,
+            tint = tone,
         )
         Text(
             stringResource(R.string.delay_short, minutes),
-            color = MaterialTheme.colorScheme.error,
+            color = tone,
             style = MaterialTheme.typography.labelMedium,
         )
     }
 }
 
-/** How wide a column of [compact][PlatformLabel] labels must be for all of [tracks]; zero without any. */
+/** How wide a column of [PlatformLabel]s must be for all of [tracks]; zero without any. */
 @Composable
 fun rememberPlatformWidth(tracks: List<String>): Dp {
     val measurer = rememberTextMeasurer()
@@ -328,15 +359,14 @@ fun rememberPlatformWidth(tracks: List<String>): Dp {
 }
 
 /**
- * A platform or stand; outlined, and in the error colour with a spoken note when it changed.
- * [compact] leaves out the word, for a column of them under a heading the reader already knows.
+ * A platform or stand, just its name (A, 3) outlined: the box says what it is. In the error
+ * colour with a spoken note when it changed.
  */
 @Composable
 fun PlatformLabel(
     track: String,
     changed: Boolean,
     modifier: Modifier = Modifier,
-    compact: Boolean = false,
 ) {
     val color = if (changed) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
     val spoken =
@@ -349,7 +379,7 @@ fun PlatformLabel(
             stringResource(R.string.platform, track)
         }
     Text(
-        if (compact) track else stringResource(R.string.platform, track),
+        track,
         modifier
             .semantics { contentDescription = spoken }
             .border(1.dp, color, MaterialTheme.shapes.extraSmall)

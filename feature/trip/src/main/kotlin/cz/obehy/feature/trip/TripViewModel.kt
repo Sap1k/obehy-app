@@ -12,18 +12,23 @@ import cz.obehy.core.model.TripDetail
 import cz.obehy.core.model.TripInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
 
 /** How many pending answers to wait through, about a minute at the API's pace, as the web does. */
 private const val COMPOSITION_PATIENCE = 20
 private const val COMPOSITION_DEFAULT_WAIT_S = 3L
 private const val MILLIS_PER_SECOND = 1_000L
+
+/** How long a trip opening with nothing to show waits for Oběhy's details before showing without them. */
+private const val DETAILS_GRACE_MS = 1_500L
 
 internal data class TripState(
     val motisTripId: String,
@@ -66,8 +71,20 @@ internal class TripViewModel
                     local.update { it.copy(failed = true) }
                     return@launch
                 }
-                local.update { it.copy(trip = plain) }
-                val detailed = trips.withDetails(plain, request)
+                val detailed =
+                    if (local.value.trip == null) {
+                        // Nothing on screen yet: Oběhy's details get a moment to come, so the trip
+                        // opens once, whole, rather than jumping about as they land in it.
+                        val details = async { trips.withDetails(plain, request) }
+                        withTimeoutOrNull(DETAILS_GRACE_MS) { details.await() }
+                            ?: run {
+                                local.update { it.copy(trip = plain) }
+                                details.await()
+                            }
+                    } else {
+                        local.update { it.copy(trip = plain) }
+                        trips.withDetails(plain, request)
+                    }
                 local.update { it.copy(trip = detailed) }
                 val info = detailed.info
                 when {
