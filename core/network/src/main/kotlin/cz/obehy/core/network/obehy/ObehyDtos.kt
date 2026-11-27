@@ -100,6 +100,10 @@ data class TripRealtime(
     val offRoute: Boolean = false,
     val stale: Boolean = false,
     val updatedAt: String,
+    /** How late the journey runs now, in shown minutes. */
+    val delayMin: Int? = null,
+    /** Its band; unknown when stale. */
+    val punctuality: String = UNKNOWN,
 )
 
 @Serializable
@@ -145,6 +149,12 @@ data class TripCall(
     val sourceClass: String? = null,
     /** request_stop, on_request, conditional, exit_only, boarding_only, not_stopping, border_control_only. */
     val flags: List<String> = emptyList(),
+    /** At the time a rider meets (departure; arrival at the last call): shown minutes late. */
+    val delayMin: Int? = null,
+    /** Its band, decided by the API (`early` … `very_late`, `unknown`, `cancelled`). */
+    val punctuality: String = UNKNOWN,
+    /** The vehicle has left it, as the API decides. */
+    val passed: Boolean = false,
 )
 
 @Serializable
@@ -155,12 +165,25 @@ data class Alert(
     /** Per language: `cs`, `en`, … */
     val header: Map<String, String> = emptyMap(),
     val description: Map<String, String> = emptyMap(),
+    /** What it's about: lines, stops and trips. */
+    val informs: List<AlertTarget> = emptyList(),
+)
+
+/** A line (`route`), stop (`stop`) or trip (`trip`) an alert is about, by its ID. */
+@Serializable
+data class AlertTarget(
+    val kind: String,
+    val id: String,
 )
 
 @Serializable
 data class ObehyTrip(
     val tripId: String,
     val serviceDate: String,
+    val line: Line? = null,
+    /** The train number (Os 6819). */
+    val tripShortName: String? = null,
+    val headsign: String? = null,
     val realtime: TripRealtime? = null,
     val vehicles: List<TripVehicle> = emptyList(),
     val composition: Boolean = false,
@@ -168,6 +191,12 @@ data class ObehyTrip(
     val notes: NoteGroups = NoteGroups(),
     val connections: List<Connection> = emptyList(),
     val alerts: List<Alert> = emptyList(),
+    /** Index in [calls] of the first not passed. */
+    val nextCall: Int? = null,
+    /** With `include=run`: the rail run from this trip on. */
+    val run: ObehyRun? = null,
+    /** With `include=shape`: its path, when the release has one. */
+    val shape: ObehyLineString? = null,
 )
 
 /** A trip's notes as the API groups them: when it runs, the marked codes in print order, the longer texts. */

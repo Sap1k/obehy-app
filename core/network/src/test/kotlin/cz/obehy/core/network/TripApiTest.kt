@@ -6,8 +6,11 @@ import cz.obehy.core.model.TripDetail
 import cz.obehy.core.model.UnitKind
 import cz.obehy.core.network.motis.MotisApi
 import cz.obehy.core.network.motis.toTrip
+import cz.obehy.core.network.obehy.Alert
+import cz.obehy.core.network.obehy.AlertTarget
 import cz.obehy.core.network.obehy.ObehyApi
 import cz.obehy.core.network.obehy.addedTo
+import cz.obehy.core.network.obehy.concerns
 import cz.obehy.core.network.obehy.toDomain
 import cz.obehy.core.network.obehy.toTripInfo
 import io.ktor.client.request.HttpRequestData
@@ -20,6 +23,21 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class TripApiTest {
+    @Test
+    fun `a line's cancellation of another departure is no trip's business`() {
+        fun alert(
+            effect: String,
+            vararg informs: AlertTarget,
+        ) = Alert("pid:1", "WARNING", effect, informs = informs.toList())
+        val line = AlertTarget("route", "jdf:route:199026")
+        val mine = AlertTarget("trip", "jdf:trip:1")
+        val stop = AlertTarget("stop", "jdf:stop:24325")
+        assertFalse(alert("NO_SERVICE", line).concerns("jdf:trip:1"))
+        assertTrue(alert("NO_SERVICE", line, mine).concerns("jdf:trip:1"))
+        assertTrue(alert("NO_SERVICE", stop).concerns("jdf:trip:1"))
+        assertTrue(alert("DETOUR", line).concerns("jdf:trip:1"))
+    }
+
     private val seen = mutableListOf<HttpRequestData>()
     private val tripId = "czptt:trip:Pa%3A0054%3AKT----22530A%3A00%3A2026:1"
     private val motisTripId = "20261104_21:58_czptt_$tripId"

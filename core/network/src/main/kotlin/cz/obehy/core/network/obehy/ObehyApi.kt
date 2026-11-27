@@ -28,11 +28,61 @@ class ObehyApi(
             }.body()
     }
 
-    /** A trip on a service date, whole, with its calls, notes and what's live on it. */
+    /**
+     * A trip on a service date, whole, with its calls, notes and what's live on it. [include] asks
+     * for more: `shape` (its path) and `run` (a rail run's later parts merged in).
+     */
     suspend fun trip(
         tripId: String,
         serviceDate: String,
-    ): ObehyTrip = client.get(tripUrl(tripId, serviceDate)).body()
+        include: List<String> = emptyList(),
+    ): ObehyTrip =
+        client
+            .get(tripUrl(tripId, serviceDate)) {
+                if (include.isNotEmpty()) parameter("include", include.joinToString(","))
+            }.body()
+
+    /** The vehicles in [bbox] (`minlon,minlat,maxlon,maxlat`, at most [BBOX_MAX_DEG2] square degrees). */
+    suspend fun vehicles(bbox: String): ObehyVehicles =
+        client.get("${baseUrl}vehicles") { parameter("bbox", bbox) }.body()
+
+    /**
+     * Vehicles found by line, train number, headsign, fleet number or plate: an exact line or train
+     * number first, then the number or plate, a line it starts, any match; nearest [near] (`lat,lon`) first in each.
+     */
+    suspend fun searchVehicles(
+        query: String,
+        near: String? = null,
+        limit: Int = SEARCH_LIMIT,
+    ): ObehyVehicles =
+        client
+            .get("${baseUrl}vehicles") {
+                parameter("q", query)
+                near?.let { parameter("near", it) }
+                parameter("limit", limit)
+            }.body()
+
+    /** One vehicle: its state, registry entry and the source reports that are it. */
+    suspend fun vehicle(vehicleId: String): ObehyVehicleDetail =
+        client.get("${baseUrl}vehicles/${vehicleId.encodeURLPathPart()}").body()
+
+    /** The stops in [bbox] (at most [STOPS_BBOX_MAX_DEG2] square degrees). */
+    suspend fun stops(bbox: String): ObehyStops = client.get("${baseUrl}stops") { parameter("bbox", bbox) }.body()
+
+    /** A stop place's next [limit] departures, or with [arrivals] its arrivals; from [cursor] on (a board's `next`). */
+    suspend fun departures(
+        locationId: String,
+        limit: Int,
+        arrivals: Boolean = false,
+        cursor: String? = null,
+    ): ObehyDepartures =
+        client
+            .get(
+                "${baseUrl}stop-places/${locationId.encodeURLPathPart()}/" + if (arrivals) "arrivals" else "departures",
+            ) {
+                parameter("limit", limit)
+                cursor?.let { parameter("cursor", it) }
+            }.body()
 
     /**
      * A train's composition from the stop [from] (default: its next stop). The API asks its source
@@ -59,5 +109,17 @@ class ObehyApi(
 
         /** The API's `enrich_legs_max` (src/obehy/data/api/api-v1.toml). */
         const val MAX_LEGS = 60
+
+        /** The API's `vehicles.bbox_max_deg2`. */
+        const val BBOX_MAX_DEG2 = 4.0
+
+        /** The API's `vehicles.limit`: a box answering this many may be missing some. */
+        const val VEHICLES_LIMIT = 3000
+
+        /** The API's `vehicles.search_limit`. */
+        const val SEARCH_LIMIT = 20
+
+        /** The API's `stops.bbox_max_deg2`. */
+        const val STOPS_BBOX_MAX_DEG2 = 0.5
     }
 }

@@ -1,0 +1,552 @@
+{
+ "release_id": "20261120T041034Z-eec05409a8ee",
+ "generated_at": "2026-11-20T23:47:11.153135+01:00",
+ "vehicles": [
+  {
+   "vehicle_id": "pid:0:8432",
+   "feed": "jdf",
+   "source": "pid",
+   "state": "running",
+   "last_seen": "2026-11-20T23:46:56+01:00",
+   "position_at": "2026-11-20T23:46:56+01:00",
+   "latitude": 50.09243708013451,
+   "longitude": 14.369798654531584,
+   "bearing": 66.87088970603988,
+   "trip_id": "overlay:pid-gtfs:trip:4bdafb1c6e0338a9ce74",
+   "service_date": "2026-11-20",
+   "line": {
+    "route_id": "jdf:route:199001",
+    "short_name": "1",
+    "long_name": "Sídliště Petřiny - Výstaviště",
+    "mode": "tram",
+    "color": "7A0603",
+    "text_color": "FFFFFF"
+   },
+   "trip_short_name": null,
+   "headsign": "Praha,Sídliště Ďáblice",
+   "traits": {
+    "low_floor": null,
+    "air_conditioning": false,
+    "wheelchair_accessible": false,
+    "manufacturer": null,
+    "model": "ČKD Tatra T3R.P",
+    "operator": "DP PRAHA",
+    "licence_plate": null,
+    "fleet_number": "8432"
+   },
+   "sources": [
+    "pid"
+   ],
+   "distance_m": null,
+   "delay_min": 0,
+   "punctuality": "on_time"
+  },
+  {
+   "vehicle_id": "pid:3:4610",
+   "feed": "jdf",
+   "source": "pid",
+   "state": "running",
+   "last_seen": "2026-11-20T23:46:13+01:00",
+   "position_at": "2026-11-20T23:46:13+01:00",
+   "latitude": 50.07821072281324,
+   "longitude": 14.29213165789058,
+   "bearing": 22.40124765436733,
+   "trip_id": "jdf:trip:100100:260829:1143:overlay:61bbc471f029",
+   "service_date": "2026-11-20",
+   "line": {
+    "route_id": "jdf:route:100100",
+    "short_name": "100",
+    "long_name": "Zličín - Letiště / Terminál 1",
+    "mode": "bus",
+    "color": "007DA8",
+    "text_color": "FFFFFF"
+   },
+   "trip_short_name": "100100 1143",
+   "headsign": "Letiště / Airport ✈",
+   "traits": {
+    "low_floor": null,
+    "air_conditioning": true,
+    "wheelchair_accessible": true,
+    "manufacturer": null,
+    "model": "Iveco Crossway LE CITY 14,5M",
+    "operator": "DP PRAHA",
+    "licence_plate": null,
+    "fleet_number": "4610"
+   },
+   "sources": [
+    "pid"
+   ],
+   "distance_m": null,
+   "delay_min": 1,
+   "punctuality": "on_time"
+  },
+  {
+   "vehicle_id": "pid:11:3999",
+   "feed": "jdf",
+   "source": "pid",
+   "state": "running",
+   "last_seen": "2026-11-20T23:46:39+01:00",
+   "position_at": "2026-11-20T23:46:39+01:00",
+   "latitude": 50.1104094,
+   "longitude": 14.377548,
+   "bearing": 93.2350677148653,
+   "trip_id": "jdf:trip:199051:261102:1263:overlay:99f1ae2aff02",
+   "service_date": "2026-11-20",
+   "line": {
+    "route_id": "jdf:route:199051",
+    "short_name": "51",
+    "long_name": "Bořislavka - Hradčanská",
+    "mode": "trolleybus",
+    "color": "80166F",
+    "text_color": "FFFFFF"
+   },
+   "trip_short_name": "199051 1263",
+   "headsign": "Praha,Hradčanská",
+   "traits": {
+    "low_floor": null,
+    "air_conditioning": null,
+    "wheelchair_accessible": true,
+    "manufacturer": null,
+    "model": null,
+    "operator": "DP PRAHA",
+    "licence_plate": null,
+    "fleet_number": "3999"
+   },
+   "sources": [
+    "pid"
+   ],
+   "distance_m": null,
+   "delay_min": -1,
+   "punctuality": "on_time"
+  },
+  {
+   "vehicle_id": "pid:trip:991_11438_260202",
+   "feed": "jdf",
+   "source": "pid",
+   "state": "positioning",
+   "last_seen": "2026-11-20T23:46:52+01:00",
+   "position_at": "2026-11-20T23:44:12+01:00",
+   "latitude": 50.074598,
+   "longitude": 14.339039,
+   "bearing": null,
+   "trip_id": "jdf:trip:199991:260829:1526:overlay:aa31040186ff",
+   "service_date": "2026-11-20",
+   "line": {
+    "route_id": "jdf:route:199991",
+    "short_name": "A",
+    "long_name": "Nemocnice Motol - Petřiny - Skalka - Depo Hostivař",
+    "mode": "metro",
+    "color": "00A562",
+    "text_color": "FFFFFF"
+   },
+   "trip_short_name": "199991 1526",
+   "headsign": "Praha,Depo Hostivař",
+   "traits": {
+    "low_floor": null,
+    "air_conditioning": null,
+    "wheelchair_accessible": true,
+    "manufacturer": null,
+    "model": null,
+    "operator": "DP PRAHA",
+    "licence_plate": null,
+    "fleet_number": null
+   },
+   "sources": [
+    "pid"
+   ],
+   "distance_m": null,
+   "delay_min": null,
+   "punctuality": "unknown"
+  },
+  {
+   "vehicle_id": "train:52",
+   "feed": "czptt",
+   "source": "sz-mapa",
+   "state": "running",
+   "last_seen": "2026-11-20T23:46:52+01:00",
+   "position_at": "2026-11-20T23:46:32+01:00",
+   "latitude": 50.089235,
+   "longitude": 14.453508,
+   "bearing": 240.32567017851278,
+   "trip_id": "czptt:trip:Pa%3A0054%3AKT----21347A%3A00%3A2026:1",
+   "service_date": "2026-11-20",
+   "line": {
+    "route_id": "czptt:route:line:3:1154:102",
+    "short_name": "Ex3",
+    "long_name": "Praha – Pardubice – Brno – Břeclav",
+    "mode": "rail",
+    "color": "b91c1c",
+    "text_color": "ffffff"
+   },
+   "trip_short_name": "rj 52",
+   "headsign": "Praha hlavní nádraží",
+   "traits": {
+    "low_floor": null,
+    "air_conditioning": null,
+    "wheelchair_accessible": null,
+    "manufacturer": null,
+    "model": null,
+    "operator": null,
+    "licence_plate": null,
+    "fleet_number": null
+   },
+   "sources": [
+    "sz-mapa"
+   ],
+   "distance_m": null,
+   "delay_min": 16,
+   "punctuality": "very_late"
+  },
+  {
+   "vehicle_id": "pid:0:8436",
+   "feed": "jdf",
+   "source": "pid",
+   "state": "positioning",
+   "last_seen": "2026-11-20T23:46:36+01:00",
+   "position_at": "2026-11-20T23:46:36+01:00",
+   "latitude": 50.10464,
+   "longitude": 14.42951,
+   "bearing": null,
+   "trip_id": "jdf:trip:199001:261113:1232:overlay:208e9a3bf1aa",
+   "service_date": "2026-11-20",
+   "line": {
+    "route_id": "jdf:route:199001",
+    "short_name": "1",
+    "long_name": "Sídliště Petřiny - Výstaviště",
+    "mode": "tram",
+    "color": "7A0603",
+    "text_color": "FFFFFF"
+   },
+   "trip_short_name": "199001 1232",
+   "headsign": "Praha,Sídliště Petřiny",
+   "traits": {
+    "low_floor": null,
+    "air_conditioning": false,
+    "wheelchair_accessible": false,
+    "manufacturer": null,
+    "model": "ČKD Tatra T3R.P",
+    "operator": "DP PRAHA",
+    "licence_plate": null,
+    "fleet_number": "8436"
+   },
+   "sources": [
+    "pid"
+   ],
+   "distance_m": null,
+   "delay_min": null,
+   "punctuality": "unknown"
+  },
+  {
+   "vehicle_id": "pid:3:3879",
+   "feed": "jdf",
+   "source": "pid",
+   "state": "running",
+   "last_seen": "2026-11-20T23:46:51+01:00",
+   "position_at": "2026-11-20T23:46:51+01:00",
+   "latitude": 50.127361771452236,
+   "longitude": 14.460281457086943,
+   "bearing": 160.36229859675632,
+   "trip_id": "jdf:trip:100102:260829:1223:overlay:2ffae79b260d",
+   "service_date": "2026-11-20",
+   "line": {
+    "route_id": "jdf:route:100102",
+    "short_name": "102",
+    "long_name": "Sídliště Bohnice - Kobylisy - Šimůnkova",
+    "mode": "bus",
+    "color": "007DA8",
+    "text_color": "FFFFFF"
+   },
+   "trip_short_name": "100102 1223",
+   "headsign": "Praha,Sídliště Bohnice",
+   "traits": {
+    "low_floor": null,
+    "air_conditioning": true,
+    "wheelchair_accessible": true,
+    "manufacturer": null,
+    "model": "SOR NB 12",
+    "operator": "DP PRAHA",
+    "licence_plate": null,
+    "fleet_number": "3879"
+   },
+   "sources": [
+    "pid"
+   ],
+   "distance_m": null,
+   "delay_min": 0,
+   "punctuality": "on_time"
+  },
+  {
+   "vehicle_id": "pid:11:509",
+   "feed": "jdf",
+   "source": "pid",
+   "state": "running",
+   "last_seen": "2026-11-20T23:46:53+01:00",
+   "position_at": "2026-11-20T23:46:53+01:00",
+   "latitude": 50.11027958139296,
+   "longitude": 14.38609427583051,
+   "bearing": 343.7457175092069,
+   "trip_id": "jdf:trip:199051:261102:1258:overlay:5b43d071c2cb",
+   "service_date": "2026-11-20",
+   "line": {
+    "route_id": "jdf:route:199051",
+    "short_name": "51",
+    "long_name": "Bořislavka - Hradčanská",
+    "mode": "trolleybus",
+    "color": "80166F",
+    "text_color": "FFFFFF"
+   },
+   "trip_short_name": "199051 1258",
+   "headsign": "Praha,Bořislavka",
+   "traits": {
+    "low_floor": null,
+    "air_conditioning": false,
+    "wheelchair_accessible": true,
+    "manufacturer": null,
+    "model": "Škoda 36 Tr T'CITY",
+    "operator": "DP PRAHA",
+    "licence_plate": null,
+    "fleet_number": "509"
+   },
+   "sources": [
+    "pid"
+   ],
+   "distance_m": null,
+   "delay_min": 0,
+   "punctuality": "on_time"
+  },
+  {
+   "vehicle_id": "pid:trip:991_11488_260202",
+   "feed": "jdf",
+   "source": "pid",
+   "state": "running",
+   "last_seen": "2026-11-20T23:46:52+01:00",
+   "position_at": "2026-11-20T23:46:52+01:00",
+   "latitude": 50.06943478999284,
+   "longitude": 14.498242670980138,
+   "bearing": 122.45206568188964,
+   "trip_id": "jdf:trip:199991:260829:1520:overlay:2b91cde3c251",
+   "service_date": "2026-11-20",
+   "line": {
+    "route_id": "jdf:route:199991",
+    "short_name": "A",
+    "long_name": "Nemocnice Motol - Petřiny - Skalka - Depo Hostivař",
+    "mode": "metro",
+    "color": "00A562",
+    "text_color": "FFFFFF"
+   },
+   "trip_short_name": "199991 1520",
+   "headsign": "Praha,Depo Hostivař",
+   "traits": {
+    "low_floor": null,
+    "air_conditioning": null,
+    "wheelchair_accessible": true,
+    "manufacturer": null,
+    "model": null,
+    "operator": "DP PRAHA",
+    "licence_plate": null,
+    "fleet_number": null
+   },
+   "sources": [
+    "pid"
+   ],
+   "distance_m": null,
+   "delay_min": 0,
+   "punctuality": "on_time"
+  },
+  {
+   "vehicle_id": "train:579",
+   "feed": "czptt",
+   "source": "pid",
+   "state": "positioning",
+   "last_seen": "2026-11-20T23:46:21+01:00",
+   "position_at": "2026-11-20T23:46:10+01:00",
+   "latitude": 50.082999,
+   "longitude": 14.436497,
+   "bearing": null,
+   "trip_id": "czptt:trip:Pa%3A0054%3AKT----22536A%3A00%3A2026:1",
+   "service_date": "2026-11-20",
+   "line": {
+    "route_id": "czptt:route:line:3:1154:102",
+    "short_name": "Ex3",
+    "long_name": "Praha – Pardubice – Brno – Břeclav",
+    "mode": "rail",
+    "color": "b91c1c",
+    "text_color": "ffffff"
+   },
+   "trip_short_name": "rj 579",
+   "headsign": "Brno hlavní nádraží",
+   "traits": {
+    "low_floor": null,
+    "air_conditioning": null,
+    "wheelchair_accessible": true,
+    "manufacturer": null,
+    "model": null,
+    "operator": null,
+    "licence_plate": null,
+    "fleet_number": null
+   },
+   "sources": [
+    "pid"
+   ],
+   "distance_m": null,
+   "delay_min": null,
+   "punctuality": "unknown"
+  },
+  {
+   "vehicle_id": "pid:0:8760",
+   "feed": "jdf",
+   "source": "pid",
+   "state": "running",
+   "last_seen": "2026-11-20T23:46:51+01:00",
+   "position_at": "2026-11-20T23:46:51+01:00",
+   "latitude": 50.10001016842923,
+   "longitude": 14.42502002653643,
+   "bearing": 275.7708105320565,
+   "trip_id": "overlay:pid-gtfs:trip:7e178fa214681f21f43a",
+   "service_date": "2026-11-20",
+   "line": {
+    "route_id": "jdf:route:199001",
+    "short_name": "1",
+    "long_name": "Sídliště Petřiny - Výstaviště",
+    "mode": "tram",
+    "color": "7A0603",
+    "text_color": "FFFFFF"
+   },
+   "trip_short_name": null,
+   "headsign": "Praha,Sídliště Petřiny",
+   "traits": {
+    "low_floor": null,
+    "air_conditioning": false,
+    "wheelchair_accessible": true,
+    "manufacturer": null,
+    "model": "Pragoimex T3R.PLF",
+    "operator": "DP PRAHA",
+    "licence_plate": null,
+    "fleet_number": "8760"
+   },
+   "sources": [
+    "pid"
+   ],
+   "distance_m": null,
+   "delay_min": 1,
+   "punctuality": "on_time"
+  },
+  {
+   "vehicle_id": "pid:3:3976",
+   "feed": "jdf",
+   "source": "pid",
+   "state": "positioning",
+   "last_seen": "2026-11-20T23:45:07+01:00",
+   "position_at": "2026-11-20T23:41:07+01:00",
+   "latitude": 50.13153,
+   "longitude": 14.4103,
+   "bearing": null,
+   "trip_id": "jdf:trip:100102:260829:1222:overlay:99c1ee19dbb7",
+   "service_date": "2026-11-20",
+   "line": {
+    "route_id": "jdf:route:100102",
+    "short_name": "102",
+    "long_name": "Sídliště Bohnice - Kobylisy - Šimůnkova",
+    "mode": "bus",
+    "color": "007DA8",
+    "text_color": "FFFFFF"
+   },
+   "trip_short_name": "100102 1222",
+   "headsign": "Praha,Šimůnkova",
+   "traits": {
+    "low_floor": null,
+    "air_conditioning": true,
+    "wheelchair_accessible": true,
+    "manufacturer": null,
+    "model": "SOR NB 12",
+    "operator": "DP PRAHA",
+    "licence_plate": null,
+    "fleet_number": "3976"
+   },
+   "sources": [
+    "pid"
+   ],
+   "distance_m": null,
+   "delay_min": null,
+   "punctuality": "unknown"
+  },
+  {
+   "vehicle_id": "pid:11:524",
+   "feed": "jdf",
+   "source": "pid",
+   "state": "positioning",
+   "last_seen": "2026-11-20T23:46:10+01:00",
+   "position_at": "2026-11-20T23:46:10+01:00",
+   "latitude": 50.06887,
+   "longitude": 14.40566,
+   "bearing": null,
+   "trip_id": "jdf:trip:199052:260921:1381:overlay:6f65450eeafd",
+   "service_date": "2026-11-20",
+   "line": {
+    "route_id": "jdf:route:199052",
+    "short_name": "52",
+    "long_name": "Na Knížecí - Waltrovka - Jinonice",
+    "mode": "trolleybus",
+    "color": "80166F",
+    "text_color": "FFFFFF"
+   },
+   "trip_short_name": "199052 1381",
+   "headsign": "Praha,Jinonice",
+   "traits": {
+    "low_floor": null,
+    "air_conditioning": null,
+    "wheelchair_accessible": true,
+    "manufacturer": null,
+    "model": null,
+    "operator": "DP PRAHA",
+    "licence_plate": null,
+    "fleet_number": "524"
+   },
+   "sources": [
+    "pid"
+   ],
+   "distance_m": null,
+   "delay_min": null,
+   "punctuality": "unknown"
+  },
+  {
+   "vehicle_id": "pid:trip:991_11489_260202",
+   "feed": "jdf",
+   "source": "pid",
+   "state": "positioning",
+   "last_seen": "2026-11-20T23:46:52+01:00",
+   "position_at": "2026-11-20T23:46:52+01:00",
+   "latitude": 50.069422,
+   "longitude": 14.49823,
+   "bearing": 121.0,
+   "trip_id": "jdf:trip:199991:260829:1527:overlay:27eb3359190a",
+   "service_date": "2026-11-20",
+   "line": {
+    "route_id": "jdf:route:199991",
+    "short_name": "A",
+    "long_name": "Nemocnice Motol - Petřiny - Skalka - Depo Hostivař",
+    "mode": "metro",
+    "color": "00A562",
+    "text_color": "FFFFFF"
+   },
+   "trip_short_name": "199991 1527",
+   "headsign": "Praha,Nemocnice Motol",
+   "traits": {
+    "low_floor": null,
+    "air_conditioning": null,
+    "wheelchair_accessible": true,
+    "manufacturer": null,
+    "model": null,
+    "operator": "DP PRAHA",
+    "licence_plate": null,
+    "fleet_number": null
+   },
+   "sources": [
+    "pid"
+   ],
+   "distance_m": null,
+   "delay_min": null,
+   "punctuality": "unknown"
+  }
+ ]
+}

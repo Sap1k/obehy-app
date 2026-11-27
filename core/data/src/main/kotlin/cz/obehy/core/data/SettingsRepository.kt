@@ -53,6 +53,20 @@ class SettingsRepository
             store.edit { it[ONBOARDED] = true }
         }
 
+        /** The MOTIS servers (base URLs) found to answer railviz, for the map in the mode without Oběhy. */
+        val railvizServers: Flow<Set<String>> = store.data.map { it[RAILVIZ_SERVERS].orEmpty() }
+
+        /** Remembers whether the server at [url] answers railviz. */
+        suspend fun setRailviz(
+            url: String,
+            answers: Boolean,
+        ) {
+            store.edit {
+                val known = it[RAILVIZ_SERVERS].orEmpty()
+                it[RAILVIZ_SERVERS] = if (answers) known + url else known - url
+            }
+        }
+
         /** The journey search options, remembered between searches. */
         val searchOptions: Flow<SearchOptions> =
             store.data.map { prefs ->
@@ -95,5 +109,6 @@ class SettingsRepository
             val LOW_FLOOR = booleanPreferencesKey("search_low_floor")
             val ROUTED_TRANSFERS = booleanPreferencesKey("search_routed_transfers")
             val TRANSPORT_TYPES = stringSetPreferencesKey("search_transport_types")
+            val RAILVIZ_SERVERS = stringSetPreferencesKey("railviz_servers")
         }
     }

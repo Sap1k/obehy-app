@@ -1,0 +1,102 @@
+{
+ "release_id": "20261120T041034Z-eec05409a8ee",
+ "generated_at": "2026-11-20T23:47:11.610843+01:00",
+ "stops": [
+  {
+   "location_id": "czptt:stop:CZ:57236",
+   "name": "Praha Masarykovo nádraží",
+   "kind": "stop_place",
+   "domain": "heavy_rail",
+   "municipality": null,
+   "district": null,
+   "latitude": 50.087651,
+   "longitude": 14.434708,
+   "coordinate_precision": "exact",
+   "distance_m": null,
+   "modes": [
+    "rail"
+   ],
+   "group": null
+  },
+  {
+   "location_id": "jdf:stop:10298",
+   "name": "Praha,Haštalské náměstí",
+   "kind": "stop_place",
+   "domain": "surface",
+   "municipality": "Praha",
+   "district": "Haštalské náměstí",
+   "latitude": 50.091,
+   "longitude": 14.42404,
+   "coordinate_precision": "exact",
+   "distance_m": null,
+   "modes": [
+    "bus"
+   ],
+   "group": null
+  },
+  {
+   "location_id": "jdf:stop:16365",
+   "name": "Praha,Nemocnice Na Františku",
+   "kind": "stop_place",
+   "domain": "surface",
+   "municipality": "Praha",
+   "district": "Nemocnice Na Františku",
+   "latitude": 50.093004,
+   "longitude": 14.422005,
+   "coordinate_precision": "exact",
+   "distance_m": null,
+   "modes": [
+    "bus"
+   ],
+   "group": null
+  },
+  {
+   "location_id": "jdf:stop:17373",
+   "name": "Praha,Masná",
+   "kind": "stop_place",
+   "domain": "surface",
+   "municipality": "Praha",
+   "district": "Masná",
+   "latitude": 50.089333,
+   "longitude": 14.424331,
+   "coordinate_precision": "exact",
+   "distance_m": null,
+   "modes": [
+    "bus"
+   ],
+   "group": null
+  },
+  {
+   "location_id": "jdf:stop:17482",
+   "name": "Praha,Petrské náměstí",
+   "kind": "stop_place",
+   "domain": "surface",
+   "municipality": "Praha",
+   "district": "Petrské náměstí",
+   "latitude": 50.091314,
+   "longitude": 14.4324965,
+   "coordinate_precision": "exact",
+   "distance_m": null,
+   "modes": [
+    "bus"
+   ],
+   "group": null
+  },
+  {
+   "location_id": "jdf:stop:21381",
+   "name": "Praha,Truhlářská",
+   "kind": "stop_place",
+   "domain": "surface",
+   "municipality": "Praha",
+   "district": "Truhlářská",
+   "latitude": 50.089458,
+   "longitude": 14.428683,
+   "coordinate_precision": "exact",
+   "distance_m": null,
+   "modes": [
+    "bus"
+   ],
+   "group": null
+  }
+ ]
+}

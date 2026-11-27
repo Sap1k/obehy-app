@@ -59,7 +59,7 @@ fun ObehyTrip.toTripInfo(
                 long = notes.long,
             ),
         connections = connections.map { connection -> connection.toConnection(callName(connection.atSequence)) },
-        alerts = alerts.map { it.toAlert(language) },
+        alerts = alerts.filter { it.concerns(tripId) }.map { it.toAlert(language) },
         hasComposition = composition,
         boardingLocationId = boarding?.locationId,
         boardingSequence = boarding?.sequence,
@@ -88,7 +88,11 @@ private fun VehicleTraits.toVehicleInfo() =
         airConditioning = airConditioning,
     )
 
-private fun ObehyMarkedNote.toMarkedNote() = MarkedNote(text, signIcon(key, icon))
+private fun ObehyMarkedNote.toMarkedNote() =
+    MarkedNote(text, if (icon == CALENDAR) "${CALENDAR}_${key.substringAfter(':')}" else signIcon(key, icon))
+
+/** A calendar designation's icon (`jdf:X`, `jdf:1` … `jdf:7`, `jdf:+`): its day code is added to it. */
+private const val CALENDAR = "calendar"
 
 private fun Label.of(language: String) = if (language == "cs") cs else en
 
@@ -102,7 +106,14 @@ private fun Connection.toConnection(stopName: String?) =
         note = note,
     )
 
-private fun Alert.toAlert(language: String) =
+/**
+ * Whether an alert is this trip's business. A line's alerts are, except its cancellations: those
+ * name one departure of the line ("the 12:34 won't run"), some other trip's, and mean nothing here.
+ */
+internal fun Alert.concerns(tripId: String): Boolean =
+    effect != NO_SERVICE || informs.any { it.kind == "trip" && it.id == tripId } || informs.none { it.kind == "route" }
+
+internal fun Alert.toAlert(language: String) =
     TripAlert(
         title = header.of(language).orEmpty(),
         text = description.of(language),
@@ -169,3 +180,4 @@ private fun ObehyUnitFeature.toCoachFeature(language: String) =
     )
 
 private val RAW_CODE = Regex("^raw:[^:]+:")
+private const val NO_SERVICE = "NO_SERVICE"

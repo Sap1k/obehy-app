@@ -1,0 +1,16 @@
+{
+ "lat": 44.69888350209936,
+ "lon": 13.16131649538875,
+ "zoom": 4.0,
+ "serverConfig": {
+  "motisVersion": "v2.11.4",
+  "hasElevation": true,
+  "hasRoutedTransfers": true,
+  "hasStreetRouting": true,
+  "maxOneToManySize": 128.0,
+  "maxOneToAllTravelTimeLimit": 2880.0,
+  "maxPrePostTransitTimeLimit": 7200.0,
+  "maxDirectTimeLimit": 21600.0,
+  "shapesDebugEnabled": true
+ }
+}

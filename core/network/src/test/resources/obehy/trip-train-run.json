@@ -1,0 +1,834 @@
+{
+ "release_id": "20261120T041034Z-eec05409a8ee",
+ "generated_at": "2026-11-20T23:48:15.877060+01:00",
+ "trip_id": "czptt:trip:Pa%3A0054%3AKT----21347A%3A00%3A2026:1",
+ "service_date": "2026-11-20",
+ "journey": {
+  "namespace": "czptt:train_number",
+  "key": "52"
+ },
+ "line": {
+  "route_id": "czptt:route:line:3:1154:102",
+  "short_name": "Ex3",
+  "long_name": "Praha – Pardubice – Brno – Břeclav",
+  "mode": "rail",
+  "color": "b91c1c",
+  "text_color": "ffffff"
+ },
+ "agency": "České dráhy, a.s.",
+ "trip_short_name": "rj 52",
+ "headsign": "Praha hlavní nádraží",
+ "wheelchair_accessible": null,
+ "bikes_allowed": null,
+ "amenities": {
+  "wheelchair": null,
+  "bicycles": null,
+  "reservation": null,
+  "refreshments": false,
+  "luggage": false,
+  "self_service_ticketing": false,
+  "on_request": false,
+  "conditional": false,
+  "integrated_transport": [],
+  "operates": []
+ },
+ "realtime": {
+  "lifecycle": "running",
+  "off_route": false,
+  "stale": false,
+  "updated_at": "2026-11-20T23:47:22+01:00",
+  "sources": [
+   {
+    "source": "sz-mapa",
+    "label": {
+     "cs": "Správa železnic",
+     "en": "Správa železnic"
+    },
+    "heard_at": "2026-11-20T23:47:22.271273+01:00",
+    "position_at": "2026-11-20T23:47:22+01:00",
+    "delay_s": 990,
+    "leads_position": true
+   }
+  ],
+  "delay_min": 16,
+  "punctuality": "very_late"
+ },
+ "vehicles": [
+  {
+   "vehicle_id": "train:52",
+   "state": "running",
+   "last_seen": "2026-11-20T23:47:52+01:00",
+   "position_at": "2026-11-20T23:47:22+01:00",
+   "latitude": 50.087809,
+   "longitude": 14.44207,
+   "bearing": 219.31863276371527,
+   "traits": {
+    "low_floor": null,
+    "air_conditioning": null,
+    "wheelchair_accessible": null,
+    "manufacturer": null,
+    "model": null,
+    "operator": null,
+    "licence_plate": null,
+    "fleet_number": null
+   },
+   "sources": [
+    "sz-mapa"
+   ],
+   "physical": false,
+   "followed_as": null
+  }
+ ],
+ "run_parts": [
+  {
+   "trip_id": "czptt:trip:Pa%3A0054%3AKT----21347A%3A00%3A2026:1",
+   "run_part": 1
+  }
+ ],
+ "composition": true,
+ "calls": [
+  {
+   "sequence": 6,
+   "location_id": "czptt:stop:CZ:33425",
+   "name": "Břeclav",
+   "latitude": 48.754384,
+   "longitude": 16.893605,
+   "boarding": "regular",
+   "alighting": "regular",
+   "flags": [],
+   "platform": "1",
+   "scheduled_arrival": "2026-11-20T20:04:00+01:00",
+   "scheduled_departure": "2026-11-20T20:12:00+01:00",
+   "estimated_arrival": "2026-11-20T20:26:29.500000+01:00",
+   "estimated_departure": "2026-11-20T20:30:29.500000+01:00",
+   "status": "actual",
+   "source_class": "gps",
+   "delay_min": 18,
+   "punctuality": "very_late",
+   "passed": true
+  },
+  {
+   "sequence": 26,
+   "location_id": "czptt:stop:CZ:33295",
+   "name": "Brno hlavní nádraží",
+   "latitude": 49.189992,
+   "longitude": 16.611046,
+   "boarding": "regular",
+   "alighting": "regular",
+   "flags": [],
+   "platform": "1",
+   "scheduled_arrival": "2026-11-20T20:41:00+01:00",
+   "scheduled_departure": "2026-11-20T20:46:00+01:00",
+   "estimated_arrival": "2026-11-20T20:57:29.500000+01:00",
+   "estimated_departure": "2026-11-20T21:00:29.500000+01:00",
+   "status": "actual",
+   "source_class": "gps",
+   "delay_min": 14,
+   "punctuality": "very_late",
+   "passed": true
+  },
+  {
+   "sequence": 34,
+   "location_id": "czptt:stop:CZ:33095",
+   "name": "Blansko",
+   "latitude": 49.353212,
+   "longitude": 16.646189,
+   "boarding": "regular",
+   "alighting": "regular",
+   "flags": [],
+   "platform": "2",
+   "scheduled_arrival": "2026-11-20T21:06:00+01:00",
+   "scheduled_departure": "2026-11-20T21:08:00+01:00",
+   "estimated_arrival": null,
+   "estimated_departure": "2026-11-20T21:21:29.500000+01:00",
+   "status": "actual",
+   "source_class": "gps",
+   "delay_min": 13,
+   "punctuality": "very_late",
+   "passed": true
+  },
+  {
+   "sequence": 43,
+   "location_id": "czptt:stop:CZ:34725",
+   "name": "Letovice",
+   "latitude": 49.556091,
+   "longitude": 16.57084,
+   "boarding": "regular",
+   "alighting": "regular",
+   "flags": [],
+   "platform": "2",
+   "scheduled_arrival": "2026-11-20T21:23:30+01:00",
+   "scheduled_departure": "2026-11-20T21:25:30+01:00",
+   "estimated_arrival": null,
+   "estimated_departure": "2026-11-20T21:38:29.500000+01:00",
+   "status": "actual",
+   "source_class": "gps",
+   "delay_min": 13,
+   "punctuality": "very_late",
+   "passed": true
+  },
+  {
+   "sequence": 51,
+   "location_id": "czptt:stop:CZ:54333",
+   "name": "Svitavy",
+   "latitude": 49.760076,
+   "longitude": 16.479852,
+   "boarding": "regular",
+   "alighting": "regular",
+   "flags": [],
+   "platform": "2",
+   "scheduled_arrival": "2026-11-20T21:42:30+01:00",
+   "scheduled_departure": "2026-11-20T21:44:30+01:00",
+   "estimated_arrival": null,
+   "estimated_departure": "2026-11-20T21:58:29.500000+01:00",
+   "status": "actual",
+   "source_class": "gps",
+   "delay_min": 14,
+   "punctuality": "very_late",
+   "passed": true
+  },
+  {
+   "sequence": 56,
+   "location_id": "czptt:stop:CZ:53913",
+   "name": "Česká Třebová",
+   "latitude": 49.896831,
+   "longitude": 16.447115,
+   "boarding": "regular",
+   "alighting": "regular",
+   "flags": [],
+   "platform": "16",
+   "scheduled_arrival": "2026-11-20T21:55:00+01:00",
+   "scheduled_departure": "2026-11-20T21:57:00+01:00",
+   "estimated_arrival": "2026-11-20T22:14:29.500000+01:00",
+   "estimated_departure": "2026-11-20T22:16:29.500000+01:00",
+   "status": "actual",
+   "source_class": "gps",
+   "delay_min": 19,
+   "punctuality": "very_late",
+   "passed": true
+  },
+  {
+   "sequence": 75,
+   "location_id": "czptt:stop:CZ:53613",
+   "name": "Pardubice hlavní nádraží",
+   "latitude": 50.031682,
+   "longitude": 15.756512,
+   "boarding": "regular",
+   "alighting": "regular",
+   "flags": [],
+   "platform": "2",
+   "scheduled_arrival": "2026-11-20T22:32:00+01:00",
+   "scheduled_departure": "2026-11-20T22:34:00+01:00",
+   "estimated_arrival": null,
+   "estimated_departure": "2026-11-20T22:49:29.500000+01:00",
+   "status": "actual",
+   "source_class": "gps",
+   "delay_min": 15,
+   "punctuality": "very_late",
+   "passed": true
+  },
+  {
+   "sequence": 92,
+   "location_id": "czptt:stop:CZ:53414",
+   "name": "Kolín",
+   "latitude": 50.025832,
+   "longitude": 15.212705,
+   "boarding": "regular",
+   "alighting": "regular",
+   "flags": [],
+   "platform": "102",
+   "scheduled_arrival": "2026-11-20T22:53:00+01:00",
+   "scheduled_departure": "2026-11-20T22:55:00+01:00",
+   "estimated_arrival": null,
+   "estimated_departure": "2026-11-20T23:11:29.500000+01:00",
+   "status": "actual",
+   "source_class": "gps",
+   "delay_min": 16,
+   "punctuality": "very_late",
+   "passed": true
+  },
+  {
+   "sequence": 114,
+   "location_id": "czptt:stop:CZ:57176",
+   "name": "Praha-Libeň",
+   "latitude": 50.100637,
+   "longitude": 14.502328,
+   "boarding": "regular",
+   "alighting": "regular",
+   "flags": [],
+   "platform": "0",
+   "scheduled_arrival": "2026-11-20T23:25:00+01:00",
+   "scheduled_departure": "2026-11-20T23:26:00+01:00",
+   "estimated_arrival": null,
+   "estimated_departure": "2026-11-20T23:42:29.500000+01:00",
+   "status": "actual",
+   "source_class": "gps",
+   "delay_min": 16,
+   "punctuality": "very_late",
+   "passed": true
+  },
+  {
+   "sequence": 116,
+   "location_id": "czptt:stop:CZ:57076",
+   "name": "Praha hlavní nádraží",
+   "latitude": 50.08309,
+   "longitude": 14.435978,
+   "boarding": "regular",
+   "alighting": "regular",
+   "flags": [],
+   "platform": "9",
+   "scheduled_arrival": "2026-11-20T23:32:00+01:00",
+   "scheduled_departure": "2026-11-20T23:43:00+01:00",
+   "estimated_arrival": "2026-11-20T23:48:30+01:00",
+   "estimated_departure": "2026-11-20T23:50:30+01:00",
+   "status": "predicted",
+   "source_class": "source",
+   "delay_min": 16,
+   "punctuality": "very_late",
+   "passed": false
+  }
+ ],
+ "features": [
+  {
+   "kinds": [
+    "note"
+   ],
+   "group": "note",
+   "icon": "note",
+   "label": {
+    "cs": "vůz vhodný pro přepravu cestujících na vozíku, je nutné objednání přepravy",
+    "en": "Note"
+   },
+   "official": false,
+   "scope": "trip",
+   "from_sequence": null,
+   "to_sequence": null,
+   "system": null,
+   "note": {
+    "kind": "czptt_central_note",
+    "code": "34",
+    "label": "invalida s plošinou",
+    "text": "vůz vhodný pro přepravu cestujících na vozíku, je nutné objednání přepravy"
+   },
+   "source_code": null
+  },
+  {
+   "kinds": [
+    "note"
+   ],
+   "group": "note",
+   "icon": "note",
+   "label": {
+    "cs": "přeprava spoluzavazadel s povinnou rezervací místa pro jízdní kolo a cestujícího, v některých vlacích pouze pro jízdní kolo",
+    "en": "Note"
+   },
+   "official": false,
+   "scope": "trip",
+   "from_sequence": null,
+   "to_sequence": null,
+   "system": null,
+   "note": {
+    "kind": "czptt_central_note",
+    "code": "29",
+    "label": "kolo rezervace nutná",
+    "text": "přeprava spoluzavazadel s povinnou rezervací místa pro jízdní kolo a cestujícího, v některých vlacích pouze pro jízdní kolo"
+   },
+   "source_code": null
+  },
+  {
+   "kinds": [
+    "note"
+   ],
+   "group": "note",
+   "icon": "note",
+   "label": {
+    "cs": "restaurační vůz",
+    "en": "Note"
+   },
+   "official": false,
+   "scope": "trip",
+   "from_sequence": null,
+   "to_sequence": null,
+   "system": null,
+   "note": {
+    "kind": "czptt_central_note",
+    "code": "18",
+    "label": "hospoda",
+    "text": "restaurační vůz"
+   },
+   "source_code": null
+  },
+  {
+   "kinds": [
+    "note"
+   ],
+   "group": "note",
+   "icon": "note",
+   "label": {
+    "cs": "ve vlaku je řazen vůz s bezdrátovým připojením k internetu",
+    "en": "Note"
+   },
+   "official": false,
+   "scope": "trip",
+   "from_sequence": null,
+   "to_sequence": null,
+   "system": null,
+   "note": {
+    "kind": "czptt_central_note",
+    "code": "40",
+    "label": "WiFi",
+    "text": "ve vlaku je řazen vůz s bezdrátovým připojením k internetu"
+   },
+   "source_code": null
+  },
+  {
+   "kinds": [
+    "note"
+   ],
+   "group": "note",
+   "icon": "note",
+   "label": {
+    "cs": "palubní portál",
+    "en": "Note"
+   },
+   "official": false,
+   "scope": "trip",
+   "from_sequence": null,
+   "to_sequence": null,
+   "system": null,
+   "note": {
+    "kind": "czptt_central_note",
+    "code": "41",
+    "label": "palubní portál ČD",
+    "text": "palubní portál"
+   },
+   "source_code": null
+  },
+  {
+   "kinds": [
+    "note"
+   ],
+   "group": "note",
+   "icon": "note",
+   "label": {
+    "cs": "ve vlaku je řazen vůz s přípojkou 230 V",
+    "en": "Note"
+   },
+   "official": false,
+   "scope": "trip",
+   "from_sequence": null,
+   "to_sequence": null,
+   "system": null,
+   "note": {
+    "kind": "czptt_central_note",
+    "code": "30",
+    "label": "zásuvka",
+    "text": "ve vlaku je řazen vůz s přípojkou 230 V"
+   },
+   "source_code": null
+  },
+  {
+   "kinds": [
+    "note"
+   ],
+   "group": "note",
+   "icon": "note",
+   "label": {
+    "cs": "vůz nebo oddíly vyhrazené pro cestující s dětmi do 10 let",
+    "en": "Note"
+   },
+   "official": false,
+   "scope": "trip",
+   "from_sequence": null,
+   "to_sequence": null,
+   "system": null,
+   "note": {
+    "kind": "czptt_central_note",
+    "code": "33",
+    "label": "dítě",
+    "text": "vůz nebo oddíly vyhrazené pro cestující s dětmi do 10 let"
+   },
+   "source_code": null
+  },
+  {
+   "kinds": [
+    "note"
+   ],
+   "group": "note",
+   "icon": "note",
+   "label": {
+    "cs": "dětské kino",
+    "en": "Note"
+   },
+   "official": false,
+   "scope": "trip",
+   "from_sequence": null,
+   "to_sequence": null,
+   "system": null,
+   "note": {
+    "kind": "czptt_central_note",
+    "code": "42",
+    "label": "kino",
+    "text": "dětské kino"
+   },
+   "source_code": null
+  },
+  {
+   "kinds": [
+    "note"
+   ],
+   "group": "note",
+   "icon": "note",
+   "label": {
+    "cs": "do označených vozů možno zakoupit místenku",
+    "en": "Note"
+   },
+   "official": false,
+   "scope": "trip",
+   "from_sequence": null,
+   "to_sequence": null,
+   "system": null,
+   "note": {
+    "kind": "czptt_central_note",
+    "code": "19",
+    "label": "místenka",
+    "text": "do označených vozů možno zakoupit místenku"
+   },
+   "source_code": null
+  },
+  {
+   "kinds": [
+    "note"
+   ],
+   "group": "note",
+   "icon": "note",
+   "label": {
+    "cs": "vlak zařazený v integrovaném dopravním systému",
+    "en": "Note"
+   },
+   "official": false,
+   "scope": "call_range",
+   "from_sequence": 26,
+   "to_sequence": 116,
+   "system": null,
+   "note": {
+    "kind": "czptt_central_note",
+    "code": "44",
+    "label": "IDS",
+    "text": "vlak zařazený v integrovaném dopravním systému"
+   },
+   "source_code": null
+  }
+ ],
+ "notes": {
+  "operates": [],
+  "marked": [],
+  "long": [
+   "vůz vhodný pro přepravu cestujících na vozíku, je nutné objednání přepravy",
+   "přeprava spoluzavazadel s povinnou rezervací místa pro jízdní kolo a cestujícího, v některých vlacích pouze pro jízdní kolo",
+   "restaurační vůz",
+   "ve vlaku je řazen vůz s bezdrátovým připojením k internetu",
+   "palubní portál",
+   "ve vlaku je řazen vůz s přípojkou 230 V",
+   "vůz nebo oddíly vyhrazené pro cestující s dětmi do 10 let",
+   "dětské kino",
+   "do označených vozů možno zakoupit místenku",
+   "vlak zařazený v integrovaném dopravním systému"
+  ]
+ },
+ "connections": [],
+ "links": [],
+ "alerts": [],
+ "shape": {
+  "type": "LineString",
+  "coordinates": [
+   [
+    16.893605,
+    48.754384
+   ],
+   [
+    16.611046,
+    49.189992
+   ],
+   [
+    16.646189,
+    49.353212
+   ],
+   [
+    16.57084,
+    49.556091
+   ],
+   [
+    16.479852,
+    49.760076
+   ],
+   [
+    16.447115,
+    49.896831
+   ],
+   [
+    15.756512,
+    50.031682
+   ],
+   [
+    15.212705,
+    50.025832
+   ],
+   [
+    14.502328,
+    50.100637
+   ],
+   [
+    14.435978,
+    50.08309
+   ]
+  ]
+ },
+ "next_call": 9,
+ "run": {
+  "calls": [
+   {
+    "trip_id": "czptt:trip:Pa%3A0054%3AKT----21347A%3A00%3A2026:1",
+    "continues_as": null,
+    "call": {
+     "sequence": 6,
+     "location_id": "czptt:stop:CZ:33425",
+     "name": "Břeclav",
+     "latitude": 48.754384,
+     "longitude": 16.893605,
+     "boarding": "regular",
+     "alighting": "regular",
+     "flags": [],
+     "platform": "1",
+     "scheduled_arrival": "2026-11-20T20:04:00+01:00",
+     "scheduled_departure": "2026-11-20T20:12:00+01:00",
+     "estimated_arrival": "2026-11-20T20:26:29.500000+01:00",
+     "estimated_departure": "2026-11-20T20:30:29.500000+01:00",
+     "status": "actual",
+     "source_class": "gps",
+     "delay_min": 18,
+     "punctuality": "very_late",
+     "passed": true
+    }
+   },
+   {
+    "trip_id": "czptt:trip:Pa%3A0054%3AKT----21347A%3A00%3A2026:1",
+    "continues_as": null,
+    "call": {
+     "sequence": 26,
+     "location_id": "czptt:stop:CZ:33295",
+     "name": "Brno hlavní nádraží",
+     "latitude": 49.189992,
+     "longitude": 16.611046,
+     "boarding": "regular",
+     "alighting": "regular",
+     "flags": [],
+     "platform": "1",
+     "scheduled_arrival": "2026-11-20T20:41:00+01:00",
+     "scheduled_departure": "2026-11-20T20:46:00+01:00",
+     "estimated_arrival": "2026-11-20T20:57:29.500000+01:00",
+     "estimated_departure": "2026-11-20T21:00:29.500000+01:00",
+     "status": "actual",
+     "source_class": "gps",
+     "delay_min": 14,
+     "punctuality": "very_late",
+     "passed": true
+    }
+   },
+   {
+    "trip_id": "czptt:trip:Pa%3A0054%3AKT----21347A%3A00%3A2026:1",
+    "continues_as": null,
+    "call": {
+     "sequence": 34,
+     "location_id": "czptt:stop:CZ:33095",
+     "name": "Blansko",
+     "latitude": 49.353212,
+     "longitude": 16.646189,
+     "boarding": "regular",
+     "alighting": "regular",
+     "flags": [],
+     "platform": "2",
+     "scheduled_arrival": "2026-11-20T21:06:00+01:00",
+     "scheduled_departure": "2026-11-20T21:08:00+01:00",
+     "estimated_arrival": null,
+     "estimated_departure": "2026-11-20T21:21:29.500000+01:00",
+     "status": "actual",
+     "source_class": "gps",
+     "delay_min": 13,
+     "punctuality": "very_late",
+     "passed": true
+    }
+   },
+   {
+    "trip_id": "czptt:trip:Pa%3A0054%3AKT----21347A%3A00%3A2026:1",
+    "continues_as": null,
+    "call": {
+     "sequence": 43,
+     "location_id": "czptt:stop:CZ:34725",
+     "name": "Letovice",
+     "latitude": 49.556091,
+     "longitude": 16.57084,
+     "boarding": "regular",
+     "alighting": "regular",
+     "flags": [],
+     "platform": "2",
+     "scheduled_arrival": "2026-11-20T21:23:30+01:00",
+     "scheduled_departure": "2026-11-20T21:25:30+01:00",
+     "estimated_arrival": null,
+     "estimated_departure": "2026-11-20T21:38:29.500000+01:00",
+     "status": "actual",
+     "source_class": "gps",
+     "delay_min": 13,
+     "punctuality": "very_late",
+     "passed": true
+    }
+   },
+   {
+    "trip_id": "czptt:trip:Pa%3A0054%3AKT----21347A%3A00%3A2026:1",
+    "continues_as": null,
+    "call": {
+     "sequence": 51,
+     "location_id": "czptt:stop:CZ:54333",
+     "name": "Svitavy",
+     "latitude": 49.760076,
+     "longitude": 16.479852,
+     "boarding": "regular",
+     "alighting": "regular",
+     "flags": [],
+     "platform": "2",
+     "scheduled_arrival": "2026-11-20T21:42:30+01:00",
+     "scheduled_departure": "2026-11-20T21:44:30+01:00",
+     "estimated_arrival": null,
+     "estimated_departure": "2026-11-20T21:58:29.500000+01:00",
+     "status": "actual",
+     "source_class": "gps",
+     "delay_min": 14,
+     "punctuality": "very_late",
+     "passed": true
+    }
+   },
+   {
+    "trip_id": "czptt:trip:Pa%3A0054%3AKT----21347A%3A00%3A2026:1",
+    "continues_as": null,
+    "call": {
+     "sequence": 56,
+     "location_id": "czptt:stop:CZ:53913",
+     "name": "Česká Třebová",
+     "latitude": 49.896831,
+     "longitude": 16.447115,
+     "boarding": "regular",
+     "alighting": "regular",
+     "flags": [],
+     "platform": "16",
+     "scheduled_arrival": "2026-11-20T21:55:00+01:00",
+     "scheduled_departure": "2026-11-20T21:57:00+01:00",
+     "estimated_arrival": "2026-11-20T22:14:29.500000+01:00",
+     "estimated_departure": "2026-11-20T22:16:29.500000+01:00",
+     "status": "actual",
+     "source_class": "gps",
+     "delay_min": 19,
+     "punctuality": "very_late",
+     "passed": true
+    }
+   },
+   {
+    "trip_id": "czptt:trip:Pa%3A0054%3AKT----21347A%3A00%3A2026:1",
+    "continues_as": null,
+    "call": {
+     "sequence": 75,
+     "location_id": "czptt:stop:CZ:53613",
+     "name": "Pardubice hlavní nádraží",
+     "latitude": 50.031682,
+     "longitude": 15.756512,
+     "boarding": "regular",
+     "alighting": "regular",
+     "flags": [],
+     "platform": "2",
+     "scheduled_arrival": "2026-11-20T22:32:00+01:00",
+     "scheduled_departure": "2026-11-20T22:34:00+01:00",
+     "estimated_arrival": null,
+     "estimated_departure": "2026-11-20T22:49:29.500000+01:00",
+     "status": "actual",
+     "source_class": "gps",
+     "delay_min": 15,
+     "punctuality": "very_late",
+     "passed": true
+    }
+   },
+   {
+    "trip_id": "czptt:trip:Pa%3A0054%3AKT----21347A%3A00%3A2026:1",
+    "continues_as": null,
+    "call": {
+     "sequence": 92,
+     "location_id": "czptt:stop:CZ:53414",
+     "name": "Kolín",
+     "latitude": 50.025832,
+     "longitude": 15.212705,
+     "boarding": "regular",
+     "alighting": "regular",
+     "flags": [],
+     "platform": "102",
+     "scheduled_arrival": "2026-11-20T22:53:00+01:00",
+     "scheduled_departure": "2026-11-20T22:55:00+01:00",
+     "estimated_arrival": null,
+     "estimated_departure": "2026-11-20T23:11:29.500000+01:00",
+     "status": "actual",
+     "source_class": "gps",
+     "delay_min": 16,
+     "punctuality": "very_late",
+     "passed": true
+    }
+   },
+   {
+    "trip_id": "czptt:trip:Pa%3A0054%3AKT----21347A%3A00%3A2026:1",
+    "continues_as": null,
+    "call": {
+     "sequence": 114,
+     "location_id": "czptt:stop:CZ:57176",
+     "name": "Praha-Libeň",
+     "latitude": 50.100637,
+     "longitude": 14.502328,
+     "boarding": "regular",
+     "alighting": "regular",
+     "flags": [],
+     "platform": "0",
+     "scheduled_arrival": "2026-11-20T23:25:00+01:00",
+     "scheduled_departure": "2026-11-20T23:26:00+01:00",
+     "estimated_arrival": null,
+     "estimated_departure": "2026-11-20T23:42:29.500000+01:00",
+     "status": "actual",
+     "source_class": "gps",
+     "delay_min": 16,
+     "punctuality": "very_late",
+     "passed": true
+    }
+   },
+   {
+    "trip_id": "czptt:trip:Pa%3A0054%3AKT----21347A%3A00%3A2026:1",
+    "continues_as": null,
+    "call": {
+     "sequence": 116,
+     "location_id": "czptt:stop:CZ:57076",
+     "name": "Praha hlavní nádraží",
+     "latitude": 50.08309,
+     "longitude": 14.435978,
+     "boarding": "regular",
+     "alighting": "regular",
+     "flags": [],
+     "platform": "9",
+     "scheduled_arrival": "2026-11-20T23:32:00+01:00",
+     "scheduled_departure": "2026-11-20T23:43:00+01:00",
+     "estimated_arrival": "2026-11-20T23:48:30+01:00",
+     "estimated_departure": "2026-11-20T23:50:30+01:00",
+     "status": "predicted",
+     "source_class": "source",
+     "delay_min": 16,
+     "punctuality": "very_late",
+     "passed": false
+    }
+   }
+  ],
+  "next": 9,
+  "alerts": []
+ }
+}

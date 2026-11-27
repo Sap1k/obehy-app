@@ -183,7 +183,7 @@ private fun MotisAlert.toAlert(): TripAlert? =
         TripAlert(title, descriptionText?.takeIf { it.isNotBlank() }, severityLevel.equals("SEVERE", ignoreCase = true))
     }
 
-private fun MotisPlace.toStopCall(realtime: Boolean): StopCall =
+internal fun MotisPlace.toStopCall(realtime: Boolean): StopCall =
     StopCall(
         name = name,
         stopId = stopId,
@@ -233,7 +233,7 @@ internal fun decodePolyline(
     return points
 }
 
-private fun timePoint(
+internal fun timePoint(
     scheduled: String?,
     expected: String?,
     realtime: Boolean,

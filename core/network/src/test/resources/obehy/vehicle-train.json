@@ -1,0 +1,61 @@
+{
+ "release_id": "20261120T041034Z-eec05409a8ee",
+ "generated_at": "2026-11-20T23:48:15.435143+01:00",
+ "vehicle_id": "train:52",
+ "vehicle": {
+  "vehicle_id": "train:52",
+  "feed": "czptt",
+  "source": "sz-mapa",
+  "state": "running",
+  "last_seen": "2026-11-20T23:47:52+01:00",
+  "position_at": "2026-11-20T23:47:22+01:00",
+  "latitude": 50.087809,
+  "longitude": 14.44207,
+  "bearing": 219.31863276371527,
+  "trip_id": "czptt:trip:Pa%3A0054%3AKT----21347A%3A00%3A2026:1",
+  "service_date": "2026-11-20",
+  "line": {
+   "route_id": "czptt:route:line:3:1154:102",
+   "short_name": "Ex3",
+   "long_name": "Praha – Pardubice – Brno – Břeclav",
+   "mode": "rail",
+   "color": "b91c1c",
+   "text_color": "ffffff"
+  },
+  "trip_short_name": "rj 52",
+  "headsign": "Praha hlavní nádraží",
+  "traits": {
+   "low_floor": null,
+   "air_conditioning": null,
+   "wheelchair_accessible": null,
+   "manufacturer": null,
+   "model": null,
+   "operator": null,
+   "licence_plate": null,
+   "fleet_number": null
+  },
+  "sources": [
+   "sz-mapa"
+  ],
+  "distance_m": null,
+  "delay_min": 16,
+  "punctuality": "very_late"
+ },
+ "registry": null,
+ "reports": [
+  {
+   "source": "sz-mapa",
+   "label": {
+    "cs": "Správa železnic",
+    "en": "Správa železnic"
+   },
+   "source_vehicle_id": "TR/1154/KASO--996001/00/2026/20261120",
+   "state": "running",
+   "last_seen": "2026-11-20T23:47:52+01:00",
+   "bound_by": "train",
+   "physical": false
+  }
+ ],
+ "sources": [],
+ "attributes": []
+}

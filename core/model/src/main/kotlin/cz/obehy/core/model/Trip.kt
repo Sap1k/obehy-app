@@ -14,6 +14,8 @@ data class TripStop(
     val call: StopCall,
     val sequence: Int? = null,
     val flags: Set<CallFlag> = emptySet(),
+    /** The vehicle has left it, as Oběhy decides; null where nobody said. */
+    val passed: Boolean? = null,
 )
 
 /**

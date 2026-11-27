@@ -1,0 +1,492 @@
+[
+ {
+  "trips": [
+   {
+    "tripId": "20261120_23:45_cz-PID_240_3400_261103",
+    "routeShortName": "240"
+   }
+  ],
+  "routeColor": "007da8",
+  "mode": "BUS",
+  "distance": 10426.35546875,
+  "from": {
+   "name": "Háje",
+   "stopId": "cz-PID_U286Z3P",
+   "importance": 0.0004906220710836351,
+   "lat": 50.030334,
+   "lon": 14.525611,
+   "level": 0.0,
+   "tz": "Europe/Prague",
+   "scheduledTrack": "B",
+   "track": "B",
+   "vertexType": "TRANSIT",
+   "modes": [
+    "SUBWAY",
+    "BUS"
+   ]
+  },
+  "to": {
+   "name": "Háje",
+   "stopId": "cz-PID_U286Z5P",
+   "importance": 0.0004906220710836351,
+   "lat": 50.030666,
+   "lon": 14.529568,
+   "level": 0.0,
+   "tz": "Europe/Prague",
+   "scheduledTrack": "F",
+   "track": "F",
+   "vertexType": "TRANSIT",
+   "modes": [
+    "SUBWAY",
+    "BUS"
+   ]
+  },
+  "departure": "2026-11-20T22:45:00Z",
+  "arrival": "2026-11-20T22:47:00Z",
+  "scheduledDeparture": "2026-11-20T22:45:00Z",
+  "scheduledArrival": "2026-11-20T22:47:00Z",
+  "realTime": true,
+  "polyline": "qpjpHa`twADABd@Df@LxA`CoBFEd@g@JPLBPY?c@KMSBqBgD_AeBc@aA[mAWuBUwE"
+ },
+ {
+  "trips": [
+   {
+    "tripId": "20261120_23:45_cz-PID_240_3400_261103",
+    "routeShortName": "240"
+   }
+  ],
+  "routeColor": "007da8",
+  "mode": "BUS",
+  "distance": 10426.35546875,
+  "from": {
+   "name": "Háje",
+   "stopId": "cz-PID_U286Z5P",
+   "importance": 0.0004906220710836351,
+   "lat": 50.030666,
+   "lon": 14.529568,
+   "level": 0.0,
+   "tz": "Europe/Prague",
+   "scheduledTrack": "F",
+   "track": "F",
+   "vertexType": "TRANSIT",
+   "modes": [
+    "SUBWAY",
+    "BUS"
+   ]
+  },
+  "to": {
+   "name": "Horčičkova",
+   "stopId": "cz-PID_U151Z1P",
+   "importance": 3.742403714568354e-05,
+   "lat": 50.032000000000004,
+   "lon": 14.534417,
+   "level": 0.0,
+   "tz": "Europe/Prague",
+   "scheduledTrack": "A",
+   "track": "A",
+   "vertexType": "TRANSIT",
+   "modes": [
+    "BUS"
+   ]
+  },
+  "departure": "2026-11-20T22:47:00Z",
+  "arrival": "2026-11-20T22:48:00Z",
+  "scheduledDeparture": "2026-11-20T22:47:00Z",
+  "scheduledArrival": "2026-11-20T22:48:00Z",
+  "realTime": true,
+  "polyline": "urjpHyxtwA{@sOUkB[mAi@qAoAsBc@q@"
+ },
+ {
+  "trips": [
+   {
+    "tripId": "20261120_23:45_cz-PID_240_3400_261103",
+    "routeShortName": "240"
+   }
+  ],
+  "routeColor": "007da8",
+  "mode": "BUS",
+  "distance": 10426.35546875,
+  "from": {
+   "name": "Horčičkova",
+   "stopId": "cz-PID_U151Z1P",
+   "importance": 3.742403714568354e-05,
+   "lat": 50.032000000000004,
+   "lon": 14.534417,
+   "level": 0.0,
+   "tz": "Europe/Prague",
+   "scheduledTrack": "A",
+   "track": "A",
+   "vertexType": "TRANSIT",
+   "modes": [
+    "BUS"
+   ]
+  },
+  "to": {
+   "name": "Sochorcova",
+   "stopId": "cz-PID_U2729Z1P",
+   "importance": 4.448889740160666e-06,
+   "lat": 50.033367,
+   "lon": 14.539841,
+   "level": 0.0,
+   "tz": "Europe/Prague",
+   "scheduledTrack": "A",
+   "track": "A",
+   "vertexType": "TRANSIT",
+   "modes": [
+    "BUS"
+   ]
+  },
+  "departure": "2026-11-20T22:48:00Z",
+  "arrival": "2026-11-20T22:49:00Z",
+  "scheduledDeparture": "2026-11-20T22:48:00Z",
+  "scheduledArrival": "2026-11-20T22:49:00Z",
+  "realTime": true,
+  "polyline": "_{jpHcwuwAyCqEs@qA_@eAcA}D[u@_@uA|@aGViCDB"
+ },
+ {
+  "trips": [
+   {
+    "tripId": "20261120_23:45_cz-PID_240_3400_261103",
+    "routeShortName": "240"
+   }
+  ],
+  "routeColor": "007da8",
+  "mode": "BUS",
+  "distance": 10426.35546875,
+  "from": {
+   "name": "Sochorcova",
+   "stopId": "cz-PID_U2729Z1P",
+   "importance": 4.448889740160666e-06,
+   "lat": 50.033367,
+   "lon": 14.539841,
+   "level": 0.0,
+   "tz": "Europe/Prague",
+   "scheduledTrack": "A",
+   "track": "A",
+   "vertexType": "TRANSIT",
+   "modes": [
+    "BUS"
+   ]
+  },
+  "to": {
+   "name": "Newtonova",
+   "stopId": "cz-PID_U491Z12P",
+   "importance": 4.611300482793013e-06,
+   "lat": 50.0317,
+   "lon": 14.548058999999999,
+   "level": 0.0,
+   "tz": "Europe/Prague",
+   "scheduledTrack": "D",
+   "track": "D",
+   "vertexType": "TRANSIT",
+   "modes": [
+    "BUS"
+   ]
+  },
+  "departure": "2026-11-20T22:49:00Z",
+  "arrival": "2026-11-20T22:49:00Z",
+  "scheduledDeparture": "2026-11-20T22:49:00Z",
+  "scheduledArrival": "2026-11-20T22:49:00Z",
+  "realTime": true,
+  "polyline": "qckpH_yvwAECB_@HgHE{CAyHn@gExF{QNs@RL"
+ },
+ {
+  "trips": [
+   {
+    "tripId": "20261120_23:45_cz-PID_240_3400_261103",
+    "routeShortName": "240"
+   }
+  ],
+  "routeColor": "007da8",
+  "mode": "BUS",
+  "distance": 10426.35546875,
+  "from": {
+   "name": "Newtonova",
+   "stopId": "cz-PID_U491Z12P",
+   "importance": 4.611300482793013e-06,
+   "lat": 50.0317,
+   "lon": 14.548058999999999,
+   "level": 0.0,
+   "tz": "Europe/Prague",
+   "scheduledTrack": "D",
+   "track": "D",
+   "vertexType": "TRANSIT",
+   "modes": [
+    "BUS"
+   ]
+  },
+  "to": {
+   "name": "Jakobiho",
+   "stopId": "cz-PID_U338Z1P",
+   "importance": 1.584083292982541e-05,
+   "lat": 50.03308,
+   "lon": 14.559354,
+   "level": 0.0,
+   "tz": "Europe/Prague",
+   "scheduledTrack": "A",
+   "track": "A",
+   "vertexType": "TRANSIT",
+   "modes": [
+    "BUS"
+   ]
+  },
+  "departure": "2026-11-20T22:49:00Z",
+  "arrival": "2026-11-20T22:50:00Z",
+  "scheduledDeparture": "2026-11-20T22:49:00Z",
+  "scheduledArrival": "2026-11-20T22:50:00Z",
+  "realTime": true,
+  "polyline": "cyjpHklxwASMbAcFd@iEBoDy@yK{@gEgG{^NG"
+ },
+ {
+  "trips": [
+   {
+    "tripId": "20261120_22:58_de-DELFI_3486090767",
+    "routeShortName": "EN"
+   }
+  ],
+  "mode": "LONG_DISTANCE",
+  "distance": 692858.5625,
+  "from": {
+   "name": "Usti nad Labem hl.n.",
+   "stopId": "de-DELFI_000005400019",
+   "importance": 0.0007065513054840267,
+   "lat": 50.65956,
+   "lon": 14.044727999999997,
+   "level": 0.0,
+   "tz": "Europe/Prague",
+   "vertexType": "TRANSIT",
+   "modes": [
+    "HIGHSPEED_RAIL",
+    "LONG_DISTANCE",
+    "NIGHT_RAIL",
+    "REGIONAL_RAIL",
+    "BUS"
+   ]
+  },
+  "to": {
+   "name": "Praha-Holesovice",
+   "stopId": "de-DELFI_000005400201",
+   "importance": 0.0021808333694934845,
+   "lat": 50.110214,
+   "lon": 14.440012999999999,
+   "level": 1.0,
+   "tz": "Europe/Prague",
+   "vertexType": "TRANSIT",
+   "modes": [
+    "HIGHSPEED_RAIL",
+    "LONG_DISTANCE",
+    "NIGHT_RAIL",
+    "REGIONAL_RAIL"
+   ]
+  },
+  "departure": "2026-11-20T22:41:00Z",
+  "arrival": "2026-11-20T23:43:00Z",
+  "scheduledDeparture": "2026-11-20T22:14:00Z",
+  "scheduledArrival": "2026-11-20T23:16:00Z",
+  "realTime": true,
+  "polyline": "cmetHwbvtANZz@dBv@bBPZJPLVNTRXPVNPPRLL\\\\ZXj@`@PJHD^Rf@T`@LTFj@L\\HjB`@d@F^DjALzBPzARp@J`@FdAN^DT@N@T?^@`@?TAVAZC^EXG^IRCvA_@XGNE|GeBzBk@hBe@|@UlCq@DApFwArSiF`@Kt@Sx@SlBg@lD}@FAfD}@bB_@pAWbAS\\GrEy@zBc@TEvE{@~E}@hB[VEPEx@OxA]f@Oh@Qf@Sh@Yb@Wf@]l@g@h@e@^c@X_@~@oA~@{Af@s@X_@X[f@e@JGPM\\U`@SbAa@vAe@v@Yl@[j@]l@a@l@e@rAuAX_@hA}AbAcBl@kAt@_BN]Vq@^cAV_AV_AVaATcAf@oC`@mCVoCFs@Do@Dm@PeDNiDR}DPaER_E@_@NyCPgDPeEHwA@SDq@HgAFy@Hw@Lw@Lu@Ls@Nq@Ru@Ru@Vu@Xs@\\u@Vi@b@s@Xe@\\c@Za@^a@^[`@[b@YdAm@lAk@vAq@vAq@dBy@vAq@rBcA|Aq@p@Ul@S~A[nAOrAItA@vADxANtBXrBVrEh@|ARlBVr@Jr@Jt@Pr@Pt@Vp@Tr@Xr@X`B|@`E|BtAv@pAj@xAb@vAZvAPzAJh@DJ?j@DnAHnANf@Hf@NdA\\JDdAd@dB~@lBbApBfAlBdApAr@DBdAp@dAz@b@b@\\`@j@r@X`@`@p@Zh@Xl@Zr@l@dBX~@Nl@Rz@Pz@Nz@L|@J`ABPBZ@LF~@F`AB`AB`A@hCAnCElJCrJApC?n@CpDC~HCtHC|EAx@EnNCpJEvHAzC?`C?fA@z@BhADp@?FFdAF~@JbAL`AL|@PdAPv@Px@Tz@Vv@Vv@Zv@JZP\\Xn@LVjAdCnAhCl@pA\\r@pAlC\\p@Vh@Xn@jAdCpAlC^v@`@v@^p@\\l@Zf@\\f@LNj@n@d@d@`@\\l@d@TRfAl@h@Tj@TnA\\r@NNDf@JbBXnBV~@Fj@BD?n@?b@@r@Cr@Ep@Gp@Gn@Mr@Qp@Qp@Ul@Ut@]dAm@pAw@zFyD`C_BjBmAXSxAaAlFkDTOh@]FEjCyAbAk@`CkAZQ`A_@n@Qn@WNGhAa@RGRGf@M^In@KvAQtAKjAGfAApA?v@@x@@~@BxAJL?VBb@FbAPfAZRHXJh@T^L`Bp@TJDBvBdAt@b@ZNr@`@tBjADBZPbAj@pAn@j@Rd@Nf@Ld@Hn@Hl@DvABF?jEAxE?lBA`FAjE?fCAlACd@Ch@Ep@In@M^IZI^KlAc@`Bs@dCgA`@Qf@YFCl@[l@_@h@_@n@c@xAsA`BwAnBeB~AwArAkA`Aw@`@Yh@Y\\O\\Mt@Uj@Kh@Gh@E`BKtBIdBKtAKvAYrAa@z@a@LGh@[j@a@jAeAfAqAhA_Bx@_Bv@mBp@qBT{@T}@R_APcAb@qChAmIz@iGPoANaA`@wC`@yCf@iDZcBF_@P{@R}@Vy@Vy@Xu@Zy@^u@\\s@`@q@`@m@`@m@b@e@lAkApAaANKjAw@nBqAxDeCjAu@|@k@v@a@b@Sf@Sd@Md@K`@GRCH?l@E\\?X@h@Bj@H|@RTHPFd@P|@d@z@n@\\Vn@j@dB|AbBxAbBzA`BvAb@^x@t@|ArAbBzAbA|@f@`@|AtAdEtDjEvDpE|DhB|AdB|At@l@f@d@hB|ArE|DDDbBxAvCfCn@j@`@\\nAbAn@`@h@\\|@d@x@^`A\\`B`@`BX`BHjA@jAErAKnASv@Sr@S`A_@nAm@fBkAf@_@z@u@v@y@hAwAhAaBrA_CN[Ve@f@eAFMBITk@b@mA`@uA\\yAR{@ZsBLu@Hu@BMPyAZiCDUh@oEBU\\qCz@aHlA_KvAoLp@sF@QXyBXwB\\oCf@kEDUd@aEr@wFv@kG`@_DBURyAt@wFBO^yCx@sGjAwJt@kGlCwTz@kHXgCLmAHo@|@_It@kGBUh@kEJw@BWNqA^yCJs@?ExAqLh@mEFi@P}AfA_JrEe_@zAcMvHwn@`CsRxDq[dCeS\\aDpHom@d@qDHw@vD{ZZkC\\qCHm@bAqIR{A@KD]v@kGp@oFV{BDY@OZcCZiC`@}CjAuJv@mG@OHq@bAgIz@aH|@kHZkCBSd@wDD]@GFg@NkAr@aGb@oDD[@InAgK`B{MZeCtC_Vd@wDJu@ZyBLy@ZoBd@kC^gBLq@p@yCpAgF\\qAz@_DhAkEfA_Ez@aDzAuF|FiT~@kDFWh@qBv@qC~E}Q`F_RV_ArFsShByGfAeEn@}BzCeLpEqPtB}HlCaKzBkIRs@Lg@fByGzDuNPm@FY~EwQ|@iDPk@vAmFfDcMHYJ_@xAqFx@yChB_Ht@kCx@gC~@iCbAcCBIbAsBfAuB`AyAbA{Ax@eAv@_AbAeAdAaAVSb@a@l@e@ZSNMb@YnAw@hAk@fAi@bAa@lBu@f@SbC{@LEpAe@vBq@xAe@pC}@jC{@lDiAlDiAlDgAt@WtBq@lDgANEfCw@TIPGzC}@t@WJCZKVInDiAjC{@`IkCPG^Kz@YvBs@lFcBlC{@p@UrE{AhA_@dNmExBs@`DgAzAm@j@Sp@YrB}@jB{@nBeApBkAbBiAbBmAhCuBfBaBx@y@LM\\]jAuARUxAmBtAsBh@}@l@aAbAqBR_@LWh@gAnAmCjAkC\\y@d@iAZ_Ab@oAX_A\\mAr@wCf@oCToAPsAXuBFi@\\mDDg@TmCHy@Dg@NuA@ULsALwAX}CT}CTqDD{@?GBg@RyDJwBPeE?GB]PsFJsCBw@FmBFuBBu@@o@DcBBoC@_D@iAAmA?qACeBAsACs@As@Cw@Ck@Ei@Cm@Gs@Gs@I{@I{@WcCQ{A[wCGm@{@cIi@{ECUSoBUuBo@wF_@{Ca@uCi@mDUwAKq@]uBg@_CWaAUy@Y{@Ws@[u@[s@_AkBkAsB{AgCu@mAQYQYkAqBOYyAcCu@qAa@o@sA_C{AeC{AiCsA{BoAuBwAaC{AiC{AeCw@sAOYi@}@{CgFu@oAc@w@}AgCsA_CuA{ByAgCoAuBeAgBS]{AiC{AeC{AiCyAeCsA{B{AiCyAeC{AgC{AgCuA}BuAaCiAkBkAsBoAuBkAqBaAaBqA{BqAwBa@q@m@eAsA{BgAiBaAaB_A_BoAwBuAaCyAaCqDiG{AgCsA}BwAaCsA}BuA}BsA{BuA_CyAiCmAsB{AgCWc@c@q@Yg@sA}BwAcC}AiCcAcBMUoAwBiAkBgAkBiAmBgAkBuAeCe@{@_@{@c@_A]{@_@cA[_A_@kAYeA]mAUcAUgASgASgAM{@Gi@UgB[}C]sDYcD?I[kDSuCC]Es@GmAEmACcAAQ?MCeB?_A?y@?m@?y@Bq@?o@Bu@Bw@Dw@Dw@Du@Fy@Ds@Hw@JgAHs@Hw@DWPiAPgAN}@Nu@h@kCp@eDr@gDj@eCPu@Pq@Po@Pm@Tq@Tq@Zy@Xu@Vi@`@w@Zo@\\i@`@q@Zc@V]\\c@Za@X[\\]l@k@t@m@p@e@t@e@bAk@tAm@fAg@ZOFCx@a@p@[ZOPGJGHCtCsA`DyAnDaBzE{BbBu@`@SdAe@xAo@fD}AlAm@tAm@dBy@DA\\QzCsAd@U|CwAlB}@~CwADAVMdAi@rB_APIhCmAdBw@jAi@zAs@tAo@vAo@zAs@|As@zAs@|Aq@zAs@vAo@nDaBXMpAm@dBw@dBy@dAe@fAg@|As@xAs@xAo@tAo@rAo@xAo@tAo@vAq@|As@tAo@zAq@rAo@|Aw@d@Wh@[ZSJEf@_@l@c@j@e@d@c@d@e@h@i@f@m@d@k@`@i@f@s@b@s@`@q@^q@`@w@^u@`@_A`@{@Tk@Tm@Pe@bT}i@l@_B`ImStCoHZy@tAoD|c@ejAtL}ZdO}_@xJ_WzA{DbAgC`@aA^}@^}@^u@b@y@b@s@^q@\\g@h@u@h@s@j@q@h@k@f@k@d@c@lAgAnAeAtAmAlAeArAkAnAcAnAgAlAgApAgAlAeAhA_AJI~@{@ROjAcA~AsAz@w@|@u@jAaAd@_@h@e@xBgBJKvBgBdByAHIFEn@i@xAmA~@y@z@q@hAaAnAeAfAaA|AqAzAsAxAoAvAmAtAmAzAqAzAqAZYZWRQr@o@\\YLKdB{AZWXW`BuA~@y@x@q@POXUpA{@h@Yj@Yd@Qd@Qh@Qj@Oj@Ml@Kf@Gh@Gx@EVA~@?T?tAFxAPlAXtA`@rAf@rAt@nAx@zApARTFDZZfApAbAxAbA`BlAtBlAtBpAzBnAxB`@p@RZb`@|p@rXte@pAxBdAjBV`@|@zAtMdUts@hnArG~KbEfHhB`DNTvEfIZd@`Sh]n^ln@|IjO`AbBJRfAjBzClFdCjELTfAjBx@xAHNr@nAtAbCDHfB~CvCfFrBnDhAnBPXpBhDzChF`DrF~AnC`AbBdA`BPZ\\j@p@hAFHp@hAHLrAzB^l@nB`DxCfFnAxBbDtFvBpDrHnMrI~NjKrQbFtIlAtBtC`FhArBdAvBZn@Vr@Vn@Tn@x@~BZ`AV~@XdATbAh@jCl@~Cl@hDPdANx@F^TjATnAh@dCLf@ZrAh@zBt@tCr@rCv@xCx@`Dv@~Ct@xCx@~Cx@~Cx@tCXdAhAlD|H`UdArC`ArC|@dCl@dBXr@l@`Bv@lBp@xA~@hBf@x@d@t@b@p@f@n@lAvA\\b@b@`@d@d@l@h@l@b@j@`@l@b@l@\\h@Xf@Vj@Vh@TpAb@xAf@jBl@dCx@^L|Af@tC~@|Bt@j@Pb@PD@RFlBl@lBn@pBn@rBp@hBl@rBp@jBl@`Bh@PFvAd@dBj@pBn@nBn@~Ah@fBj@hBl@rBn@pBp@lBl@hA^`@NbBh@fBj@fBl@bBj@t@VFBbCx@nAb@`@Nd@N~@Z`@NrC`A~@ZtDlAbA\\dCx@d@Nh@PhA^vAd@n@T^JxBr@fBj@pBh@xAZhB^hB^lB`@J@j@LxAXbB\\dB\\hB\\lB\\bBZF@nARzAVfBZlB\\hBZjB\\xB`@lBZnB\\NBrAVrB\\nB^xAVrB`@tATbBZlB\\dBXTDjAT`BXdBX~Bb@t@LVDn@Dd@Bp@BR?vABt@@`@@f@Bd@Df@Hj@Jh@Lf@Jl@LxAZx@Lh@Fb@@h@@h@?t@E`Oy@bCMbCMxEYtCQxCQp@Ev@Gh@Ch@E~@Ez@Gt@Kr@Mp@Op@Sz@[v@[HEbFwBn@Yn@W`Ac@fAe@hAi@h@[f@]FEjAaAb@[dA}@|AsAlAaADE~AsAXWl@g@`A{@\\]p@s@PQt@cAV_@d@s@DGHOhAwBVi@L]Zs@Pg@Ne@X{@Pm@Nk@Li@Li@Hc@Je@Hg@Hc@Hg@Z{BHg@NeAXuBXsB`@qC`@sCTiBf@oDh@}DRwA@KJq@BYDm@BYHs@DYfA}Hx@cG`@{Ch@yDdAwHb@{CJo@X}AHi@Ns@Ji@Ns@No@\\wA`@gBl@eCf@wBd@iBTw@Z{@Tk@Rc@P]P]JSNWR[LUT[`@g@FKX[`BcBzA_B`@g@d@i@^i@^m@x@wAr@cBp@iBr@wBp@qBr@uBNe@DMl@qB\\cAn@oBr@wBz@kCz@kCx@eCf@}AL_@n@oBHWHS`@iA\\{@Xq@`@}@^u@d@}@`@s@h@y@`@o@d@m@f@q@lAsAjAgAn@g@^Wj@_@h@Yf@WPIZOj@Qn@SfBg@VGh@Mj@OdBg@jBe@pBi@hBg@nA[jA[JCTGn@MpASfAGj@Cj@?j@@j@DrAJxANd@Fj@J`@Jn@Pf@Rh@RfAj@bAh@`Ab@nA`@z@PbAH`@?d@?^Cb@Eb@Gh@KfA]bAc@f@[h@]d@a@^_@t@y@l@}@f@{@Vg@Rc@Re@Nc@Tq@Rs@Nk@Nm@`@uB`@{BPgABIr@aEd@eCr@eETkAJm@Nu@Ps@No@No@Ri@Tq@Pi@Pa@Vi@Ra@Ra@Xg@PWDIFIl@y@X[Z[t@m@r@e@bAc@`AYx@Ov@Ex@A`@AD?pAAdAALAd@ERCd@I^K`@M\\M\\Of@Yf@]d@a@r@o@`@g@X]`@i@Xc@f@w@Zk@Xk@Xk@Vm@t@kB~@eCv@sBdAmC`@aAz@oBFQvAgDN]FQLUVm@Xk@h@_Al@{@x@{@n@i@DCrAy@jAq@~Ao@j@Sn@QpAWzAOvACrAB~@HnARfBd@zAh@`Bn@hBp@t@Xl@VbBl@~Ar@`B|@vAbAxAjAtArAbAjANPlA`BhAjBdApBdAvBh@jANXlAjCfA~B~@tBz@|Br@zBn@fCh@fC`@jC\\jCXdCT`CX~BZ|Bb@vBd@pBl@lBp@nBZr@\\t@fAvBhAvBfAxBr@tA~@`B~@xA~@lATTVVXX`@\\b@XfAp@fAh@jA^jAV|AR~AT`BPp@D\\?j@@f@AnAKpAYd@Mj@Sx@a@x@g@b@[ZYl@k@hAqAnAcBlAoBdAsBx@kBn@mBj@qBXuANw@Ly@Fi@Jy@H{@HaADcAF_AB}@?eAA_AAyCEoDG}CGqCOcCSeCC[My@Io@QeAQ_Ag@sB{@gDe@eBi@mBs@mCw@{Cy@yCs@sCU}@CKMo@YaBQiAQkAKcAMkAKgAKsAGkAGmACcACoAAaA?oAA{@@_@?u@?eA@qD@gD@qD?oD@mD@qD@sD?kDAsDC{CEqCEsCG}C?WGsCGmDEkDGoDIiDAiACsAAeA?_A@aA@u@B{@Dw@Dy@Fi@De@B[Hq@Lw@N}@`@mBRw@Rq@n@gBLYd@aAZm@^k@Ze@^g@`AgAbA{@d@_@f@Yd@Wp@YVK`@M`@Kb@I`@G`@Cd@Ab@@b@B`@Dd@Fd@J`@N`@P~@h@pAbA|AxAt@l@NJLJb@VVLZN^L^L`@Hd@HjALD@P@ZDvANTBl@FhAJT@pBPvGd@jBJ|CP|CTdG`@fBNt@FlAHbCNlCRb@BrCTvCRtE\\jCRx@F`BJzE\\vE\\vEZl@FdIj@zBRtATvA\\bA^fAf@fAj@rA|@rAdA`@`@n@n@dAlA~@rAt@vAVd@Zj@Xb@Zh@n@v@r@r@z@r@x@b@t@Zl@Nl@Ld@Fj@B|@B\\Ab@EZCd@Il@Qt@Ud@Un@]n@c@l@e@\\]TWl@y@h@u@x@}Az@kBxC{GhA_Ch@cAZg@V]h@u@p@w@p@m@j@e@p@e@r@c@t@[n@Wl@Qn@M~@Kh@Eh@Cv@Al@@h@Fl@Dn@Jf@Ln@Rv@Zt@^z@l@~@t@~@|@j@r@b@n@Zf@Zn@`@v@z@hB`@v@h@z@l@v@h@n@l@j@^\\^VZRh@Zh@Vf@RPFp@TzAd@hBj@~Af@hBj@vAb@z@XRFb@Jd@JH@b@Fl@Dl@@x@Ar@Iz@OhA[fA_@RITMVKb@Wz@i@^Yt@o@HItA}Ap@_AR]Xg@P[JSDKZq@\\y@jAgCl@sAjBcEFOxAcDp@}AzI_SbDsH\\w@rA}Cp@_BXy@Xw@Lg@Nm@Lm@H]Jq@F_@Fa@Hu@Hu@De@Ba@Bc@Bc@@e@Bi@@e@?i@?Y?s@Aw@Ao@GiAAUASEc@Ei@Ec@Ii@Ge@Kk@Os@Oq@_@sA]oAk@qBe@iBm@_Cs@uCiBeHs@uCc@iBMg@Mm@Qu@UqAY_BMcAOeAOoAMiAMuAMyAGcAGoAEgACcACkCAWAoA?u@?e@?g@@k@@eACcC?a@CkB?[AoBASCkDAcBAy@CuCA}AAoA?w@?k@?k@@s@@kBBu@?e@@]?c@?kR?k@?_C?a@?e@Ac@Ae@A[S_HAe@"
+ },
+ {
+  "trips": [
+   {
+    "tripId": "20261120_20:12_cz-CZPTT_czptt:trip:Pa%3A0054%3AKT----21347A%3A00%3A2026:1",
+    "routeShortName": "Ex3 (rj 52)"
+   }
+  ],
+  "routeColor": "b91c1c",
+  "mode": "LONG_DISTANCE",
+  "distance": 232359.046875,
+  "from": {
+   "name": "Praha-Libeň",
+   "stopId": "cz-CZPTT_czptt:stop:CZ:57176:platform:0",
+   "parentId": "cz-CZPTT_czptt:stop:CZ:57176",
+   "importance": 0.003261878853663802,
+   "lat": 50.100636,
+   "lon": 14.502327999999999,
+   "level": 0.0,
+   "tz": "Europe/Prague",
+   "scheduledTrack": "0",
+   "track": "0",
+   "vertexType": "TRANSIT",
+   "modes": [
+    "LONG_DISTANCE",
+    "REGIONAL_RAIL"
+   ]
+  },
+  "to": {
+   "name": "Praha hlavní nádraží",
+   "stopId": "cz-CZPTT_czptt:stop:CZ:57076:platform:9",
+   "parentId": "cz-CZPTT_czptt:stop:CZ:57076",
+   "importance": 0.007628875784575939,
+   "lat": 50.08309,
+   "lon": 14.435977999999999,
+   "level": 0.0,
+   "tz": "Europe/Prague",
+   "scheduledTrack": "9",
+   "track": "9",
+   "vertexType": "TRANSIT",
+   "modes": [
+    "LONG_DISTANCE",
+    "NIGHT_RAIL",
+    "REGIONAL_RAIL",
+    "BUS"
+   ]
+  },
+  "departure": "2026-11-20T22:42:00Z",
+  "arrival": "2026-11-20T22:48:00Z",
+  "scheduledDeparture": "2026-11-20T22:26:00Z",
+  "scheduledArrival": "2026-11-20T22:32:00Z",
+  "realTime": true,
+  "polyline": "_hxpHqnowAs@pHQhDIfCIlJSlJkB|]gA|[CzEF`DRzD`@zDdAzFxBjInCxHrCfGxBvDhCpDfTlWdBhC|@fB|@xBrApE|EvUtDbRjCbOtFx_@n@lG^rGz@j^VdFTdCb@~CvBbKlBfGj@hAjAzA~CfCxNrJS`A"
+ },
+ {
+  "trips": [
+   {
+    "tripId": "20261120_21:55_eu-flixbus_N60-13-2155112026-WIF#B-00",
+    "routeShortName": "FlixBus N60"
+   }
+  ],
+  "routeColor": "73d700",
+  "mode": "COACH",
+  "distance": 540557.625,
+  "from": {
+   "name": "Vienna Erdberg (Busterminal VIB)",
+   "stopId": "eu-flixbus_dcbdc34e-9603-11e6-9066-549f350fcb0c",
+   "importance": 0.003190715331584215,
+   "lat": 48.190870000000004,
+   "lon": 16.414007,
+   "level": 0.0,
+   "tz": "Europe/Vienna",
+   "stopCode": "WIG",
+   "vertexType": "TRANSIT",
+   "modes": [
+    "COACH"
+   ]
+  },
+  "to": {
+   "name": "Prague (Main Railway Station)",
+   "stopId": "eu-flixbus_9b6adf5b-3ecb-11ea-8017-02437075395e",
+   "importance": 0.0015119409654289484,
+   "lat": 50.083583999999995,
+   "lon": 14.435296000000001,
+   "level": 0.0,
+   "tz": "Europe/Prague",
+   "stopCode": "PR1",
+   "vertexType": "TRANSIT",
+   "modes": [
+    "COACH"
+   ]
+  },
+  "departure": "2026-11-20T22:42:00Z",
+  "arrival": "2026-11-21T02:25:00Z",
+  "scheduledDeparture": "2026-11-20T22:30:00Z",
+  "scheduledArrival": "2026-11-21T02:25:00Z",
+  "realTime": true,
+  "polyline": "_iceHsydcBEOI_@Ea@Ea@C[AY?WAWCkDCiD?_@A]C_@Ec@Ea@G[I]K_@KYMYKQKQMOOQKKOMOKSMYOa@Q]Ke@Ic@Eq@Cw@?{A@c@AWCWGYKUGSOQMUOg@c@g@w@iAkBgAeBa@o@_Wab@uBiDYg@{AeCuDsGoAuBwAaC_BkCiCgEsBkDsAwB}K}QwFiJaAaBaA_Bc@s@e@w@mB_Dg@{@m@aAWc@oDeGkB_DgAgBSSaBeCy@aAw@y@o@i@m@_@{@a@m@Uk@My@Ms@Ek@AcA@u@DwABaA@aA?yBAyKE{@Ce@Ec@G]K]Io@UoBy@{Am@uBw@q@Wu@U{Ae@kBq@i@Wq@_@_Ao@w@u@q@y@gByBk@q@y@w@uA}@aAi@yAk@yHmCiFcB_GeBe@OgAa@_Ag@yAy@w@g@e@_@eA}@}@}@qA{AiCmDo@y@k@o@g@g@o@g@_Ak@gE{BwH_Ee@WuEcCc@WeBcAc@YoA}@sAeA}AoAkBcBq@u@qAwAiAsA{@eA}AuBwBsCe@m@iDsEq@{@m@y@g@o@o@y@yAmB_AgAuA}A}@_AaA_Aq@q@gA_A{BiBwD{CgA}@}BiBaAs@w@i@mAw@iAo@wC_BwCqAqCkAoBq@iBi@m@Qk@Mg@Me@Kq@Mm@Ki@Im@IoAQsAOw@Ec@Ac@?g@De@Di@Je@JsB`@aALk@Bc@?e@Ae@Ic@Ie@Oe@QeEeBsAk@uCkAGA]Qm@[k@_@e@_@a@c@Y[SYYa@g@{@[s@[s@Yy@Su@Oq@Ou@Ko@S}AQiBQoBMkBI{BEuBCiD@wCFmCJmCNgCX{C^wChAuGbAcGPgBPiBNsBNiCHgCDkC?gBAqBE{BI{BKoBSoC]yCc@}Ce@oCYoA[wA[mA_@mAe@{Ag@uAk@wAo@yAe@}@k@{@k@{@k@u@m@q@u@o@o@i@w@g@m@_@{@_@aA]eAWeAWqCm@mG{AoBi@mA]_AY_Bm@uAm@eBy@o@YyC_BoGiDsEgCyBiAeCwA}DuBaCqAuDqB_Aa@{@]q@UeA]s@Q_B]sAU_BOqAIoACqAAyAD}AH{ANgAPcARsA\\qAb@aA^s@XiAh@uAt@qAx@_DlB}KbH}BpAaChAaA`@{Ad@_B^wAVyAPcAHwAFwABiBCiBKmBS{AWgAWoCw@mEcBsCiAmBu@iDoAcDoAoAg@sIeDwJyDkAe@}IkDkCy@_Ck@sB]}BWmBMeCIeB?uCHsDTkCJcCHuCBuDAgEO{CQmFi@wBUq@IwAIsACuB?uAD{@HoBVm@Fu@LsA^qA`@eBl@}@^cAh@qBjAeBpAwBhByAvAiApAiBdCkBxCkU~b@_@t@}JpRqBtDyArCoHhNsAbCeBbDiDrGw@|Ao@xA{@xBg@|Aw@tC}@|De@nCS~AWvBUvBe@xCKp@Q~AOpAQrAOfAMp@I\\GXQp@Oh@Qj@O\\Uj@[l@S^U^e@n@WZ_@^UTOJa@X[RUNUJWJ[L_@Jc@Ha@Ha@B_@B[@[AYAYCSC]E}AQqCg@gC]sAQeCSgAGmAGk@?i@AgAAoAAW?sA@iDBaE@kCCwAEqAGqCUkAOqAUoAWqAYgA[eAYoAa@{Ak@gAe@q@Yw@_@}@e@eAi@_CoAo@_@iAg@}DaBaA]q@SuAc@cAY{Cs@aDq@aAU}FkAsEy@{Du@kBa@aE_AcGoAcDm@oB_@qFcAoFcAoDw@y@S{Ae@i@Qi@U_Ae@g@[{@i@e@_@g@c@e@a@i@i@o@s@i@q@Yc@g@s@i@{@_@q@[m@a@}@e@gAaC_GuAeDyBaFYq@oBmEqAyCiBgEaBiEiA_DwAoDk@wAy@kBo@yAaAoBmA_Cg@}@o@gAy@sAoAmB_BcC}@{Aw@yAy@eBm@wA[y@Um@k@_Bm@qBe@_B_@_BYsA[wA_@iBw@eEeAcFgAgFsAaGqAwFo@eCo@iCg@uBm@}B}@iDu@oCy@oC]iAi@_B_@gAs@oB]_AaAeCe@iA]w@_@y@_AkBg@_Ay@uAU_@{@sAw@mAyAuBcByBi@q@i@q@aCiC{@}@kAgAyAoA{AkA}@q@{@m@aAo@iAq@oSiLwKiGcQyJeQyJeCwAgBcAuEmCeMmHgFyCwFcDkEeCkBgAsDuBw@e@sBkA_RqKqO_JiHeEaB}@iB_A_A_@gA_@kA]_ASiAQoAO_AGy@CeA?iA@iAFm@Dw@HaAP}@Pw@RcAZ}@Z_JjDqDpAuDpAeGpBuC|@aAXeAXs@RsAVmAVwB\\kAPoANwBRqAHaCJsBDyB@aCA{AEcCOgBMcAKeAMkBWw@M{@OiB_@uA]_Co@}@YcCy@_Bk@wAi@}B}@sDaBkB{@iB{@}CaBwCaB}DaCwCkB_C_BoDkCeAu@iA}@qBaB{AqAmC_C{BwBaCaC{B{ByCaDmD}DwAaBsA}A}D_FiDkEmDyEcE_GmE{GqAqBuAyBiAoBwA_CgAkBmBkDaAgBwBaEeBeDaBeDqCaGoAmCa@aAm@wAiA}Ck@gBc@}Ai@oBg@sBe@{B]cBW_B[sB]qCOqA[eD_@oEO{AOgAOsASqAYyA]cBa@iBc@_Bi@eBk@_By@qBo@wAq@uAy@wAy@oAm@_A]a@[a@y@_Aw@y@q@m@q@k@_As@_Am@}@g@q@_@e@ScCeA_CaAmB{@yDeBkCoAq@[cFgCcE{BuDuB{@e@oDwBoDyBmBqAsCsByBeBsAiAsAmAsAqAoAmAqAuAeCqCw@_A}AoBaAqAaAuAyAuB_AwAcC_EaBuCsAiCqAkC}@kBu@cBa@}@iAmCuEsKiAkCs@eBq@}Aa@{@a@y@q@sAs@oAw@oAq@cAk@y@q@}@m@u@e@k@i@k@k@k@i@i@s@o@w@o@{@q@_Aq@y@g@q@a@uAu@wAo@iAc@kAc@gA[iA[yA[eASkAQ{AOcBKwAEaAAqA@oABmBF{DLof@bBmBDqB?kBEyBIgCOyBSuBYyBc@wBg@sBk@wBs@iBs@_Bq@yD_BeAc@id@oR{LgFaBq@iBq@qBo@wAa@wA]u@O_AQgBW_AMeAKqAKmAGqAEkACaB?sBBiADyBLuALyAPkAPqATwAXkBd@_Bf@kA^sAf@iAd@oAj@kAl@kAn@qAt@gAt@cAp@}@p@u@j@iA`A{ApAaHfGqKlJkEvDoBdBoA~@eAr@q@`@m@XwAl@iBr@aAXkAZgAT}@Nw@JaAHu@Fs@B}@Bg@?{@?q@Cs@Ey@EoAQgAQqAYgAYmA_@kAe@kAg@y@c@kAq@wA_AuA_A_C}A{@k@kAq@m@[o@]{@c@s@]cAa@wAk@sAe@eA[aAWeAW{A[_Ce@eAUgAY}@Uq@Uu@Uw@[kAe@eAg@cAe@gAm@wA{@}@m@aAs@uAgAcA}@u@q@a@a@QQm@o@q@u@o@u@q@y@i@q@y@gAq@cAk@{@g@{@s@mAq@kAo@qAo@sA[s@e@gAi@mAe@kAm@cBu@yBk@iB]qAc@aB]sAe@uBS_A[wA_@sB[uBYeBS_BSaBa@kDuFqf@eC{TgAqJu@_Hu@gGa@kD[}BWgBYkBYcBYcBa@yBWsA]{Ai@yBc@aBg@cBa@mAc@sAy@{BeAgCw@eBYk@cAoBs@qAq@gAs@gAuAkBmA}AcAiAaAgAmAiAiAaAgA{@cAw@_Am@aAm@aAk@iAm@a@QwAi@mAa@gA[oA]y@Sw@MgBW}AQqBMuAEsAA_B@oAF_BJ{ANuC`@w@LyAR[DWB}@HaAHoAFkADiB@}A?_BCiBIeAIu@GmBSm@IcAOy@QkBa@mAY}@WaBi@iAa@q@Y{@]}@a@mBaAaAi@w@g@{BwAaBmAkDcCaEsCmDsCwB}AgPsL{DsCqBwAeBkAqAy@uA{@}A_AaB_AeB}@_B{@}Au@gBy@aCeAaBo@sBy@}Ak@uBs@mBm@sBk@aBc@yA_@}@S{@O{@Os@KkAO}@KMAkAI}@CiAEgAAyA?uADgADgAFaAJeAJaANm@H}@P_AR_ATkAZeA\\u@Vy@Z{@\\iAh@gAh@aAh@{@h@s@b@o@b@{@n@iAz@eA|@w@p@o@n@q@p@IJm@n@}@dA{@bAw@bAgAzA}AzBq@bAgGbJ{FtI}A|By@jAo@~@m@v@o@z@eAlAm@p@gAbAu@n@yAhAoAz@gAp@_@Vq@b@u@h@m@`@u@n@m@h@eAbAw@v@g@j@s@|@k@t@g@r@g@t@oAvB_AjBkAbCiAdCgI`RgNj[q@~Ao@vAwArCw@xAmAlB{@lA]b@u@~@gBjBy@x@s@l@}@t@cAr@y@f@{@f@oAn@aAb@qAb@eA\\aB^gB\\cBRqAHiAD{EByPRoBDiAFeAFu@Ho@J{@Lw@NcAVm@P{Ah@s@XqAl@gAl@gAn@gAv@mA~@uAdAoA`AaAp@y@f@e@Xo@\\s@\\s@ZkAb@}@X{@Tm@Nw@Nm@Le@F}@Jy@FyAH{@@eB?s@CiAGs@G}@OeAQcAUw@Sm@Oq@Uw@WwB}@aEeBsCaA_@K_AUsAYgAQ}AWsB[q@Ig@CS?c@@[B]BsAHo@B[?_@?c@C[Ei@GwAUc@Ea@AIAaAOoDi@wB]_LkBcQsC{B_@uQyCoQuCaBSy@EiACmADcALq@L}@Tu@VkCdAoDpA{@X{@T_@H]H}@NcAJ}@J]GUAKCGAEKGGGCI?IBGHEJAH?J?HBLBFDFDH@PFrAApB?xACz@El@Il@Mt@On@Wr@sAfDm@|Ay@fCu@lCo@pCg@dCg@vCa@`Dk@rE[rB[hBa@lBc@hB]pAk@fB_@fAKVq@`Bk@pAw@zAm@dA{@tA{@lA_AlAiAnAcA`A_At@}@r@aAn@y@h@w@^iAf@sAd@_ATo@NeAR_ALsANiBXaC^iARoAT}B\\iBXcDj@sBZmCb@eHjAgC`@yAViDh@oC`@{APgANcAFuBJcB@aBA{AIaBKqBWkBYwA_@uBm@sBu@_C_AsB}@_G}BqEiB{EkBkEeByJ{DmHwCm@[g@[]S]Yg@g@Y]]e@g@{@a@o@IMU[U[e@k@GGCGCS?MCMCKGKGGKCI?KBGHK?G?KCOC[?OA]?YDWDcCj@kGlAm@Lc@HuCj@cCf@UDm@JqAVODm@LQD_BZ[FI@qAVoAVeB^eDp@mGlAmDt@oB^aMbCk@LOBSDs@Ni@Ju@Rq@Ti@Ps@Vw@^u@`@q@^o@f@{AlAUBa@IUMk@II@GBIDMJy@r@yApAQj@Yl@MVKf@Ad@ERqB~Ac@Vg@Z_@Nc@Pe@Ne@Le@Hi@F[B_CTsDXm@HwAL]DwAJ{Ed@kBRc@DcAL[FYH}@Xu@\\{@j@ED}@r@WXi@h@UZS\\S^kA`CWp@EEGCG?GBGFCJAJ?LBJFH]v@kBfE[p@g@~@e@p@y@`AMNYTa@\\[Ti@\\_@Pe@Py@XyA\\cALcAHmGl@AKEKEEICG@GDEHCJ?JkVtBcJx@m@FuCV}D^y@Hg@JAICGEGECE?G?GFGJAD?F?FUFg@J]JqAd@{@^u@`@]R]X}@n@w@|@mC~CwF`KqGbJmIzHuWfQsGtCyBbAaEv@iBXiBTkDV{DX_CPeHf@yl@hEYB{_@pCyL~@aF^{ANeEXs@Fs@HqD\\cAHyCTkCTy@FmIp@oE^qE^{D`@cAJgBR_BRs@Ho@DgDf@qAR_Db@kAPyFbAwA\\ihAxQ{DbAiCr@eC`AaAd@o@ZmAx@mA|@kAdAgAhA{BpCyAvBi@|@}A~BgXtc@iBvCuAhB}@fAq@r@uAlAw@r@{@j@{@h@wAt@{B`Ai@Ro@T}@ZyAh@{Af@_Bh@_Bh@QFaBh@uDlAsd@rOcAb@i@X_Aj@c@Z_At@y@`Ac@l@s@hA_@v@e@dAk@dB]pA[zA_@tB[xB[bCSzA[jCm@|CMx@_AjGa@fBY`A]lAa@hAgAhCiAxBcA`B{ApBkBnBkBbBwQ|MiCpB}BnB{BfCyAhBuAvBwAlCsAzCaJvT}@vBkBlEeAjCiBtEyAvDoB|EmCvGeAfCiBnEkBtEcBbE_E`K}@zBmB|EaWno@gFnM_A|Bs@zAw@tA_AhA}@~@eA~@iAr@oAj@kA\\{AVuADeA@qCYqBYyAQmBSoCIqCBmBLmBTkBZkAVm@RcEzAsCxA}DvCkB|AsDhE{BzCcInLyAjByBbC{BtByBbBaBdAo@\\q@\\gBx@aA^{Bp@y@TeB`@{UzEkMhCiGnAOB_APoANqBTmA?mABeCBqAAiACy@C}@IeAIuASo@Kw@M}@U_Bc@yAg@gAe@}As@{Aw@_BcA}AiAy@o@y@s@wAuA{AcBaC{Cm@{@y@oAaA_BQ[a@q@mBoDsB{DgBqDk@iAsBeEoBwDiBgD}@_B_BoC_CuDgCwDsC{DgB{BOQgDaEqFwFmCkC_CqBmFcEm@e@oCqBsCqBwBuAqBoAyMmH{FkC_Bs@e@SiEeBcA_@{Ag@OGgA]sC}@gEiA_EaAuBa@wAWkCc@gC]_BQiD[UCeF_@{CO_CIiGOeJIcMDiDFeBBoCHoDJqDNcGXeF^cJt@wHv@aEd@gFj@wFv@}Fx@aFv@_LdBwMzByN`C_HfAcG~@{HfAyDd@oEf@cEb@sCVoCRwG`@kDNmADcCFoBBsDBoDA_ECkEKsBIeBIsDSeE[{CYoDc@eCY}AUyB]eB[gB[mDs@}D_AaDw@wEqAw@WQEqAa@uBs@QGiDkAcGiCwBcAkBcAaAi@kAm@oEsC}AeA{@m@kBwA{@q@SMsBgBuAiAmB_BeDsCwG{FoE{DwJwIkEyD_LcK}AsAkBkB{A{AkDuDkC{C}@kAoBiCeBeCcBiCk@{@kAoB}BgEy@{A{@gBqAoCsBwEsAiDeAoC}AoEcAcDmA}DuAiFmA{EeAyEkFaWwBiJiAyEa@}AIWCMy@_Dc@wAm@oB[cAy@gCw@wBe@oAg@qAe@iAaA}Bk@qAiAcCkA_C_AcB_AaBeAeBg@y@u@iAo@aA_AsAs@_A{@gA{@eAgBqBQSEGeCiC}A{AwBiBgCuBwB{AiCiBgAy@]UiEqCgBiAsAy@uC}AsAo@sCyAkC_AgA_@aCy@}DiA}@WeAUaF_AsBY{BWaAKqAK}@IiCKuAGkDCcC?uEHyBHca@dBaQj@oDN[@yCLkHXyDJ{@@{DFy@@sE@}A?[?aNGiJ@qL^wAByJp@{x@pH}i@pF_Iv@_E^qANy@FOBwHt@_AJ{BRMCMEKGKKKKKOCMCMCO?M?O@O@MBMDMFIFIFGHCHAH?H@HDHHFHDJDJBL@LBPLxAO~BKlB[vFSfDk@jKgApReAvQGtAKzBMvCGpBMzFClDAnB@xBDpDBhBBxADxAJhCNlDBb@nAtUJdCHnCD~BBrC@xCAtDEnCGrCKvCE`AOnCQbCWzC[zCg@fEQpAeAlGa@pBi@fC{FdVSv@Ib@{@rD_AxDc@jB}GlY[rAc@~B{AdIw@hEo@pDQdA}@tFa@vC}BpPm@~FIz@}@tIiAtM}GffACj@i@~H[hD[|C]jCa@pC_@rB_@jBcAtEiAlEgBlGMb@cBpGw@dD_ArE{@nFUzAa@rCa@zC]pDk@|G[jEK~Aq@vJq@tIi@|FYtC[jCw@xFw@~E}ApIiBlI]tAkBrHa@`BeCjJyGdXuB`J{AhHkAlGaA~Fm@tD}AdLy@|Gq@nGw@xHEZ}AfOkBxQaDj[cAtJcAvJk@xF_AdJYjCeAdJQtAiAjIq@|E}@pFiAlG_AzEcAzE_AzD}AxGi@rB_@rAENyAhFwAvEeA`Ds@rB_AhCwD|JaBxD{AfDsBlEuCvFcEnH{BjDkCtDuBpCsAxAgAnAgBjBoDlDmDtCwAdA{AdAuChBeBbAkAn@MFOFqDfBuHhDiEjBo@Z{BjA{Ax@wBnAuBrAwAdAgDjCsChCiBnBqBzBaBpB{ArB_ClDmAnBs@nAcAlBaAjBsAtCeAbCwAnDoAjDu@|BeAhD{@|C}@nDy@tDcAnEsBbKgAtFwAvGw@fDmAtEaAbDgAdDuAxDsA`DsAvCwBhEaBpC_BfCkCvDwA`BaClCcDbDcJvI_A`AcAdAkAtAcApA_C~CeA`BiAlBcBtCgApB{DjHyB|DwAbC}AbCaDrEwBnCcCvCiCtCqN`P{AfBqDrEiBpCcBpC{AlCuAnCyBlEyBrEeCfFmGtMmGpM}DjIyD~HsDvHiDnHmBnEiB|EgC|HcAvD_AvDiApFu@|Do@bEm@`Ee@bEe@jFY`EU|DQdEK|DGbFI~JYtj@OnKc@nMKzBa@lGOhBWxC_@xD_@hDs@jFa@tCw@rE]pBs@rD_AjE_A|D_AjDcArDsAnE{AzEyAxEgB~F_DbK_CtHsAhEqC`JcC`ImC~IeAxDgAfEeAtEe@tBk@vCw@tEUtAWdBObAQhAQvAOlAOlA]~CIv@I`AIr@Gr@Gv@Ej@OlBMnBUpDIpBKrBEnAEpAIdCI`CSpHa@fNQpFWjJ]jL]bL[vLWpIS|IIhDOnGQhJSnLWbPQfKKxGKtGUdMOnHKpDOhDa@fHw@bJw@rHc@|CKt@_@tCq@bEc@lCgBrKu@lEwAxIoAfIOdAOlAM|@cAtHo@dFo@dFsA~K_Dp[wB|QyA~K_AfGa@bCa@`CQ|@}BxLcAlEcAfEmA|EeA|D{BpHyB~GwAbEgAvCaAfCaAbCaA~BsIlRaDvGoDrHUd@oPx]sKtV}I`VoEnNgB`GeB~F}DlO{AhGuAfGoBlJQt@Y|AwArHcBrJeCdP{BxPw@xG_BrOa@pEwAtPsAnPCf@mE~j@oA~OwAjO_AnI{@dHmAjIsAbIsApHkBzIkBbI}BbJeCrI_BbFkE~LcEhK}AzDoInSaChG_AhCw@~BkAjDcAdDaAhD_ApDu@zCs@vCmApFkAvFcDrOOx@kB|IgBvHuAzEwA|EaGdOaGhLgBtCQV}@tAwBtCuBlCiN|PmAbBwAzBiBxCiBnDkBtDuAbDsAjDsCzHqBxFKVM^}@hCiCjHqElMcD~IiDzIiFrLwP`\\eCzEqEtJ}AjDiBfE{Mb[cB~DeCpF_AnBk@hAeB|CoCpEoBtCqBlC{DrEsFrGaApAaAtAuAvBkB|CcBbDkCjG_A~BmBrFgAtDy@nDeAjEyCpN_AjEe@jBaArDo@vBo@nByAjEkAhDkAlDaBnF{@~Cw@`DuArGy@hEe@rCa@rCy@hGo@nGi@dHS`DQhDMbDIdDQlLU|JSpGUlF[dFYrEg@bGm@fGw@xGy@xFYtBW~A}@`FIh@{@fEg@|BsAbGyBzIgF`TiEfQkAzEmB|HWbAq@pCyAdGaC|JwExRg@~BeD~NWfAwDtPuDfP}BjKoBzIUdAkAfFI^iDjOw@pDqCzLaEtQiChLsIx_@Sz@uKff@oEdSiFjUWhAgCbL}@dEcBpI}@`Fg@fDe@hDYpBWlBm@hFeBnO{A~MiAtIeA|Gk@jDk@~CeB|IeA|EcAhEU|@wElRqE|PmCxK{AlHkArG_@hCk@lEYlCMnAMzAUbCKrAYxEc@zJi@pMm@rLg@|Gg@vG{AfOy@nIMjAs@dHgAlKqDl^}BzTcIdx@It@o@hGWzCk@fHs@|Jy@pNU~Ec@|KOjEO|EUbKYxKIjC[tJe@xKA\\[hG}@vOg@~Gs@lKGv@[nEm@tIYzE]hFQ|CObDM~COzDO`FA\\MrEEpDKnIAdF?fD@zFBxGHnFFhFPdJb@tUJ`JFpH?bHE~GGjEIvDMvDMnDSrESrD]tF[|Eq@~Ja@`GWbEUhEUxDS|EQvFKnGG~G?fGBlIHzIBrJ@|IArAGfKMjFQfGS|DSzD_@`H{@bNsAjTOxBUtD_ApPe@xHY~F_@hIm@zNYbI]rLa@jMG~ASvF[tGUhDi@dGQhBg@jE}@bGy@pEoAjGk@`Cm@~B}ApFwAhEwF`OmNr^qCjIkBhGkAtEaA`E[tAaAdFk@zC{@lFm@rEm@|EYpC_@dEW`DWfDKbBG~@o@`KSxDm@zIS|Ca@xHq@rKe@nHg@nGi@`Hi@bG_@hDa@pDa@bD]lC_@pCm@`Eq@bEmA`Hk@vCo@zCeA~EyAhGoCdKw@nCw@dCwAlEeB`FgAxCaFxL}AvDeAlCaCnFgD`ImCjGy@pBkC~FmBlEeBfEeBdE_DtHqB|EaChGuCjH{A|DoCrHmEjLkBjFmBrF{CpIkD|JyM|_@eI`VM^uDvK_CvG_@jAuBhGm@fBu@fCm@vBa@`BoAjFe@hCm@|C[zB[vBS|A[xCQbBOfB]fFEz@QvDMtDKfCKjDMxDMfDOdCOzBQrBa@pD]lCYhBo@pD[|Ac@jBi@tBu@jCsAbEiAvCe@fAqArC_AfB_BlCkCnDeBrBiBlBkDlD{ArA_GlFiEbEoArA_AhA}@dAs@`Aq@`AaBnC_AnBo@vAeArCgAjDwB~Hw@rCiAnDm@fBo@`BkAbCcAjB{@rAaArAkAvAs@x@sAjAy@n@w@j@wA|@qAr@oAp@wC~AoAt@kAv@aBnAyAtAm@n@m@t@uAfBuA|Bk@dAq@tAu@fB}@`Cm@rBk@pB_@dBWjAUrAW~AU~AUpBa@lE[xDi@rGmAlOg@rGu@lJi@tGk@hHo@`IcA`MEl@e@dFc@`Fs@bHw@`H{@|G_AnGoAfI_@pBi@`DkArGc@`CmAfGqAzGeDpPi@xCsBzK}@vEaAxFwAhIObAgB|Ky@pFs@xEk@`EwAzJ_@tCoAnJuBrOaBdMeDnVwAnKuArJk@pDm@pDk@fDm@|Ci@hCy@rD{@pDy@zC_A`D_AzCcAvCcArCeAjCcAbCcAzB_AnBaApBaAhBq@lA_AbBaBhCiAdBwAnB{@jAoA~AmAxA}@bAoAzAs@x@}@fAqA~AoA~AmA`BgAbBoApBgAlBuB|DeCxEyAlC{AnCsBfDgA`BcB`C{@fA{@bAsAzAuAtAu@p@w@t@s@l@{@r@oBxAuCnBuBzAsBzAuAjAeAbAgAnAkAvAwAvBqAxBoAbCmArCy@zBu@`Cm@vB[nAYpAc@xB[hBU~AQ|A]bDQvBQtBMxCGpCClB@bC@fCDfBFhBHrBLrB\\~D`A`Jn@zFd@hFNdBNdCJpBN|DHhCDjCNtGLtGPrGJ|CP`DNrCPnCZ`Fh@rGf@dHj@fIZjFTfEJ~BLnDJfDBpAFbDDdD@pC?xC?jCGhFG|EIjCGfCOvCY~F[dFi@rGq@xGY~Ba@bD{@xFgArGc@fCg@bCsAlGeBnHgBpHuEtQiBfHgBdHgBrH_BnHgAlFcAlF_ArFy@tFWtBcAxHe@nE_@dEI~@i@dHc@|G[dGUdGQ|EQjFClAWvKwAls@KlEI|CKxCStEKrBKxAMvA]zD[tCIz@a@vCSzAe@vCW`B[zAc@xB]zAc@lBg@pBw@rCcAbDy@~Bu@rBkAtCw@jBw@`BoAdCeAjBo@fAo@bAw@lAmAdBqAbBkAxAaAdAaAbA_A|@{@z@{AlAc@\\uAdAsBvAuBlAgAj@oAl@}Ap@mBt@{DpAcCp@_B^{Bd@{Bd@qF~@qIvAmIxAuFlAkFtAoFlBmF`CoCzAeC~AgAx@kA~@qCbCgBdBiBhBmCjDkCtDmChEwB~DgBrDo@xAo@|A{@xBu@tBaAtCcAfDcAxDu@|Cu@lDo@dDk@dDe@bDg@xDc@`E[dDWlDa@~Hy@xQUhFWlFYfFa@xEu@zG[hCc@lCmAvG{@~D_AbEcArDk@tBu@`Cu@xBu@rBi@zAgCtG{A~Dq@fBeB`Fo@nBKZe@bBg@`Bw@zC_FtSgCbKkA|DqA|DaDlIsAxCwArC_CdEaCxDgB`CeBzBeBtBoEdFyEhFsEdFoLpMqGjHkBvBq@v@s@x@cBvBaBxB{A|BuA|BwAdCuAlCuCrGgApCaAlCmB~FgBdGoD~LyA~Em@jBo@hBgB~Eq@dBq@`BkBfEkBbEmCvFOZqApCs@xAcAzBgBzDgB`E{ArDwApDmAlDy@bCu@|Bm@vBKb@{@fD{@zDe@bCc@hC[pBWpBUxBSpBSdCM~BIdCGdCCtC@tCDvCJnCNjCTnCTtBXtBXfBX`B`@jB`@bBjAjElAjE^vA\\tAZxAZxAVxAT|ARzAP~AN~AL~AJ`BFvABx@@p@Bp@?n@@p@?p@?n@?p@?p@Ap@An@EbBANA^I`BK`BM~AO~AS|AW`BUpAMv@SfAQx@On@]pA_@vA[`Ac@rA_BhEuAhDk@vAi@|Ag@|Ai@bBi@vBa@jBi@xCe@|CeAbIs@fF[xBYfB{@vE}@fEaAdE{AfGuBhI_AzDuAvFg@vBe@bCk@pCUjA_@zB_@bCw@tFq@vFc@fEc@rE_A~JmF~k@i@rGaDp]}@vJu@~HcBbRqArNk@fGUvBY|BUzASrAc@zBe@rBi@rBy@jCy@zBs@dBy@dBy@|A_AvA_ArAgAtAiAlAqAlAsAfAeAr@kAp@{@b@iAf@wEhBmCbAcHlCiMxE}IdDgJhDuIdDuI`DcInCuC~@qCv@uD`A_E~@yIhBsI`BuIbBgLxBoFdAaF`AkFbAeI~AaI|AuDr@sXlFmDr@yFdAwCl@kI~AsFdAMB{@PoGnAiCh@mF`A{L`C_LvBuL~BoL|BuE|@kEz@{B`@{Bb@yCj@_@H_GjAgB\\cB\\yAZyA^uA^aAX{Bz@iCnA_Af@}@j@}@j@mBvAeBxA_B~AsAxAmAxAqAfBiA`BqAvBw@xAy@zAw@dB_AxBy@vBw@zBiBbGy@bDu@~Co@lCcAlEoDnOkAdFe@fBe@bBe@zAe@pAi@pAg@jAq@pAw@vAw@lAu@dAoA|AkAnAk@j@k@f@_BhAkAr@uAr@gAb@o@TgBd@gAPiANkALqAH}CRwCReBLwAL{ARoAR_B^kBf@_Bl@qAj@wAt@sAv@sA~@uAdAcDzCmAtAkAxAgBfC_BjCaAlBc@|@yAfDqApDkAvDo@`Ck@fC}@lE[fBYfBaCpOaCnOmC`QiCrPgBdLgAbHwAhJ_@zBw@dFc@tCe@dCg@`Co@dCs@dCc@lAa@fAkAlCcAtB_A~A_ArAq@`Aw@`Am@p@}@~@}@t@}@p@yAbAeB~@_CnAqFpCqDhB{C|Ay@b@aGvCOH[RuNlH{BhAsBfA}@b@{LlGwLfGmPpIiG~CeDdBkBfA_Al@aAt@o@d@uAhA}@z@{@x@{@z@u@z@sBhCqBrCkB|C_BtC{CxFkCrEeA~AgA~A_BnB{A`BaB~AcBzAwBdByBdBmCxByBlBu@t@s@t@a@d@c@f@q@~@k@z@y@tAm@jAo@nAs@fBm@~Ag@~Ag@|A[pA[tAUnA_@zBWlBSfBQ`COxBGhBE`BCfB?|C@`A?b@D`BF|AH|AHvALrALlA`@`D`@zC|AfJjBvJfBtJp@~Dn@|Dj@vDh@|Dd@|D`@~DVbDVnDT`ERhEJpDHpDDhD@zDAhFAfCEdCQrGYtGW`EY`E]vDc@tDa@fDe@nD]tB]nBw@fE}@`E}@|DiB|GiAvD{@~BmA~CwAhDuA|C{AzCk@fAi@hAcBzCiAtBeArBaAtB{@tBa@fA_@fA[dAW~@U|@Sx@_@jB[fBU~AWpB[tCYjDSfC]tEU`CWbC]`C_@rBWpA[tA]rA_@jAe@xAk@|Ai@lAe@bAq@pAk@`Ag@v@_@h@}@jAi@l@g@j@}@x@cAx@eAt@_Al@aB|@{BhAqAp@w@b@y@d@{@j@s@h@aAx@u@t@aAdAy@bA}@rAaAzAgApB}AvCyAvCmA|ByDtHeDpG{CbGmBnDo@lAgAlBgA`BwAlB_BjByAxAaBtAaChB_BfA}AdA}AfA{AbAyCtB}DlCsCnBuA~@q@d@qE~CiEvCuE~CkD|ByDhCsA`AsA|@mD`Cq@b@oC`BaAh@sAl@aA`@{Aj@gExAkC|@_A\\_A`@}@d@}@d@mAx@iA|@c@`@i@f@eAjAo@x@k@v@mAnBeAlBcAzBo@~Au@vBaA~Ci@lByBzHsE`PwEnPkEpOqFjRqDvMkBhGsChKkBtGgBlG{B~H{B~HoAlEmAjE}CpKs@|Bs@vBq@rBo@nBiBzE_B~DiB|DcAvBcApBiBfDy@tAy@tA{@rA}@pAwBzCgB~BwBjCaFvFuBzBkBlBkBnBaHhHkGrGeHnHuPlQyC|CuC|CaBhBaBrB_BrBuAnBeBpCcBtCw@zAu@zAiB`EkAxCgAtCo@nBo@lBuAxE}@lDy@nDk@tCg@lCa@`C_@~Bq@zEq@dFkChSiChSwGtg@_AhH_@|CSrA_BbMi@jEsB|Oo@bFu@bGc@xDa@~Dc@vE[|DWbD_@hFY~EWhFY`GYzFc@nJc@nJSjEm@|L[hGIjAMlBQjBY|B[rB_@tB_@hBe@fBm@nBiAbDiAhCq@pAcAdB{@lAy@bA{@bA_A|@s@p@q@f@oAz@wAv@gBt@qAb@y@PaAPs@Jk@Hi@B_AD}@?}ACaBGgCQ_DScBGuBCwABuAH_AJ{@LiATyA`@cA\\aBr@{Ax@qAx@o@f@s@j@kAfAkAnA}@hA{@jAeBpCkArByBjEq@nAuAnCyB|DiBxC}AfCwBxCcC~CeD`Ey@bAcAnAcC|CaAjA{B|Cm@`As@nAw@|As@zA{@zBy@bCc@|Ag@hBe@tB]hBWzAUvA]lCWhCs@|Gq@`Gs@xFwAfI}@`E}@xDs@lCu@dC_ApCm@dBm@|A{AlDkAbCeAvBgApBkAjBkA`B{@bA{AbBgAfAg@d@YToB`B_CzAcBz@eAf@u@ZiA`@eA\\oCn@}B`@gD`@cFf@}APyBVoCd@uAZyAb@eA^_Bp@iCxAwB|AwAnAkBlB}@dA{@hAw@fAqAnBU\\IP_@l@aLvQ}@xAuB~CuBvCsBnCcD~DoAzA]`@q@t@gAlAsC|CmGzG]^yJnKgErEy@|@mCtCm@p@cCjCiBlBwCbDyChD_AlAaApAw@lAw@lAaAzAQ^_CtEsAzCeApCm@bBe@rAcAhDoAbFo@xCm@`Ds@jE{@nGyBxR]nCy@pF}@|Ec@jBg@rBc@|As@|B}@fCwAlDe@bAeAtBs@nAgAfBiA`BqAbBiBtBgAhA_Ax@w@p@mA|@_HrF{E`EsNrLwEvD_BxAcB~Aq@l@q@r@gBlBgAlAwCnDgC~CyEjGyC`EeBdCuApBqB|CkAlBgCpE_CpEsE|IeDrG_B`DwAxC_AtBu@jBo@bBo@nBq@xBi@lBk@|Bc@lBe@xBa@zBwCnP}CdQgBzJoEhWYzA_Pt}@eBxJ_AjFOx@wAjIY|AeA~Fe@lCa@zBYxAYrAg@~Bo@|Bk@nBk@~A{@rBy@bBy@~A{@vAcBjC_BnBcEjF_AjAcTvX_AjAyf@fo@sDvEu^le@qAdBwAhBu@`AmCpDiB~Bq@x@kBbCgB~BqE|FkG`IkF|GuBnCiEtFoBfCkDnE{GxIaFnG}EjGaBzB_NbQaArAw@bAw@fAyB`DgA~A_AtAaA|A}@tAcAdB_A|AOXuA`CgBdDy@|AgBlDgBpDeAxBcD`HcApBgA~BS`@cAvBgBpDaDzGaC~EqBdE{AbDgA|B_FbKwJlS}JvSgA|BcDxGaAvBeCfFo@vA}@pBw@jBm@|AqAnDk@dBc@pAw@dCeApD_AnDw@~CI`@k@lCOn@g@bCm@dDc@pC{@xFa@zC[tCUpBYtCWxC_@nDYrC[dDa@dE[dDI`AOzA[~Cq@bH_@|DUhCa@dEa@fEo@pFc@nDSzAUxASvAUvAYbBy@xEg@bCWpAWlAYlAo@rCk@zBk@zB]pA]pAg@dBaAdDwA~EaAdDs@dCaBvFaBxFoEpOmGjTcB~FoChJuBjHsFnRcD~K{B|H{AhFaAdD_DvKo@zB}@|Cc@xAy@rCeArDeB`Go@xBgAtDa@tAi@jBg@`Bw@~Ba@jAe@jAk@pA_AlBc@z@m@hAk@|@k@z@o@~@w@`Ae@j@g@j@e@h@wAtAm@h@s@h@u@h@w@h@iAp@uAr@_A`@yAh@w@Xe@Nm@RuGtB}@X{@Xy@Z{@Zy@\\YL_@R]P]R[R]T[T[V[X]ZWV[\\[\\W\\Y\\W`@W^Yb@W^S`@o@lA[t@Yn@i@zASh@Oh@Qh@Oj@Oj@Ml@Mj@Kj@Mn@Kn@Kj@In@Ip@Il@Gp@IhAIhACp@Er@Ct@Al@Ap@Ap@?p@?p@?r@@n@@r@Bn@DlADfADr@L`BJbBJ~ALdBH~ABr@Dv@@h@@n@Bp@@n@?p@@v@?l@An@?p@Ar@Cp@Al@Cn@Cp@Ep@Cp@El@En@Gp@Gl@YnCKt@Gf@Kn@Id@EVOz@Mp@[xAMl@Mf@Ml@Ol@Oj@]rAa@xAQl@e@vA_A|CGPUv@_@lAuAnE_ClHc@pAwAhEuA`EuA`Ec@nAs@nBgCdH_AfCaAjCw@rBeAlCw@pBcAlCs@fB{@tBi@pA}@tB}@xB]|@eC`GcAfC_@|@_@|@e@fA]z@}@xBa@`A]~@e@rA]hA_@pAWdAWdAW`AU`AQl@Of@K^M^O\\GPYn@Yf@Yf@c@l@i@v@aAlAW^w@dAQTeFpH]b@WZST]Z]X[TiAt@q@d@WPUPWRUTUTQPQRQVQVeFlHyB`Da@l@yB~Ck@v@c@h@]\\[XQLQLQJQJOFMDODODOBOBMBO@K@_A@_@@o@@w\\d@O?K?MAIAUCKCMCMEMGa@O]QOGMEUEQEOCMCG?I?_@@yAHyAJE?E?M@Q@iDTu@Fg@BaAFsAJiAFcAHE?Q@M@gAHaCPG?M@w@DU?G?OCOAE?KA_@AGAUCeBKWCsAIE?WCSA{@EUIMGKI_@a@o@aAi@{@OSw@yAu@yACGEGUe@EIEGEECEKK{@e@y@e@{@a@e@UWKo@Sa@Iu@KWC]Gi@Im@OMEOGQI]SqAw@uA}@_@WIEYQ]U"
+ },
+ {
+  "trips": [
+   {
+    "tripId": "20261120_22:58_cz-CZPTT_czptt:trip:Pa%3A0054%3A--KADR170448%3A01%3A2026:2",
+    "routeShortName": "NJ 457"
+   }
+  ],
+  "routeColor": "4c1d95",
+  "mode": "NIGHT_RAIL",
+  "distance": 315692.625,
+  "from": {
+   "name": "Ústí nad Labem hlavní nádraží",
+   "stopId": "cz-CZPTT_czptt:stop:CZ:53179:platform:1",
+   "parentId": "cz-CZPTT_czptt:stop:CZ:53179",
+   "importance": 0.0011239160085096955,
+   "lat": 50.659150000000004,
+   "lon": 14.044077999999997,
+   "level": 0.0,
+   "tz": "Europe/Prague",
+   "scheduledTrack": "1",
+   "track": "1",
+   "vertexType": "TRANSIT",
+   "modes": [
+    "LONG_DISTANCE",
+    "NIGHT_RAIL",
+    "REGIONAL_RAIL",
+    "BUS"
+   ]
+  },
+  "to": {
+   "name": "Praha-Holešovice",
+   "stopId": "cz-CZPTT_czptt:stop:CZ:57256:platform:1",
+   "parentId": "cz-CZPTT_czptt:stop:CZ:57256",
+   "importance": 0.0021808333694934845,
+   "lat": 50.110638,
+   "lon": 14.439706000000001,
+   "level": 1.0,
+   "tz": "Europe/Prague",
+   "scheduledTrack": "1",
+   "track": "1",
+   "vertexType": "TRANSIT",
+   "modes": [
+    "HIGHSPEED_RAIL",
+    "LONG_DISTANCE",
+    "NIGHT_RAIL",
+    "REGIONAL_RAIL"
+   ]
+  },
+  "departure": "2026-11-20T22:41:00Z",
+  "arrival": "2026-11-20T23:42:00Z",
+  "scheduledDeparture": "2026-11-20T22:14:00Z",
+  "scheduledArrival": "2026-11-20T23:16:00Z",
+  "realTime": true,
+  "polyline": "ujetHo~utArAlCbBbCtBfBbBz@lFnAlGl@tFv@zBJjBGlB[~i@iN~`@aK~c@iIjD_A|CcBtAmAxBsChBoCzAaB|A_ArEaBzAy@xAgArAuA`B}BbAcBtBiEv@uBn@_Cl@eCf@oC`@mCj@aHpCwl@b@_HVoBj@{Cf@kBp@iBxAsCrAkB`ByAhBgAlSoJ~Ak@~A[bDYtA@pDTpV~ChBb@zCdAlLnGjDnAnDl@lG`@~Ch@vChAjOhIjClB`AdAdAtA|@zAt@`Bl@dB|@hD`@vBX~B\\~FDjEe@~rAKhX?hEDdCT~DXdCp@zDf@tBn@nBx@pBnTld@zA|B|AdBdBvApBbAfFtArEp@pBJzDGbBObB_@pC}@zBkAr\\qT|D}BrIiExCgAnCm@zFe@`E?`FNpC`@fAZhJnErLpGpAb@lAVrDRra@G~BIlAMlCm@rDyA`GqCfCcB~MuLbBqAfAi@rAc@tAShJg@rAKvAYrAa@rBeAvBgBhAqAdA_Bz@_Bv@kB|AmFhAuGrGee@hA}FhAiDxAcDbA_BdAsA~CmCfHwE~GgEjAg@jAYlBQ`BDhB\\lAb@vClBxmAffA`D|BtD~AbEz@`BHvCArAMfCg@tBs@nAm@fBiAbBwA`CqC|CaFnAgCdAqCrAkFv@mF~Iut@bUuiBfI}r@jHam@hc@kpDrb@slDxTgiBpAyIdC_MfJs]lm@a|Bh{@gaDnBsGbCmGnCqF|D}F|BeCzE_ErBqAtEwBxJqDtLyDnj@eQncAg\\|FsB|HiD`FqCfEwChCuBlEgExDyEtAsBzCqFzCmGnCoGxAoEnAeFh@oChAcIfDy_@~@oQjAi]J_H@iKKaHYoFkHer@oCiReAuF_BkFwBuE{j@e`AkyB}tDuWwc@{BaEcA{ByBkGmAwEiAsG}@qHqAkOk@cKIiE@aFT_Ih@cHj@mE`@eCjEuSt@wChAiDbByDvBqDhC{CrC_CzBoAna@eRtuB_aAnR{ItEeCfDmC~DsElCkEdCiFlXyr@~cBqlE`B}DfCuE|CcEdEcEfd@c`@n\\{X`XmUhK}IvDsC`DwAnD{@bDWtA?lDXdDz@rAf@bDnBzApA~BhCfCzDzjAlqBtaD~sFh^zn@bSd]nM`Tt}@j}AtAbC`BfD`CrGr@`CvAtGzCtPhBpIlLzd@nCzJfAlDbOnb@tBzFhBfElCxEvCzDvCrCfChBtE|B|QdG`sA`c@b^vLrTfHpBh@vVbFxgAvRjDl@xFz@hJXlHxAbBTlABpr@wDpBSvCq@bOkGzDkBvNoLjF_FbCoD`BaDz@yBz@oCt@cDh@yC~@uGtQgrAbBcJbEyPxA_ElBkDlA}AbGuGzBsDr@aBfBcFvR{l@vAeDhBmDjAgB`CwCbBaBnAaAhDgB`EoAvT}FbDk@`DKfDRjD`@xBp@vFnCjCp@dAJnCIjASdA]nBaApAaApAwAvA{BpAwCx@oCp@eD|EeXz@iElAqDz@oBdAgBjB{BfBsA`Ac@xBg@fJUvAY`A]nBgAxAqA|AqBhAgBbBgD`FoMnGiO|@cBl@{@nBiB|CiB~Aq@lD{@xAOjD?nCZdBd@nDrA~KlEvD~BxAjAfDpDlA~ApCzErI~QnBzFn@bCjArGdBrO`AtFrAbFr@lBjB`ExGlM`CfDhBdBjBlArChAnAX|Df@rCThA@vBKvBg@hBw@|AeApBmBpAcBlByC~B_Fp@mBhAsEb@sCTwBTeEDgCIiKOoHc@mG]cCe@oCcAeEsGcV{AmGiA{HYsCS{CQsJJgw@iAct@BsDHsBZmDb@{Ct@eDbAwClAkCzAwB`CaCtBsAhBq@hCc@nCJfARdA^~@h@bGdFvAt@`AZtH`A|Jv@pcBlL|BTtB^bExAvCfBtBfBvB~B|EhIdBnBx@p@nB~@fCf@fBDdCUdBg@bCuAbB_BtAkB|@cB~CcH|BeF~AgCzAkBzAsAdBeArCeAtC_@nCCdCXxA^jB|@zB`B|@|@nA`BrCvFlAtBvAfBlBbBdAn@rAj@hJxCzIhC|ANfBApBYbDcAnCyA|AqAzAcBdA_B~@eB~BgFlSsd@xIoSp@uBb@oBh@uDR_CJmBBuCEqDOeC]}C]eB_DmL_GqUoAuFo@mD{@eHc@qFOyEGeFi@mr@AiZ_@sO"
+ },
+ {
+  "trips": [
+   {
+    "tripId": "20261120_23:40_cz-CZPTT_czptt:trip:Pa%3A0054%3AKT-----4797A%3A00%3A2026:1",
+    "routeShortName": "S1 (Os 8659)"
+   }
+  ],
+  "routeColor": "1c1745",
+  "mode": "REGIONAL_RAIL",
+  "distance": 30975.1171875,
+  "from": {
+   "name": "Praha Masarykovo nádraží",
+   "stopId": "cz-CZPTT_czptt:stop:CZ:57236:platform:2",
+   "parentId": "cz-CZPTT_czptt:stop:CZ:57236",
+   "importance": 0.0010624842252582312,
+   "lat": 50.08765,
+   "lon": 14.434707999999999,
+   "level": 0.0,
+   "tz": "Europe/Prague",
+   "scheduledTrack": "2",
+   "track": "2",
+   "vertexType": "TRANSIT",
+   "modes": [
+    "REGIONAL_RAIL"
+   ]
+  },
+  "to": {
+   "name": "Praha-Libeň",
+   "stopId": "cz-CZPTT_czptt:stop:CZ:57176:platform:3",
+   "parentId": "cz-CZPTT_czptt:stop:CZ:57176",
+   "importance": 0.003261878853663802,
+   "lat": 50.100636,
+   "lon": 14.502327999999999,
+   "level": 0.0,
+   "tz": "Europe/Prague",
+   "scheduledTrack": "3",
+   "track": "3",
+   "vertexType": "TRANSIT",
+   "modes": [
+    "LONG_DISTANCE",
+    "REGIONAL_RAIL"
+   ]
+  },
+  "departure": "2026-11-20T22:41:00Z",
+  "arrival": "2026-11-20T22:47:00Z",
+  "scheduledDeparture": "2026-11-20T22:40:00Z",
+  "scheduledArrival": "2026-11-20T22:46:00Z",
+  "realTime": true,
+  "polyline": "yvupH}gbwAEmJ}Aeb@}G{k@_Jav@gAoKqDuc@c@kDe@qCg@uBu@gCeBeEeBuC{SkVcDmEoCsEaDaH{ByG}BsIe@{Bg@yCe@kFQiF?iEPeGBcDt@yS`BkZRmJHmJHgCPiDr@qH"
+ }
+]

@@ -1,0 +1,479 @@
+{
+ "release_id": "20261120T041034Z-eec05409a8ee",
+ "generated_at": "2026-11-20T23:48:23.775935+01:00",
+ "stop": {
+  "location_id": "jdf:stop:24325",
+  "name": "Praha,Masarykovo nádraží",
+  "kind": "stop_place",
+  "domain": "surface",
+  "municipality": "Praha",
+  "district": "Masarykovo nádraží",
+  "latitude": 50.0879785,
+  "longitude": 14.432546,
+  "coordinate_precision": "exact",
+  "distance_m": null,
+  "modes": [
+   "tram",
+   "bus"
+  ],
+  "group": null
+ },
+ "stops": [
+  {
+   "location_id": "jdf:stop:24325",
+   "name": "Praha,Masarykovo nádraží",
+   "kind": "stop_place",
+   "domain": "surface",
+   "municipality": "Praha",
+   "district": "Masarykovo nádraží",
+   "latitude": 50.0879785,
+   "longitude": 14.432546,
+   "coordinate_precision": "exact",
+   "distance_m": null,
+   "modes": [
+    "tram",
+    "bus"
+   ],
+   "group": null
+  }
+ ],
+ "since": "2026-11-20T23:48:23.775935+01:00",
+ "until": "2026-11-21T00:48:23.775935+01:00",
+ "departures": [
+  {
+   "trip_id": "jdf:trip:199026:261113:1253:overlay:547cfb5eb479",
+   "service_date": "2026-11-20",
+   "location_id": "jdf:stop:24325",
+   "sequence": 25,
+   "line": {
+    "route_id": "jdf:route:199026",
+    "short_name": "26",
+    "long_name": "Dědina  - Nádraží Hostivař",
+    "mode": "tram",
+    "color": "7A0603",
+    "text_color": "FFFFFF"
+   },
+   "trip_short_name": "199026 1253",
+   "headsign": "Praha,Nádraží Hostivař",
+   "scheduled": "2026-11-20T23:45:00+01:00",
+   "estimated": "2026-11-20T23:49:07.572298+01:00",
+   "status": "predicted",
+   "source_class": "gps",
+   "stale": false,
+   "platform": "C",
+   "vehicle": {
+    "vehicle_id": "pid:0:9070",
+    "state": "running",
+    "last_seen": "2026-11-20T23:47:19+01:00",
+    "position_at": "2026-11-20T23:47:19+01:00",
+    "latitude": 50.08844469491824,
+    "longitude": 14.429214435363333,
+    "bearing": 55.80089683574607,
+    "traits": {
+     "low_floor": null,
+     "air_conditioning": false,
+     "wheelchair_accessible": true,
+     "manufacturer": null,
+     "model": "ČKD Tatra KT8D5.RN2P",
+     "operator": "DP PRAHA",
+     "licence_plate": null,
+     "fleet_number": "9070"
+    },
+    "sources": [
+     "pid"
+    ],
+    "physical": true,
+    "followed_as": null
+   },
+   "wheelchair": null,
+   "sources": [
+    "pid"
+   ],
+   "alert_ids": [],
+   "delay_min": 4,
+   "punctuality": "late",
+   "step_free": null
+  },
+  {
+   "trip_id": "overlay:pid-gtfs:trip:52d663eacb1386f50073",
+   "service_date": "2026-11-20",
+   "location_id": "jdf:stop:24325",
+   "sequence": 37,
+   "line": {
+    "route_id": "jdf:route:199015",
+    "short_name": "15",
+    "long_name": "Sídliště Barrandov - Olšanské hřbitovy",
+    "mode": "tram",
+    "color": "7A0603",
+    "text_color": "FFFFFF"
+   },
+   "trip_short_name": null,
+   "headsign": "Praha,Vozovna Hloubětín",
+   "scheduled": "2026-11-20T23:45:00+01:00",
+   "estimated": "2026-11-20T23:50:32.937729+01:00",
+   "status": "predicted",
+   "source_class": "gps",
+   "stale": false,
+   "platform": "D",
+   "vehicle": {
+    "vehicle_id": "pid:0:8540",
+    "state": "running",
+    "last_seen": "2026-11-20T23:47:54+01:00",
+    "position_at": "2026-11-20T23:47:54+01:00",
+    "latitude": 50.0861791,
+    "longitude": 14.4346819,
+    "bearing": 266.02531314412715,
+    "traits": {
+     "low_floor": null,
+     "air_conditioning": false,
+     "wheelchair_accessible": false,
+     "manufacturer": null,
+     "model": "ČKD Tatra T3R.P",
+     "operator": "DP PRAHA",
+     "licence_plate": null,
+     "fleet_number": "8540"
+    },
+    "sources": [
+     "pid"
+    ],
+    "physical": true,
+    "followed_as": null
+   },
+   "wheelchair": null,
+   "sources": [
+    "pid"
+   ],
+   "alert_ids": [],
+   "delay_min": 5,
+   "punctuality": "late",
+   "step_free": null
+  },
+  {
+   "trip_id": "overlay:pid-gtfs:trip:4806c72e9020a5afabe4",
+   "service_date": "2026-11-20",
+   "location_id": "jdf:stop:24325",
+   "sequence": 12,
+   "line": {
+    "route_id": "jdf:route:199025",
+    "short_name": "25",
+    "long_name": "Bílá Hora - Výstaviště",
+    "mode": "tram",
+    "color": "7A0603",
+    "text_color": "FFFFFF"
+   },
+   "trip_short_name": null,
+   "headsign": "Praha,Bílá Hora",
+   "scheduled": "2026-11-20T23:54:00+01:00",
+   "estimated": "2026-11-20T23:54:01.360911+01:00",
+   "status": "predicted",
+   "source_class": "gps",
+   "stale": false,
+   "platform": "D",
+   "vehicle": {
+    "vehicle_id": "pid:0:8778",
+    "state": "running",
+    "last_seen": "2026-11-20T23:47:27+01:00",
+    "position_at": "2026-11-20T23:47:27+01:00",
+    "latitude": 50.08426395209061,
+    "longitude": 14.451432770213891,
+    "bearing": 280.0982990629013,
+    "traits": {
+     "low_floor": null,
+     "air_conditioning": false,
+     "wheelchair_accessible": true,
+     "manufacturer": null,
+     "model": "Pragoimex T3R.PLF",
+     "operator": "DP PRAHA",
+     "licence_plate": null,
+     "fleet_number": "8778"
+    },
+    "sources": [
+     "pid"
+    ],
+    "physical": true,
+    "followed_as": null
+   },
+   "wheelchair": "accessible",
+   "sources": [
+    "pid"
+   ],
+   "alert_ids": [],
+   "delay_min": 0,
+   "punctuality": "on_time",
+   "step_free": null
+  },
+  {
+   "trip_id": "overlay:pid-gtfs:trip:48e7938d665f33176faa",
+   "service_date": "2026-11-20",
+   "location_id": "jdf:stop:24325",
+   "sequence": 22,
+   "line": {
+    "route_id": "jdf:route:199015",
+    "short_name": "15",
+    "long_name": "Sídliště Barrandov - Olšanské hřbitovy",
+    "mode": "tram",
+    "color": "7A0603",
+    "text_color": "FFFFFF"
+   },
+   "trip_short_name": null,
+   "headsign": "Praha,Vozovna Hloubětín",
+   "scheduled": "2026-11-20T23:55:00+01:00",
+   "estimated": "2026-11-20T23:57:58.473457+01:00",
+   "status": "predicted",
+   "source_class": "gps",
+   "stale": false,
+   "platform": "C",
+   "vehicle": {
+    "vehicle_id": "pid:0:8490",
+    "state": "running",
+    "last_seen": "2026-11-20T23:47:24+01:00",
+    "position_at": "2026-11-20T23:47:24+01:00",
+    "latitude": 50.0878876,
+    "longitude": 14.4043847,
+    "bearing": 10.594392879306099,
+    "traits": {
+     "low_floor": null,
+     "air_conditioning": false,
+     "wheelchair_accessible": false,
+     "manufacturer": null,
+     "model": "ČKD Tatra T3R.P",
+     "operator": "DP PRAHA",
+     "licence_plate": null,
+     "fleet_number": "8490"
+    },
+    "sources": [
+     "pid"
+    ],
+    "physical": true,
+    "followed_as": null
+   },
+   "wheelchair": null,
+   "sources": [
+    "pid"
+   ],
+   "alert_ids": [],
+   "delay_min": 2,
+   "punctuality": "on_time",
+   "step_free": null
+  },
+  {
+   "trip_id": "jdf:trip:199024:261113:1209:overlay:00ca2b14f9ec",
+   "service_date": "2026-11-20",
+   "location_id": "jdf:stop:24325",
+   "sequence": 20,
+   "line": {
+    "route_id": "jdf:route:199024",
+    "short_name": "24",
+    "long_name": "Vozovna Kobylisy - Spořilov",
+    "mode": "tram",
+    "color": "7A0603",
+    "text_color": "FFFFFF"
+   },
+   "trip_short_name": "199024 1209",
+   "headsign": "Praha,Vozovna Kobylisy",
+   "scheduled": "2026-11-20T23:59:00+01:00",
+   "estimated": "2026-11-20T23:59:10.351984+01:00",
+   "status": "predicted",
+   "source_class": "gps",
+   "stale": false,
+   "platform": "D",
+   "vehicle": {
+    "vehicle_id": "pid:0:9138",
+    "state": "running",
+    "last_seen": "2026-11-20T23:48:00+01:00",
+    "position_at": "2026-11-20T23:48:00+01:00",
+    "latitude": 50.065031792733215,
+    "longitude": 14.42627022420128,
+    "bearing": 268.9953899365552,
+    "traits": {
+     "low_floor": null,
+     "air_conditioning": false,
+     "wheelchair_accessible": true,
+     "manufacturer": null,
+     "model": "Škoda 14T",
+     "operator": "DP PRAHA",
+     "licence_plate": null,
+     "fleet_number": "9138"
+    },
+    "sources": [
+     "pid"
+    ],
+    "physical": true,
+    "followed_as": null
+   },
+   "wheelchair": "accessible",
+   "sources": [
+    "pid"
+   ],
+   "alert_ids": [],
+   "delay_min": 0,
+   "punctuality": "on_time",
+   "step_free": null
+  },
+  {
+   "trip_id": "jdf:trip:199003:261113:1248:overlay:c604372086ce",
+   "service_date": "2026-11-20",
+   "location_id": "jdf:stop:24325",
+   "sequence": 17,
+   "line": {
+    "route_id": "jdf:route:199003",
+    "short_name": "3",
+    "long_name": "Březiněveská - Nádraží Braník - Sídliště Modřany",
+    "mode": "tram",
+    "color": "7A0603",
+    "text_color": "FFFFFF"
+   },
+   "trip_short_name": "199003 1248",
+   "headsign": "Praha,Nádraží Braník",
+   "scheduled": "2026-11-20T23:58:00+01:00",
+   "estimated": "2026-11-20T23:59:42.321849+01:00",
+   "status": "predicted",
+   "source_class": "gps",
+   "stale": false,
+   "platform": "C",
+   "vehicle": {
+    "vehicle_id": "pid:0:9355",
+    "state": "running",
+    "last_seen": "2026-11-20T23:47:42+01:00",
+    "position_at": "2026-11-20T23:47:42+01:00",
+    "latitude": 50.10621093067646,
+    "longitude": 14.472679789629249,
+    "bearing": 171.56869600344166,
+    "traits": {
+     "low_floor": null,
+     "air_conditioning": true,
+     "wheelchair_accessible": true,
+     "manufacturer": null,
+     "model": "Škoda 15T4",
+     "operator": "DP PRAHA",
+     "licence_plate": null,
+     "fleet_number": "9355"
+    },
+    "sources": [
+     "pid"
+    ],
+    "physical": true,
+    "followed_as": null
+   },
+   "wheelchair": "accessible",
+   "sources": [
+    "pid"
+   ],
+   "alert_ids": [],
+   "delay_min": 1,
+   "punctuality": "on_time",
+   "step_free": null
+  },
+  {
+   "trip_id": "jdf:trip:199026:261113:1248:overlay:01d834d3191a",
+   "service_date": "2026-11-20",
+   "location_id": "jdf:stop:24325",
+   "sequence": 25,
+   "line": {
+    "route_id": "jdf:route:199026",
+    "short_name": "26",
+    "long_name": "Dědina  - Nádraží Hostivař",
+    "mode": "tram",
+    "color": "7A0603",
+    "text_color": "FFFFFF"
+   },
+   "trip_short_name": "199026 1248",
+   "headsign": "Praha,Dědina",
+   "scheduled": "2026-11-20T23:59:00+01:00",
+   "estimated": "2026-11-21T00:00:05.255623+01:00",
+   "status": "predicted",
+   "source_class": "gps",
+   "stale": false,
+   "platform": "D",
+   "vehicle": {
+    "vehicle_id": "pid:0:9322",
+    "state": "running",
+    "last_seen": "2026-11-20T23:47:21+01:00",
+    "position_at": "2026-11-20T23:47:21+01:00",
+    "latitude": 50.07945210614514,
+    "longitude": 14.472692809291617,
+    "bearing": 345.62853525551816,
+    "traits": {
+     "low_floor": null,
+     "air_conditioning": false,
+     "wheelchair_accessible": true,
+     "manufacturer": null,
+     "model": "Škoda 15T3",
+     "operator": "DP PRAHA",
+     "licence_plate": null,
+     "fleet_number": "9322"
+    },
+    "sources": [
+     "pid"
+    ],
+    "physical": true,
+    "followed_as": null
+   },
+   "wheelchair": "accessible",
+   "sources": [
+    "pid"
+   ],
+   "alert_ids": [],
+   "delay_min": 1,
+   "punctuality": "on_time",
+   "step_free": null
+  },
+  {
+   "trip_id": "overlay:pid-gtfs:trip:cbbb07035c2f57afb08a",
+   "service_date": "2026-11-20",
+   "location_id": "jdf:stop:24325",
+   "sequence": 18,
+   "line": {
+    "route_id": "jdf:route:199006",
+    "short_name": "6",
+    "long_name": "Nádraží Holešovice - Kubánské náměstí",
+    "mode": "tram",
+    "color": "7A0603",
+    "text_color": "FFFFFF"
+   },
+   "trip_short_name": null,
+   "headsign": "Praha,Vozovna Kobylisy",
+   "scheduled": "2026-11-21T00:01:00+01:00",
+   "estimated": "2026-11-21T00:01:02.254455+01:00",
+   "status": "predicted",
+   "source_class": "gps",
+   "stale": false,
+   "platform": "D",
+   "vehicle": {
+    "vehicle_id": "pid:0:9134",
+    "state": "running",
+    "last_seen": "2026-11-20T23:47:55+01:00",
+    "position_at": "2026-11-20T23:47:55+01:00",
+    "latitude": 50.069959,
+    "longitude": 14.4328844,
+    "bearing": 21.425625854824414,
+    "traits": {
+     "low_floor": null,
+     "air_conditioning": false,
+     "wheelchair_accessible": true,
+     "manufacturer": null,
+     "model": "Škoda 14T",
+     "operator": "DP PRAHA",
+     "licence_plate": null,
+     "fleet_number": "9134"
+    },
+    "sources": [
+     "pid"
+    ],
+    "physical": true,
+    "followed_as": null
+   },
+   "wheelchair": null,
+   "sources": [
+    "pid"
+   ],
+   "alert_ids": [],
+   "delay_min": 0,
+   "punctuality": "on_time",
+   "step_free": null
+  }
+ ],
+ "next": "eyJlIjoiMjAyNi0xMS0yMFQyMzowMTowMi4yNTQ0NTUrMDA6MDAiLCJzIjoiMjAyNi0xMS0yMFQyMzowMTowMCswMDowMCIsInQiOiJvdmVybGF5OnBpZC1ndGZzOnRyaXA6Y2JiYjA3MDM1YzJmNTdhZmIwOGEiLCJkIjoiMjAyNi0xMS0yMCIsImwiOiJqZGY6c3RvcDoyNDMyNSIsInEiOjE4fQ",
+ "alerts": [],
+ "stop_alerts": []
+}

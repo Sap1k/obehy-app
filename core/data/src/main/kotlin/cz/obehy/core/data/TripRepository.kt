@@ -5,6 +5,7 @@ import cz.obehy.core.model.Leg
 import cz.obehy.core.model.StopCall
 import cz.obehy.core.model.TripDetail
 import cz.obehy.core.model.TripInfo
+import cz.obehy.core.model.TripRef
 import cz.obehy.core.model.TripStop
 import cz.obehy.core.network.motis.MotisApi
 import cz.obehy.core.network.motis.toTrip
@@ -14,6 +15,7 @@ import cz.obehy.core.network.obehy.EnrichedLeg
 import cz.obehy.core.network.obehy.ObehyApi
 import cz.obehy.core.network.obehy.addedTo
 import cz.obehy.core.network.obehy.toDomain
+import cz.obehy.core.network.obehy.toTripDetail
 import cz.obehy.core.network.obehy.toTripInfo
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
@@ -59,7 +61,7 @@ class TripRepository
                 override fun removeEldestEntry(eldest: Map.Entry<TripRequest, Fetched>) = size > KEPT
             }
 
-        /** The plain trip of [request], if it's already here and recent. */
+        /** The trip of [request], if it's already here and recent: plain, or with Oběhy's details once it has been opened. */
         fun fetchedAhead(request: TripRequest): TripDetail? =
             synchronized(fetched) { fetched[request] }
                 ?.takeIf { System.currentTimeMillis() - it.at < KEPT_MS }
@@ -75,7 +77,7 @@ class TripRepository
                     .filterNotNull()
             }
 
-        /** The trip of [request] as MOTIS has it. */
+        /** The trip of [request] as MOTIS has it (with Oběhy's details, when kept from opening it). */
         suspend fun plain(request: TripRequest): Result<TripDetail> =
             fetchedAhead(request)?.let { Result.success(it) }
                 ?: runCatching {
@@ -93,10 +95,27 @@ class TripRepository
             plain: TripDetail,
             request: TripRequest,
         ): TripDetail =
-            if (settings.current().mode?.usesObehy == true) {
-                runCatching { withContext(computation) { withObehy(plain, request) } }.getOrNull() ?: plain
-            } else {
-                plain
+            when {
+                // Already has them: kept from when it was last opened.
+                plain.info != null -> {
+                    plain
+                }
+
+                settings.current().mode?.usesObehy == true -> {
+                    val detailed = runCatching { withContext(computation) { withObehy(plain, request) } }.getOrNull()
+                    // Kept, so the trip opens whole if it's opened again soon.
+                    detailed?.also { trip ->
+                        synchronized(fetched) {
+                            fetched[request] =
+                                Fetched(trip, System.currentTimeMillis())
+                        }
+                    }
+                        ?: plain
+                }
+
+                else -> {
+                    plain
+                }
             }
 
         /** [trip] with the latest times from MOTIS and, if it had any, details from Oběhy. */
@@ -128,6 +147,31 @@ class TripRepository
             val old = trip.stops.firstOrNull { it.call.stopId == call.stopId } ?: return this
             return copy(sequence = old.sequence, flags = flags + old.flags)
         }
+
+        /**
+         * A trip opened on the live map, by the reference its source gave: an Oběhy trip from Oběhy
+         * alone (its run and path included), a MOTIS one from MOTIS with Oběhy's details on top in
+         * the modes that have them. Asked again to refresh it.
+         */
+        suspend fun opened(ref: TripRef): Result<TripDetail> =
+            when (ref) {
+                is TripRef.Obehy -> {
+                    runCatching {
+                        withContext(computation) {
+                            obehy.trip(ref.tripId, ref.serviceDate, listOf("shape", "run")).toTripDetail(appLanguage())
+                        }
+                    }
+                }
+
+                is TripRef.Motis -> {
+                    val request = TripRequest(ref.tripId, null, null)
+                    val fresh = runCatching { withContext(computation) { ride(ref.tripId) } }
+                    fresh.map { ride ->
+                        val stops = TripDetail.stopsOf(ride)
+                        withDetails(TripDetail(ride, stops, boarded = null), request)
+                    }
+                }
+            }
 
         /** [trip] with where Oběhy last saw its vehicles; as it is if that can't be had. */
         suspend fun positions(trip: TripDetail): TripDetail {

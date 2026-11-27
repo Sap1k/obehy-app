@@ -1,0 +1,240 @@
+{
+ "release_id": "20261120T041034Z-eec05409a8ee",
+ "generated_at": "2026-11-20T23:47:11.376505+01:00",
+ "vehicles": [
+  {
+   "vehicle_id": "pid:0:8299",
+   "feed": "jdf",
+   "source": "pid",
+   "state": "running",
+   "last_seen": "2026-11-20T23:46:53+01:00",
+   "position_at": "2026-11-20T23:46:53+01:00",
+   "latitude": 50.077170698715925,
+   "longitude": 14.41944073371552,
+   "bearing": 186.70127197241337,
+   "trip_id": "jdf:trip:199022:261113:1483:overlay:0da2dba487cf",
+   "service_date": "2026-11-20",
+   "line": {
+    "route_id": "jdf:route:199022",
+    "short_name": "22",
+    "long_name": "Bílá Hora - Vypich - Zahradní Město - Nádraží Hostivař",
+    "mode": "tram",
+    "color": "7A0603",
+    "text_color": "FFFFFF"
+   },
+   "trip_short_name": "199022 1483",
+   "headsign": "Praha,Zahradní Město",
+   "traits": {
+    "low_floor": null,
+    "air_conditioning": false,
+    "wheelchair_accessible": true,
+    "manufacturer": null,
+    "model": "Pragoimex T3R.PLF",
+    "operator": "DP PRAHA",
+    "licence_plate": null,
+    "fleet_number": "8299"
+   },
+   "sources": [
+    "pid"
+   ],
+   "distance_m": 317,
+   "delay_min": 0,
+   "punctuality": "on_time"
+  },
+  {
+   "vehicle_id": "pid:0:9340",
+   "feed": "jdf",
+   "source": "pid",
+   "state": "running",
+   "last_seen": "2026-11-20T23:46:48+01:00",
+   "position_at": "2026-11-20T23:46:48+01:00",
+   "latitude": 50.075650013484626,
+   "longitude": 14.423270000608218,
+   "bearing": 271.65807022098465,
+   "trip_id": "jdf:trip:199022:261113:1460:overlay:f62a30607e8c",
+   "service_date": "2026-11-20",
+   "line": {
+    "route_id": "jdf:route:199022",
+    "short_name": "22",
+    "long_name": "Bílá Hora - Vypich - Zahradní Město - Nádraží Hostivař",
+    "mode": "tram",
+    "color": "7A0603",
+    "text_color": "FFFFFF"
+   },
+   "trip_short_name": "199022 1460",
+   "headsign": "Praha,Vypich",
+   "traits": {
+    "low_floor": null,
+    "air_conditioning": true,
+    "wheelchair_accessible": true,
+    "manufacturer": null,
+    "model": "Škoda 15T4",
+    "operator": "DP PRAHA",
+    "licence_plate": null,
+    "fleet_number": "9340"
+   },
+   "sources": [
+    "pid"
+   ],
+   "distance_m": 537,
+   "delay_min": 0,
+   "punctuality": "on_time"
+  },
+  {
+   "vehicle_id": "pid:0:9303",
+   "feed": "jdf",
+   "source": "pid",
+   "state": "running",
+   "last_seen": "2026-11-20T23:46:24+01:00",
+   "position_at": "2026-11-20T23:46:24+01:00",
+   "latitude": 50.08122467944808,
+   "longitude": 14.406030341217384,
+   "bearing": 267.64339420672957,
+   "trip_id": "jdf:trip:199022:261113:1458:overlay:4eceb60d4c2c",
+   "service_date": "2026-11-20",
+   "line": {
+    "route_id": "jdf:route:199022",
+    "short_name": "22",
+    "long_name": "Bílá Hora - Vypich - Zahradní Město - Nádraží Hostivař",
+    "mode": "tram",
+    "color": "7A0603",
+    "text_color": "FFFFFF"
+   },
+   "trip_short_name": "199022 1458",
+   "headsign": "Praha,Bílá Hora",
+   "traits": {
+    "low_floor": null,
+    "air_conditioning": false,
+    "wheelchair_accessible": true,
+    "manufacturer": null,
+    "model": "Škoda 15T3",
+    "operator": "DP PRAHA",
+    "licence_plate": null,
+    "fleet_number": "9303"
+   },
+   "sources": [
+    "pid"
+   ],
+   "distance_m": 1009,
+   "delay_min": 3,
+   "punctuality": "late"
+  },
+  {
+   "vehicle_id": "pid:0:8777",
+   "feed": "jdf",
+   "source": "pid",
+   "state": "running",
+   "last_seen": "2026-11-20T23:45:45+01:00",
+   "position_at": "2026-11-20T23:45:45+01:00",
+   "latitude": 50.0942081,
+   "longitude": 14.4095093,
+   "bearing": 190.15905629771368,
+   "trip_id": "jdf:trip:199022:261113:1489:overlay:373cdd0a7e16",
+   "service_date": "2026-11-20",
+   "line": {
+    "route_id": "jdf:route:199022",
+    "short_name": "22",
+    "long_name": "Bílá Hora - Vypich - Zahradní Město - Nádraží Hostivař",
+    "mode": "tram",
+    "color": "7A0603",
+    "text_color": "FFFFFF"
+   },
+   "trip_short_name": "199022 1489",
+   "headsign": "Praha,Nádraží Hostivař",
+   "traits": {
+    "low_floor": null,
+    "air_conditioning": false,
+    "wheelchair_accessible": true,
+    "manufacturer": null,
+    "model": "Pragoimex T3R.PLF",
+    "operator": "DP PRAHA",
+    "licence_plate": null,
+    "fleet_number": "8777"
+   },
+   "sources": [
+    "pid"
+   ],
+   "distance_m": 1750,
+   "delay_min": 1,
+   "punctuality": "on_time"
+  },
+  {
+   "vehicle_id": "pid:0:8789",
+   "feed": "jdf",
+   "source": "pid",
+   "state": "running",
+   "last_seen": "2026-11-20T23:46:49+01:00",
+   "position_at": "2026-11-20T23:46:49+01:00",
+   "latitude": 50.07189366123302,
+   "longitude": 14.45083341076219,
+   "bearing": 123.71074221029912,
+   "trip_id": "jdf:trip:199022:261113:1481:overlay:60f1e5072a92",
+   "service_date": "2026-11-20",
+   "line": {
+    "route_id": "jdf:route:199022",
+    "short_name": "22",
+    "long_name": "Bílá Hora - Vypich - Zahradní Město - Nádraží Hostivař",
+    "mode": "tram",
+    "color": "7A0603",
+    "text_color": "FFFFFF"
+   },
+   "trip_short_name": "199022 1481",
+   "headsign": "Praha,Nádraží Hostivař",
+   "traits": {
+    "low_floor": null,
+    "air_conditioning": false,
+    "wheelchair_accessible": true,
+    "manufacturer": null,
+    "model": "Pragoimex T3R.PLF",
+    "operator": "DP PRAHA",
+    "licence_plate": null,
+    "fleet_number": "8789"
+   },
+   "sources": [
+    "pid"
+   ],
+   "distance_m": 2384,
+   "delay_min": 1,
+   "punctuality": "on_time"
+  },
+  {
+   "vehicle_id": "pid:0:9280",
+   "feed": "jdf",
+   "source": "pid",
+   "state": "running",
+   "last_seen": "2026-11-20T23:46:17+01:00",
+   "position_at": "2026-11-20T23:46:17+01:00",
+   "latitude": 50.08719663429884,
+   "longitude": 14.388140503415324,
+   "bearing": 27.644791526462736,
+   "trip_id": "overlay:pid-gtfs:trip:90d92f90968ff8e43dd6",
+   "service_date": "2026-11-20",
+   "line": {
+    "route_id": "jdf:route:199022",
+    "short_name": "22",
+    "long_name": "Bílá Hora - Vypich - Zahradní Město - Nádraží Hostivař",
+    "mode": "tram",
+    "color": "7A0603",
+    "text_color": "FFFFFF"
+   },
+   "trip_short_name": null,
+   "headsign": "Praha,Vozovna Vokovice",
+   "traits": {
+    "low_floor": null,
+    "air_conditioning": false,
+    "wheelchair_accessible": true,
+    "manufacturer": null,
+    "model": "Škoda 15T3",
+    "operator": "DP PRAHA",
+    "licence_plate": null,
+    "fleet_number": "9280"
+   },
+   "sources": [
+    "pid"
+   ],
+   "distance_m": 2417,
+   "delay_min": -1,
+   "punctuality": "on_time"
+  }
+ ]
+}

@@ -137,6 +137,21 @@ class TripRepositoryTest {
         }
 
     @Test
+    fun `a trip opened once opens whole again, without asking Oběhy twice`() =
+        runTest {
+            settings.setMode(AppMode.Obehy)
+            val request = TripRequest("m", "b", "c")
+            load("b", "c")
+            val askedOnce = asked.size
+
+            // Kept with its details: it shows whole at once, and they aren't asked for again.
+            val again = repository.fetchedAhead(request)
+            assertTrue(again?.info != null)
+            assertEquals(again, repository.withDetails(again!!, request))
+            assertEquals(askedOnce, asked.size)
+        }
+
+    @Test
     fun `when Oběhy fails the trip still shows`() =
         runTest {
             settings.setMode(AppMode.Obehy)

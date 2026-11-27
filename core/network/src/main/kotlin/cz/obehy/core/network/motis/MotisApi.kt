@@ -6,6 +6,7 @@ import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import java.time.Instant
+import java.time.temporal.ChronoUnit
 
 /**
  * A MOTIS instance: Transitous, motis.obehy.cz or the user's own. [baseUrl] is read for every
@@ -42,6 +43,49 @@ class MotisApi(
             .get("${baseUrl()}api/v1/map/stops") {
                 parameter("min", min)
                 parameter("max", max)
+            }.body()
+
+    /**
+     * Every trip stretch in the box from [min] to [max] (both `lat,lon`) under way between [start]
+     * and [end] (railviz). MOTIS picks what [zoom] shows: long-distance only when zoomed out. Servers
+     * without railviz answer an error.
+     */
+    suspend fun mapTrips(
+        min: String,
+        max: String,
+        zoom: Int,
+        start: Instant,
+        end: Instant,
+    ): List<MotisMapTrip> =
+        client
+            .get("${baseUrl()}api/v1/map/trips") {
+                parameter("min", min)
+                parameter("max", max)
+                parameter("zoom", zoom)
+                // Whole seconds: given a fraction, MOTIS answers with no trips at all.
+                parameter("startTime", start.truncatedTo(ChronoUnit.SECONDS).toString())
+                parameter("endTime", end.truncatedTo(ChronoUnit.SECONDS).toString())
+                parameter("precision", RAILVIZ_PRECISION)
+            }.body()
+
+    /**
+     * The next [n] departures from [stopId] (a stop or a station), or with [arriveBy] arrivals at
+     * it, with realtime; from [pageCursor] on (a previous answer's `nextPageCursor`).
+     */
+    suspend fun stopTimes(
+        stopId: String,
+        n: Int,
+        language: String? = null,
+        arriveBy: Boolean = false,
+        pageCursor: String? = null,
+    ): MotisStopTimes =
+        client
+            .get("${baseUrl()}api/v6/stoptimes") {
+                parameter("stopId", stopId)
+                parameter("n", n)
+                if (arriveBy) parameter("arriveBy", true)
+                pageCursor?.let { parameter("pageCursor", it) }
+                language?.let { parameter("language", it) }
             }.body()
 
     /** Where the server's coverage is, and what it is. */
